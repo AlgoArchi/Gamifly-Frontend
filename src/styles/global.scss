@@ -1,0 +1,25 @@
+// 单行文本溢出
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// 清浮动
+.clearfix {
+  *zoom: 1;
+
+  &::before,
+  &::after {
+    display: table;
+    clear: both;
+    content: " ";
+  }
+
+  &::after {
+    display: block;
+    height: 1px;
+    margin-top: -1px;
+    visibility: hidden;
+  }
+}
