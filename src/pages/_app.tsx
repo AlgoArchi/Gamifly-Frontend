@@ -10,7 +10,7 @@ import { getI18nSSRProps, GetI18nStaticProps } from "@/utils/i18n";
 import theme from "@/theme";
 import "@/styles/global.scss";
 import "react-toastify/dist/ReactToastify.css";
-import Header from "@/components/Header";
+import Layout from "@/components/Layout";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -46,9 +46,10 @@ function App({ Component, pageProps }: AppProps) {
         />
       </Head>
       <ChakraProvider resetCSS theme={theme}>
-        <Header />
-        {/* @ts-ignore */}
-        <Component {...(pageProps ?? {})} />
+        <Layout>
+          {/* @ts-ignore */}
+          <Component {...(pageProps ?? {})} />
+        </Layout>
         <ToastContainer />
       </ChakraProvider>
     </>

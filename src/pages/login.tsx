@@ -5,7 +5,7 @@ import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 function App() {
   return (
     <Box w="full" margin=" 0 auto">
-      Landing page
+      login
     </Box>
   );
 }
