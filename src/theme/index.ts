@@ -18,8 +18,10 @@ const colors = {
   ...baseTheme.colors,
   white: {
     "100": "#FFFFFF",
-    "200": "rgba(255, 255, 255, 0.45)",
-    "300": "rgba(255, 255, 255, 0.13)",
+    "200": "rgba(255, 255, 255, 0.13)",
+    "300": "rgba(255, 255, 255, 0.45)",
+    "400": "rgba(255, 255, 255, 0.07)",
+    "500": "rgba(255, 255, 255, 0.8)",
   },
   black: {
     "100": "#000000",
@@ -30,6 +32,8 @@ const colors = {
     "600": "rgba(0, 0, 0, 0.55)",
     "700": "rgba(0, 0, 0, 0.75)",
     "800": "rgba(0, 0, 0, 0.9)",
+    "900": "#181D42",
+    "1000": "#202449",
   },
   blue: {
     "100": "#3D50FF",
@@ -93,7 +97,7 @@ const theme = extendTheme({
   config,
   colors,
   fonts: {
-    body: '"Bai Jamjuree Regular", "SF Pro Display", "PingFang SC", "Source Han Sans CN", "Microsoft Yahei"',
+    body: "'Orbitron','Nunito','sans-serif'",
   },
   sizes: {
     xl: "1080px",

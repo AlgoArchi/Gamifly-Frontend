@@ -1,0 +1,18 @@
+.leftMenuButton:hover {
+  background-color: #5ec6b8;
+  transition: all 0.3s ease-in-out;
+  img {
+    filter: brightness(0) invert(1);
+  }
+  p {
+    color: #fff;
+  }
+}
+.notificationIcon:hover {
+  img {
+    filter: brightness(0) invert(1);
+  }
+  div {
+    background-color: #fff;
+  }
+}

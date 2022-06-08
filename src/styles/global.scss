@@ -5,6 +5,92 @@
   text-overflow: ellipsis;
 }
 
+// 字体导入
+@font-face {
+  font-weight: 400;
+  font-family: "Orbitron";
+  font-style: normal;
+  src: url("../../public/fonts/Orbitron-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 500;
+  font-family: "Orbitron";
+  font-style: normal;
+  src: url("../../public/fonts/Orbitron-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 600;
+  font-family: "Orbitron";
+  font-style: normal;
+  src: url("../../public/fonts/Orbitron-SemiBold.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 700;
+  font-family: "Orbitron";
+  font-style: normal;
+  src: url("../../public/fonts/Orbitron-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 800;
+  font-family: "Orbitron";
+  font-style: normal;
+  src: url("../../public/fonts/Orbitron-ExtraBold.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 900;
+  font-family: "Orbitron";
+  font-style: normal;
+  src: url("../../public/fonts/Orbitron-Black.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 200;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-ExtraLight.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 300;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-Light.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 400;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 500;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-Medium.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 600;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-SemiBold.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 700;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-Bold.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 800;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-ExtraBold.ttf") format("truetype");
+}
+@font-face {
+  font-weight: 900;
+  font-family: "Nunito";
+  font-style: normal;
+  src: url("../../public/fonts/Nunito-Black.ttf") format("truetype");
+}
+
 // 清浮动
 .clearfix {
   *zoom: 1;
