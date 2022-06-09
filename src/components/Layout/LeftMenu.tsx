@@ -9,9 +9,11 @@ import gamiflyInfo from "@/assets/imgs/gamiflyInfo.webp";
 import purchase from "@/assets/imgs/purchase.webp";
 import transfer from "@/assets/imgs/transfer.webp";
 import invite from "@/assets/imgs/invite.webp";
+import px2vw from "@/utils/px2vw";
+import notificationIcon from "@/assets/imgs/notificationIcon.webp";
 import styles from "./style.module.scss";
 
-interface pageItem {
+export interface pageItem {
   name: string;
   icon: string;
   path: string;
@@ -23,49 +25,161 @@ interface buttonItem {
   click?: () => void;
 }
 
+// 页面数组
+export const pageList: pageItem[] = [
+  {
+    name: "Games",
+    path: "/games",
+    icon: gamesIcon,
+  },
+  {
+    name: "Tournaments",
+    path: "/tournaments",
+    icon: tournaments,
+  },
+  {
+    name: "Leader boards",
+    path: "/leaderBoards",
+    icon: leaderboard,
+  },
+  {
+    name: "Notifications",
+    path: "/notifications",
+    icon: notificationIcon,
+  },
+  {
+    name: "Gamifly info",
+    path: "/gamiflyInfo",
+    icon: gamiflyInfo,
+  },
+  {
+    name: "Make a Purchase",
+    path: "/purchase",
+    icon: purchase,
+  },
+  {
+    name: "Make a Transfer",
+    path: "/transfer",
+    icon: transfer,
+  },
+];
+// 按钮数组
+const buttonList: buttonItem[] = [
+  {
+    name: "Invite friend",
+    icon: invite,
+    click: () => alert("Invite"),
+  },
+];
+
+// 页面列表
+export const PageArr = React.memo(
+  ({ router, click }: { router: any; click?: () => void }) => (
+    <Flex flexDir="column">
+      {pageList.map((item: pageItem, index: number) => {
+        return (
+          <Flex
+            key={index}
+            display={{
+              base: "flex",
+              lg: item.path !== "/notifications" ? "flex" : "none",
+            }}
+            justifyContent="flex-start"
+            w="full"
+            h={{ base: px2vw(63), lg: "73px" }}
+            pl="30px"
+            color="green.100"
+            cursor="pointer"
+            pos="relative"
+            bgColor={
+              router.pathname === item.path ? "green.400" : "transparent"
+            }
+            opacity={router.pathname === item.path ? "1" : "0.5"}
+            _hover={{
+              bgColor: "green.400",
+              color: "green.100",
+              opacity: "1",
+            }}
+            _after={{
+              display: router.pathname === item.path ? "block" : "none",
+              content: "''",
+              pos: "absolute",
+              right: 0,
+              top: 0,
+              w: "3px",
+              h: "full",
+              bgColor: "green.100",
+              borderRadius: "5px",
+              boxShadow: "-2px 0px 12px #5ec6b8",
+            }}
+            onClick={() => {
+              router.push(item?.path);
+              click?.();
+            }}
+          >
+            {/* 图标 */}
+            <Flex justifyContent="center" w="27px" h="27px" mr="15px" my="auto">
+              <Image src={item.icon} />
+            </Flex>
+            {/* 名称 */}
+            <Text
+              fontSize="14px"
+              lineHeight="27px"
+              fontFamily="Orbitron"
+              fontWeight="600"
+              my="auto"
+            >
+              {item.name}
+            </Text>
+          </Flex>
+        );
+      })}
+    </Flex>
+  )
+);
+
+// 按钮列表
+export const ButtonArr = React.memo(({ click }: { click?: () => void }) => (
+  <Flex flexDir="column">
+    {buttonList.map((item: buttonItem, index: number) => {
+      return (
+        <Flex
+          key={index}
+          className={styles.leftMenuButton}
+          justifyContent="center"
+          w="213px"
+          h={{ base: px2vw(62), lg: "62px" }}
+          bgColor="green.300"
+          color="green.100"
+          mx="auto"
+          cursor="pointer"
+          onClick={() => {
+            item?.click?.();
+            click?.();
+          }}
+        >
+          {/* icon */}
+          <Flex justifyContent="center" w="27px" h="27px" mr="10px" my="auto">
+            <Image src={item.icon} />
+          </Flex>
+          {/* name */}
+          <Text
+            fontSize="14px"
+            lineHeight="27px"
+            fontFamily="Orbitron"
+            fontWeight="600"
+            my="auto"
+          >
+            {item.name}
+          </Text>
+        </Flex>
+      );
+    })}
+  </Flex>
+));
+
 function Index() {
   const router = useRouter();
-  // 页面数组
-  const pageList: pageItem[] = [
-    {
-      name: "Games",
-      path: "/games",
-      icon: gamesIcon,
-    },
-    {
-      name: "Tournaments",
-      path: "/tournaments",
-      icon: tournaments,
-    },
-    {
-      name: "Leader boards",
-      path: "/leaderBoards",
-      icon: leaderboard,
-    },
-    {
-      name: "Gamifly info",
-      path: "/gamiflyInfo",
-      icon: gamiflyInfo,
-    },
-    {
-      name: "Make a Purchase",
-      path: "/purchase",
-      icon: purchase,
-    },
-    {
-      name: "Make a Transfer",
-      path: "/transfer",
-      icon: transfer,
-    },
-  ];
-  // 按钮数组
-  const buttonList: buttonItem[] = [
-    {
-      name: "Invite friend",
-      icon: invite,
-      click: () => alert("Invite"),
-    },
-  ];
   return (
     <Flex
       flexDirection="column"
@@ -97,106 +211,10 @@ function Index() {
           </Text>
         </Flex>
         {/* pages */}
-        <Flex flexDir="column">
-          {pageList.map((item: pageItem, index: number) => {
-            return (
-              <Flex
-                key={index}
-                justifyContent="flex-start"
-                w="full"
-                h="73px"
-                pl="30px"
-                color="green.100"
-                cursor="pointer"
-                pos="relative"
-                bgColor={
-                  router.pathname === item.path ? "green.400" : "transparent"
-                }
-                opacity={router.pathname === item.path ? "1" : "0.5"}
-                _hover={{
-                  bgColor: "green.400",
-                  color: "green.100",
-                  opacity: "1",
-                }}
-                _after={{
-                  display: router.pathname === item.path ? "block" : "none",
-                  content: "''",
-                  pos: "absolute",
-                  right: 0,
-                  top: 0,
-                  w: "3px",
-                  h: "full",
-                  bgColor: "green.100",
-                  borderRadius: "5px",
-                  boxShadow: "-2px 0px 12px #5ec6b8",
-                }}
-                onClick={() => router.push(item?.path)}
-              >
-                {/* 图标 */}
-                <Flex
-                  justifyContent="center"
-                  w="27px"
-                  h="27px"
-                  mr="15px"
-                  my="auto"
-                >
-                  <Image src={item.icon} />
-                </Flex>
-                {/* 名称 */}
-                <Text
-                  fontSize="14px"
-                  lineHeight="27px"
-                  fontFamily="Orbitron"
-                  fontWeight="600"
-                  my="auto"
-                >
-                  {item.name}
-                </Text>
-              </Flex>
-            );
-          })}
-        </Flex>
+        <PageArr router={router} />
       </Flex>
       {/* button */}
-      <Flex flexDir="column">
-        {buttonList.map((item: buttonItem, index: number) => {
-          return (
-            <Flex
-              key={index}
-              className={styles.leftMenuButton}
-              justifyContent="center"
-              w="213px"
-              h="62px"
-              bgColor="green.300"
-              color="green.100"
-              mx="auto"
-              cursor="pointer"
-              onClick={() => item?.click?.()}
-            >
-              {/* icon */}
-              <Flex
-                justifyContent="center"
-                w="27px"
-                h="27px"
-                mr="10px"
-                my="auto"
-              >
-                <Image src={item.icon} />
-              </Flex>
-              {/* name */}
-              <Text
-                fontSize="14px"
-                lineHeight="27px"
-                fontFamily="Orbitron"
-                fontWeight="600"
-                my="auto"
-              >
-                {item.name}
-              </Text>
-            </Flex>
-          );
-        })}
-      </Flex>
+      <ButtonArr />
     </Flex>
   );
 }

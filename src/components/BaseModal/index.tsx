@@ -27,6 +27,7 @@ function Index({
       top="0"
       left="0"
       justifyContent="center"
+      zIndex={2}
       display={isShow ? "flex" : "none"}
       bgColor={withOutOverlay ? "transparent" : "black.500"}
       onClick={() => close?.()}

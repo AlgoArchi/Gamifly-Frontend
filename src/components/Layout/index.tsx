@@ -1,20 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/router";
-import {
-  Container,
-  Flex,
-  HStack,
-  useBoolean,
-  Image,
-  Box,
-  Text,
-} from "@chakra-ui/react";
+import { Container, Flex } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
-import notificationIcon from "@/assets/imgs/notificationIcon.webp";
 import LeftMenu from "./LeftMenu";
-import BaseButton from "../BaseButton";
-import styles from "./style.module.scss";
-import BaseModal from "../BaseModal";
+import Header from "./Header";
+import HeaderMobile from "./HeaderMobile";
 
 export interface LayoutProps {
   children: any;
@@ -23,9 +13,7 @@ export interface LayoutProps {
 function Index({ children }: LayoutProps) {
   const router = useRouter();
   const loginRouter = router?.pathname !== "/" && router?.pathname !== "/login";
-  const [logOut, setLogOut] = useBoolean(false); // 是否登陆
-  const [isLogin, setIsLogin] = useBoolean(false); // 是否登陆
-  const [notification] = useState(1); // 未读消息数量
+
   return (
     <Flex
       w="full"
@@ -86,152 +74,22 @@ function Index({ children }: LayoutProps) {
       >
         {/* 顶部Header */}
         {loginRouter && (
-          <Flex
-            justifyContent="flex-end"
-            w="full"
-            h={{ base: px2vw(40), lg: "72px" }}
-          >
-            {isLogin ? (
-              <HStack spacing="20px">
-                <BaseButton
-                  w="133px"
-                  h="52px"
-                  bgColor="transparent"
-                  border="2px solid"
-                  borderColor="blue.100"
-                  boxShadow="none"
-                  fontFamily="Nunito"
-                  fontSize="16px"
-                  fontWeight="600"
-                  color="blue.100"
-                >
-                  Earn Rewards
-                </BaseButton>
-                <BaseButton
-                  className={styles.notificationIcon}
-                  w="64px"
-                  h="52px"
-                  border="2px solid"
-                  borderColor="green.100"
-                  bgColor="transparent"
-                  boxShadow="none"
-                  pos="relative"
-                  _hover={{
-                    bgColor: "green.100",
-                    boxShadow: "0px 2px 50px #5EC6B8",
-                  }}
-                  _active={{
-                    bgColor: "green.100",
-                    boxShadow: "0px 2px 26px #5EC6B8",
-                  }}
-                >
-                  <Image src={notificationIcon} />
-                  {notification > 0 && (
-                    <Box
-                      w="10px"
-                      h="10px"
-                      borderRadius="50%"
-                      bgColor="green.100"
-                      pos="absolute"
-                      top="12px"
-                      right="19px"
-                    />
-                  )}
-                </BaseButton>
-                <BaseButton
-                  w="133px"
-                  h="52px"
-                  bgColor="transparent"
-                  border="2px solid"
-                  borderColor="blue.100"
-                  boxShadow="none"
-                  fontFamily="Nunito"
-                  fontSize="16px"
-                  fontWeight="600"
-                  color="blue.100"
-                  onClick={() => setLogOut.on()}
-                >
-                  Log Out
-                </BaseButton>
-              </HStack>
-            ) : (
-              <HStack>
-                <BaseButton
-                  w="133px"
-                  h="52px"
-                  bgColor="transparent"
-                  border="2px solid"
-                  borderColor="blue.100"
-                  boxShadow="none"
-                  fontFamily="Nunito"
-                  fontSize="16px"
-                  fontWeight="600"
-                  color="blue.100"
-                  onClick={() => setIsLogin.on()}
-                >
-                  Log In
-                </BaseButton>
-              </HStack>
-            )}
-          </Flex>
+          <>
+            <Header />
+            <HeaderMobile />
+          </>
         )}
         {/* 页面 */}
         {loginRouter ? (
-          <Flex pt={{ base: px2vw(18), lg: "20px" }} h="calc(100vh - 72px)">
+          <Flex
+            pt={{ base: px2vw(30), lg: "20px" }}
+            h={{ base: `calc(100vh - ${px2vw(55)})`, lg: "calc(100vh - 72px)" }}
+          >
             {children}
           </Flex>
         ) : (
           children
         )}
-        {/* log out */}
-        <BaseModal
-          isShow={logOut}
-          close={() => setLogOut.off()}
-          w={{ base: px2vw(336), lg: "336px" }}
-          h={{ base: px2vw(180), lg: "180px" }}
-          mt={{ base: "0", lg: "200px" }}
-          px="0"
-        >
-          <Flex flexDir="column">
-            <Text
-              fontFamily="Orbitron"
-              fontWeight="600"
-              textAlign="center"
-              color="white.100"
-              fontSize={{ base: px2vw(22), lg: "22px" }}
-              mb={{ base: px2vw(30), lg: "30px" }}
-            >
-              Log out?
-            </Text>
-            <Flex justifyContent="space-between">
-              <BaseButton
-                w={{ base: px2vw(130), lg: "130px" }}
-                fontFamily="Nunito"
-                fontSize="16px"
-                fontWeight="600"
-                onClick={() => setLogOut.off()}
-              >
-                Cancel
-              </BaseButton>
-              <BaseButton
-                w={{ base: px2vw(130), lg: "130px" }}
-                fontFamily="Nunito"
-                fontSize="16px"
-                fontWeight="600"
-                bgColor="transparent"
-                border="2px solid"
-                borderColor="blue.100"
-                color="blue.100"
-                onClick={() => {
-                  setIsLogin.off();
-                  setLogOut.off();
-                }}
-              >
-                Log out
-              </BaseButton>
-            </Flex>
-          </Flex>
-        </BaseModal>
       </Flex>
     </Flex>
   );
