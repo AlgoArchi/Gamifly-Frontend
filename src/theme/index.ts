@@ -4,13 +4,14 @@ import { createBreakpoints } from "@chakra-ui/theme-tools";
 import styles from "./styles";
 import borders from "./foundations/borders";
 import components from "./components";
+import px2vw from "../utils/px2vw";
 
 const config: ThemeConfig = {};
 
 const breakpoints = createBreakpoints({
   sm: "640px",
   md: "768px",
-  lg: "1080px",
+  lg: "1440px",
   xl: "1920px",
 });
 
@@ -22,6 +23,7 @@ const colors = {
     "300": "rgba(255, 255, 255, 0.45)",
     "400": "rgba(255, 255, 255, 0.07)",
     "500": "rgba(255, 255, 255, 0.8)",
+    "600": "rgba(255, 255, 255, 0.85)",
   },
   black: {
     "100": "#000000",
@@ -44,50 +46,111 @@ const colors = {
     "200": "rgba(94, 198, 184, 0.6)",
     "300": "rgba(94, 198, 184, 0.15)",
     "400": "rgba(94, 198, 184, 0.05)",
+    "500": "rgba(94, 198, 184, 0.11)",
   },
   yellow: { "200": "#EDAB06" },
 };
 
 const textStyles = {
   "12": {
-    fontSize: 12,
-    fontWeight: "bold",
-    lineHeight: 1,
+    fontSize: {
+      base: px2vw(12),
+      lg: "12px",
+    },
+    lineHeight: {
+      base: px2vw(12),
+      lg: "12px",
+    },
   },
   "14": {
-    fontSize: 14,
-    fontWeight: "bold",
-    lineHeight: 1,
+    fontSize: {
+      base: px2vw(14),
+      lg: "14px",
+    },
+    lineHeight: {
+      base: px2vw(14),
+      lg: "14px",
+    },
   },
   "16": {
-    fontSize: 16,
-    fontWeight: "bold",
-    lineHeight: 1,
+    fontSize: {
+      base: px2vw(16),
+      lg: "16px",
+    },
+    lineHeight: {
+      base: px2vw(16),
+      lg: "16px",
+    },
   },
   "18": {
-    fontSize: 18,
-    fontWeight: "bold",
-    lineHeight: 1,
+    fontSize: {
+      base: px2vw(18),
+      lg: "18px",
+    },
+    lineHeight: {
+      base: px2vw(18),
+      lg: "18px",
+    },
+  },
+  "20": {
+    fontSize: {
+      base: px2vw(20),
+      lg: "20px",
+    },
+    lineHeight: {
+      base: px2vw(20),
+      lg: "20px",
+    },
+  },
+  "22": {
+    fontSize: {
+      base: px2vw(22),
+      lg: "22px",
+    },
+    lineHeight: {
+      base: px2vw(22),
+      lg: "22px",
+    },
   },
   "24": {
-    fontSize: 24,
-    fontWeight: "bold",
-    lineHeight: 1,
+    fontSize: {
+      base: px2vw(24),
+      lg: "24px",
+    },
+    lineHeight: {
+      base: px2vw(24),
+      lg: "24px",
+    },
+  },
+  "26": {
+    fontSize: {
+      base: px2vw(26),
+      lg: "26px",
+    },
+    lineHeight: {
+      base: px2vw(26),
+      lg: "26px",
+    },
   },
   "30": {
-    fontSize: 30,
-    fontWeight: "bold",
-    lineHeight: 1,
+    fontSize: {
+      base: px2vw(30),
+      lg: "30px",
+    },
+    lineHeight: {
+      base: px2vw(30),
+      lg: "30px",
+    },
   },
-  "48": {
-    fontSize: 48,
-    fontWeight: "bold",
-    lineHeight: 1,
-  },
-  "64": {
-    fontSize: 64,
-    fontWeight: "bold",
-    lineHeight: 1,
+  "36": {
+    fontSize: {
+      base: px2vw(36),
+      lg: "36px",
+    },
+    lineHeight: {
+      base: px2vw(36),
+      lg: "36px",
+    },
   },
 };
 

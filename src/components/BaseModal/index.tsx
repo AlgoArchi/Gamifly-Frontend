@@ -45,16 +45,18 @@ function Index({
         onClick={(e) => e.stopPropagation()}
         {...prop}
       >
-        <Image
-          src={closeIcon}
-          pos="absolute"
-          cursor="pointer"
-          w={{ base: px2vw(18), lg: "18px" }}
-          h={{ base: px2vw(18), lg: "18px" }}
-          top={{ base: px2vw(20), lg: "20px" }}
-          right={{ base: px2vw(20), lg: "20px" }}
-          onClick={() => close?.()}
-        />
+        {!withOutClose && (
+          <Image
+            src={closeIcon}
+            pos="absolute"
+            cursor="pointer"
+            w={{ base: px2vw(18), lg: "18px" }}
+            h={{ base: px2vw(18), lg: "18px" }}
+            top={{ base: px2vw(20), lg: "20px" }}
+            right={{ base: px2vw(20), lg: "20px" }}
+            onClick={() => close?.()}
+          />
+        )}
         {children}
       </Flex>
     </Flex>

@@ -67,7 +67,7 @@ function Index({ children }: LayoutProps) {
       <Flex
         w={loginRouter ? { base: "full", lg: "calc(100% - 237px)" } : "full"}
         pl={loginRouter ? { base: px2vw(15), lg: "20px" } : 0}
-        pr={loginRouter ? { base: px2vw(15), lg: "40px" } : 0}
+        pr={loginRouter ? { base: px2vw(15), lg: "20px" } : 0}
         flexDirection="column"
         justifyContent="space-start"
         zIndex={1}
@@ -82,8 +82,11 @@ function Index({ children }: LayoutProps) {
         {/* 页面 */}
         {loginRouter ? (
           <Flex
-            pt={{ base: px2vw(30), lg: "20px" }}
-            h={{ base: `calc(100vh - ${px2vw(55)})`, lg: "calc(100vh - 72px)" }}
+            py={{ base: px2vw(30), lg: "20px" }}
+            minH={{
+              base: `calc(100vh - ${px2vw(55)})`,
+              lg: "calc(100vh - 72px)",
+            }}
           >
             {children}
           </Flex>

@@ -2,8 +2,9 @@ export default {
   global: () => {
     return {
       "html, body": {
-        fontSize: "14",
-        color: "blue.100",
+        textStyle: "14",
+        color: "white.100",
+        fontWeight: "400",
         bgColor: "white.200",
       },
 

@@ -186,14 +186,22 @@ function Index() {
       justifyContent="space-between"
       display={{ base: "none", lg: "flex" }}
       w="237px"
-      h="inherit"
+      minH="100vh"
       bgColor="black.300"
       pb="50px"
       zIndex={1}
     >
       <Flex flexDir="column">
         {/* Avatar */}
-        <Flex justifyContent="flex-start" w="full" h="92px" py="25px" pl="30px">
+        <Flex
+          justifyContent="flex-start"
+          w="full"
+          h="92px"
+          py="25px"
+          pl="30px"
+          cursor="pointer"
+          onClick={() => router.push("/profile")}
+        >
           <Image
             src={userProfile}
             w="42px"

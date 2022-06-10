@@ -48,10 +48,16 @@ function Index() {
       >
         {
           pageList.filter((item: pageItem) => item.path === router.pathname)[0]
-            .name
+            ?.name
         }
       </Text>
-      <Image src={userProfile} w={px2vw(40)} h={px2vw(40)} my="auto" />
+      <Image
+        src={userProfile}
+        w={px2vw(40)}
+        h={px2vw(40)}
+        my="auto"
+        onClick={() => router.push("/profile")}
+      />
       {/* Drawer */}
       <Drawer isOpen={open} placement="left" onClose={() => setOpen.off()}>
         <DrawerContent bgColor="black.1100" pt={px2vw(60)} pb={px2vw(20)}>

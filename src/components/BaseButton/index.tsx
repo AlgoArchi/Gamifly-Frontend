@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, ButtonProps } from "@chakra-ui/react";
+import px2vw from "@/utils/px2vw";
 
 export interface IProps extends ButtonProps {
   children: any;
@@ -12,8 +13,8 @@ function Index({ children, buttonClick, ...prop }: IProps) {
       bgColor="blue.100"
       color="white.100"
       textStyle="16"
-      w={{ base: "", lg: "195px" }}
-      h={{ base: "", lg: "52px" }}
+      w={{ base: px2vw(195), lg: "195px" }}
+      h={{ base: px2vw(52), lg: "52px" }}
       onClick={() => buttonClick && buttonClick()}
       _hover={{
         bgColor: "blue.100",
