@@ -1,25 +1,39 @@
 import React from "react";
-import { Text, Flex, Image, FlexProps } from "@chakra-ui/react";
+import { Text, Flex, Image, FlexProps, Box } from "@chakra-ui/react";
+import { CheckIcon } from "@chakra-ui/icons";
 import px2vw from "@/utils/px2vw";
 import { useRouter } from "next/router";
+import BaseCheck from "../BaseCheck";
 
 export interface NFTItemProp {
   img: string;
+  id?: string | number;
   name?: string;
   price?: string;
   unit?: string;
   unitIcon?: string;
   description?: string;
+  isActive?: boolean;
 }
 
 export interface IProps extends FlexProps {
   index: number;
   item: NFTItemProp;
   isSimple?: boolean;
+  multiple?: boolean;
   itemClick?: (obj: NFTItemProp) => void;
+  activeClick?: (index: number, obj: NFTItemProp) => void;
 }
 
-function Index({ index, item, isSimple, itemClick, ...prop }: IProps) {
+function Index({
+  index,
+  item,
+  isSimple,
+  multiple,
+  itemClick,
+  activeClick,
+  ...prop
+}: IProps) {
   const router = useRouter();
   return (
     <Flex
@@ -39,6 +53,21 @@ function Index({ index, item, isSimple, itemClick, ...prop }: IProps) {
       }}
       {...prop}
     >
+      {multiple && (
+        <BaseCheck
+          pos="absolute"
+          w={{ base: px2vw(26), lg: "26px" }}
+          h={{ base: px2vw(26), lg: "26px" }}
+          mr={{ base: px2vw(20), lg: "20px" }}
+          top={{ base: px2vw(15), lg: "15px" }}
+          left={{ base: px2vw(15), lg: "15px" }}
+          isActive={item?.isActive as boolean}
+          onClick={(e) => {
+            e.stopPropagation();
+            activeClick?.(index, item);
+          }}
+        />
+      )}
       {item?.name && (
         <Text
           fontFamily="Nunito"
@@ -71,26 +100,28 @@ function Index({ index, item, isSimple, itemClick, ...prop }: IProps) {
           </Text>
         )}
       </Flex>
-      {index === 7 && router.pathname !== "/myNft" && (
-        <Flex
-          alignItems="center"
-          justifyContent="center"
-          pos="absolute"
-          left="0"
-          top="0"
-          w="100%"
-          h="100%"
-          bgColor="black.600"
-          fontFamily="Nunito"
-          fontWeight="700"
-          textStyle="18"
-          color="white.100"
-          cursor="pointer"
-          onClick={() => router.push("/myNft")}
-        >
-          View all
-        </Flex>
-      )}
+      {index === 7 &&
+        router.pathname !== "/myNft" &&
+        router.pathname !== "/purchase" && (
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            pos="absolute"
+            left="0"
+            top="0"
+            w="100%"
+            h="100%"
+            bgColor="black.600"
+            fontFamily="Nunito"
+            fontWeight="700"
+            textStyle="18"
+            color="white.100"
+            cursor="pointer"
+            onClick={() => router.push("/myNft")}
+          >
+            View all
+          </Flex>
+        )}
     </Flex>
   );
 }
