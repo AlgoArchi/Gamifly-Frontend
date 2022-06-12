@@ -1,10 +1,8 @@
 import React from "react";
 import { Flex, Box, Text, Image } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
-import closeIcon from "@/assets/imgs/greenClose.webp";
 import messageIcon from "@/assets/imgs/messageIcon.png";
 import { gameItem } from "@/pages/purchase";
-import NFTItem, { NFTItemProp } from "../NFTItem";
 import PaymentMethod from "../PaymentMethod";
 import GamiflyWallet from "../GamiflyWallet";
 import CryptoWallet from "../CryptoWallet";

@@ -1,12 +1,19 @@
-import React from "react";
-import { Flex, Text, Image } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { Flex, Text, Image, useBoolean } from "@chakra-ui/react";
 import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import px2vw from "@/utils/px2vw";
 import image6 from "@/assets/imgs/image6.webp";
 import image8 from "@/assets/imgs/image8.webp";
 import BaseButton from "@/components/BaseButton";
+import LoadingPage from "@/components/LoadingPage";
 
 function App() {
+  const [loadingShow, setLoadingShow] = useBoolean(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadingShow.off();
+    }, 2000);
+  }, []);
   return (
     <Flex w="full" flexDir="column">
       <Text
@@ -130,6 +137,11 @@ function App() {
           </Flex>
         </Flex>
       </Flex>
+      <LoadingPage
+        progress={48}
+        isShow={loadingShow}
+        setIsShow={() => setLoadingShow.off()}
+      />
     </Flex>
   );
 }
