@@ -3,27 +3,31 @@ import { Flex, Box, Text, Image } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import closeIcon from "@/assets/imgs/greenClose.webp";
 import messageIcon from "@/assets/imgs/messageIcon.png";
+import { gameItem } from "@/pages/purchase";
 import NFTItem, { NFTItemProp } from "../NFTItem";
 import PaymentMethod from "../PaymentMethod";
 import GamiflyWallet from "../GamiflyWallet";
 import CryptoWallet from "../CryptoWallet";
 import BaseButton from "../BaseButton";
+import GameSelect from "../GameSelect";
 
 export interface IProps {
-  nftList: NFTItemProp[];
+  gameList: gameItem[];
+  activeGame: gameItem;
   paymentMethod: number;
   totalPrice: number;
-  setNftList: (list: NFTItemProp[]) => void;
+  setActiveGame: (obj: gameItem) => void;
   setPaymentMethod: (type: number) => void;
   success: () => void;
 }
 
 function Index({
-  nftList,
+  gameList,
+  activeGame,
   totalPrice,
   paymentMethod,
-  setNftList,
   setPaymentMethod,
+  setActiveGame,
   success,
 }: IProps) {
   return (
@@ -40,62 +44,28 @@ function Index({
         w={{ base: "full", lg: "70%" }}
         p={{
           base: 0,
-          lg: "20px 15px 20px 5px",
+          lg: "20px 15px",
         }}
       >
-        {/* NFTs */}
-        <Flex w="full" mb={{ base: px2vw(15), lg: "15px" }} overflowX="auto">
-          {nftList
-            .filter((item) => item.isActive)
-            .map((item: NFTItemProp, index: number) => {
-              return (
-                <Box pos="relative" key={index}>
-                  <NFTItem
-                    isSimple
-                    index={index}
-                    item={item}
-                    w={{ base: px2vw(167), lg: "177px" }}
-                    h={{ base: px2vw(167), lg: "177px" }}
-                    ml={{
-                      base: index === 0 ? 0 : px2vw(10),
-                      lg: "20px",
-                    }}
-                    mt="0"
-                    mb={{ base: px2vw(10), lg: "20px" }}
-                  />
-                  <Image
-                    src={closeIcon}
-                    w={{ base: px2vw(20), lg: "20px" }}
-                    h={{ base: px2vw(20), lg: "20px" }}
-                    pos="absolute"
-                    top={{ base: px2vw(12), lg: "12px" }}
-                    right={{ base: px2vw(12), lg: "12px" }}
-                    cursor="pointer"
-                    onClick={() => {
-                      const list = JSON.parse(JSON.stringify(nftList));
-                      let indNum = -1;
-                      list.map((ite: NFTItemProp, ind: number) => {
-                        if (ite.id === item.id) {
-                          indNum = ind;
-                        }
-                      });
-                      list.fill(
-                        {
-                          ...item,
-                          isActive: !item.isActive,
-                        },
-                        indNum,
-                        indNum + 1
-                      );
-                      setNftList(list);
-                    }}
-                  />
-                </Box>
-              );
-            })}
+        {/* Choose the game */}
+        <Flex flexDir="column" mb={{ base: px2vw(35), lg: "35" }}>
+          <Text
+            mb={{ base: px2vw(15), lg: "15px" }}
+            fontFamily="Orbitron"
+            fontWeight="600"
+            textStyle={{ base: "16", lg: "18" }}
+            color="white.100"
+          >
+            Choose the game
+          </Text>
+          <GameSelect
+            activeOption={activeGame}
+            options={gameList}
+            setActiveOption={(obj: gameItem) => setActiveGame(obj)}
+          />
         </Flex>
         {/* Payment method */}
-        <Box pl={{ base: 0, lg: "15px" }}>
+        <Box>
           <PaymentMethod
             paymentMethod={paymentMethod}
             setPaymentMethod={(type: number) => setPaymentMethod(type)}

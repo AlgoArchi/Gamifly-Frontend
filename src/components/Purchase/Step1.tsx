@@ -30,7 +30,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
           bgColor="black.600"
           cursor="pointer"
           onClick={() => {
-            setChooseType(chooseType === "Credit" ? "" : "Credit");
+            setChooseType("Credit");
           }}
         >
           <BaseCheck
@@ -58,7 +58,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
           bgColor="black.600"
           cursor="pointer"
           onClick={() => {
-            setChooseType(chooseType === "NFT" ? "" : "NFT");
+            setChooseType("NFT");
           }}
         >
           <BaseCheck
@@ -86,18 +86,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
         bottom={px2vw(45)}
         left={px2vw(15)}
         onClick={() => {
-          if (chooseType === "") {
-            toast({
-              title: "Error.",
-              position: "top",
-              description: "Please Choose Purchase type first",
-              status: "error",
-              duration: 3000,
-              isClosable: true,
-            });
-          } else {
-            continueClick();
-          }
+          continueClick();
         }}
       >
         Continue

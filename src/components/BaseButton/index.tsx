@@ -3,7 +3,6 @@ import { Button, ButtonProps } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 
 export interface IProps extends ButtonProps {
-  children: any;
   buttonClick?: () => void;
 }
 

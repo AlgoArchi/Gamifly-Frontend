@@ -4,7 +4,10 @@ import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import px2vw from "@/utils/px2vw";
 import Step1 from "@/components/Purchase/Step1";
 import Step2, { screeningItem } from "@/components/Purchase/Step2";
+import CreditStep2 from "@/components/PurchaseCredit/Step2";
 import { NFTItemProp } from "@/components/NFTItem";
+import image6 from "@/assets/imgs/image6.webp";
+import image8 from "@/assets/imgs/image8.webp";
 import arrows from "@/assets/imgs/arrows.png";
 import NFTIcon from "@/assets/imgs/NFT.png";
 import messageIcon from "@/assets/imgs/messageIcon.png";
@@ -14,17 +17,26 @@ import BaseModal from "@/components/BaseModal";
 import BaseButton from "@/components/BaseButton";
 import { useRouter } from "next/router";
 
+export interface gameItem {
+  id: number | string;
+  img: string;
+  name: string;
+  price: number | string;
+}
+
 function App() {
   const router = useRouter();
   const [showSuccess, setShowSuccess] = useBoolean(false);
   const [step, setStep] = useState(1); // 步骤
-  const [chooseType, setChooseType] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [chooseType, setChooseType] = useState("Credit"); // Credit / NFT
+  const [paymentMethod, setPaymentMethod] = useState(1); // 支付类型
+  const [totalPrice, setTotalPrice] = useState(0); // 总价格
+  // NFT筛选列表
   const [screening, setScreening] = useState<screeningItem | null>({
     id: "all",
     text: "All",
   });
+  // NFT列表
   const [nftList, setNftList] = useState<NFTItemProp[]>([
     {
       id: 1,
@@ -116,6 +128,14 @@ function App() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
     },
   ]);
+  // game列表
+  const [gameList] = useState<gameItem[]>([
+    { id: 1, img: image6, name: "Fishing Expert1", price: 200 },
+    { id: 2, img: image8, name: "Fishing Expert2", price: 300 },
+    { id: 3, img: image6, name: "Fishing Expert3", price: 200 },
+    { id: 4, img: image8, name: "Fishing Expert4", price: 300 },
+  ]);
+  const [activeGame, setActiveGame] = useState<gameItem>(gameList[0]);
 
   useEffect(() => {
     const list = nftList.filter((item: NFTItemProp) => item?.isActive);
@@ -128,7 +148,7 @@ function App() {
     }
   }, [nftList]);
 
-  const content = useMemo(() => {
+  const contentNFT = useMemo(() => {
     if (step === 1) {
       return (
         <Step1
@@ -163,6 +183,32 @@ function App() {
       );
     }
   }, [step, chooseType, screening, nftList, paymentMethod, totalPrice]);
+
+  const contentCredit = useMemo(() => {
+    if (step === 1) {
+      return (
+        <Step1
+          chooseType={chooseType}
+          setChooseType={(type: string) => setChooseType(type)}
+          continueClick={() => setStep(2)}
+        />
+      );
+    } else if (step === 2) {
+      return (
+        <CreditStep2
+          gameList={gameList}
+          activeGame={activeGame}
+          setActiveGame={(obj: gameItem) => setActiveGame(obj)}
+          totalPrice={totalPrice}
+          paymentMethod={paymentMethod}
+          setPaymentMethod={(type: number) => setPaymentMethod(type)}
+          success={() => {
+            setShowSuccess.on();
+          }}
+        />
+      );
+    }
+  }, [step, chooseType, activeGame, paymentMethod, totalPrice]);
 
   return (
     <Flex w="full" flexDir="column">
@@ -205,7 +251,14 @@ function App() {
 
             <Text color="green.100">{step}</Text>
             <Text mx="5px">/</Text>
-            <Text>3. Purchase type</Text>
+            <Text>
+              {chooseType === "NFT" ? 3 : 2}.{" "}
+              {chooseType === "NFT"
+                ? step === 2
+                  ? "Choose NFT"
+                  : "Payment"
+                : "Payment"}
+            </Text>
           </Flex>
           {/* Progress */}
           <Box
@@ -215,7 +268,16 @@ function App() {
             h={{ base: px2vw(4), lg: "4px" }}
             _after={{
               content: "''",
-              w: step === 1 ? "33.33%" : step === 2 ? "66.66%" : "100%",
+              w:
+                chooseType === "NFT"
+                  ? step === 1
+                    ? "33.33%"
+                    : step === 2
+                    ? "66.66%"
+                    : "100%"
+                  : step === 1
+                  ? "50%"
+                  : "100%",
               h: { base: px2vw(4), lg: "4px" },
               bgColor: "green.100",
               pos: "absolute",
@@ -224,7 +286,7 @@ function App() {
             }}
           />
         </Flex>
-        {content}
+        {chooseType === "NFT" ? contentNFT : contentCredit}
       </Flex>
       {/* success */}
       <BaseModal
