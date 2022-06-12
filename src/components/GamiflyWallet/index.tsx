@@ -7,11 +7,19 @@ import BaseButton from "../BaseButton";
 export interface IProps extends FlexProps {
   unit: string;
   price: string | number;
+  buttonText?: string;
   withOutButton?: boolean;
   buyClick?: () => void;
 }
 
-function Index({ unit, price, withOutButton, buyClick, ...prop }: IProps) {
+function Index({
+  unit,
+  price,
+  buttonText,
+  withOutButton,
+  buyClick,
+  ...prop
+}: IProps) {
   return (
     <Flex flexDir="column" {...prop}>
       <Flex w="full" h={{ base: px2vw(57), lg: "57px" }}>
@@ -61,7 +69,7 @@ function Index({ unit, price, withOutButton, buyClick, ...prop }: IProps) {
           textStyle="16"
           onClick={() => buyClick?.()}
         >
-          Buy
+          {buttonText || "Buy"}
         </BaseButton>
       )}
     </Flex>

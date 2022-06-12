@@ -5,10 +5,11 @@ import BaseCheck from "../BaseCheck";
 
 export interface IProps {
   paymentMethod: number;
+  withOutWallet?: boolean;
   setPaymentMethod: (type: number) => void;
 }
 
-function Index({ paymentMethod, setPaymentMethod }: IProps) {
+function Index({ paymentMethod, withOutWallet, setPaymentMethod }: IProps) {
   const MethodItem = React.memo(
     ({
       type,
@@ -62,7 +63,7 @@ function Index({ paymentMethod, setPaymentMethod }: IProps) {
         Payment method
       </Text>
       <Flex flexDir="column">
-        <MethodItem type={1} typeName="Gamifly Wallet" />
+        {!withOutWallet && <MethodItem type={1} typeName="Gamifly Wallet" />}
         <MethodItem type={2} typeName="Credit / debit card" />
         <MethodItem
           type={3}

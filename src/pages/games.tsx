@@ -12,7 +12,7 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       setLoadingShow.off();
-    }, 2000);
+    }, 1000);
   }, []);
   return (
     <Flex w="full" flexDir="column">

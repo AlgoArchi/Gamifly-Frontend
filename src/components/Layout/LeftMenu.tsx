@@ -1,5 +1,5 @@
-import React from "react";
-import { Flex, Image, Text } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Flex, Image, Text, useBoolean } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import userProfile from "@/assets/imgs/userProfile.png";
 import gamesIcon from "@/assets/imgs/games.webp";
@@ -12,6 +12,8 @@ import invite from "@/assets/imgs/invite.webp";
 import px2vw from "@/utils/px2vw";
 import notificationIcon from "@/assets/imgs/notificationIcon.webp";
 import styles from "./style.module.scss";
+import InviteFriend from "../InviteFriend";
+import FriendCode from "../FriendCode";
 
 export interface pageItem {
   name: string;
@@ -19,7 +21,7 @@ export interface pageItem {
   path: string;
 }
 
-interface buttonItem {
+export interface buttonItem {
   name: string;
   icon: string;
   click?: () => void;
@@ -61,14 +63,6 @@ export const pageList: pageItem[] = [
     name: "Make a Transfer",
     path: "/transfer",
     icon: transfer,
-  },
-];
-// 按钮数组
-const buttonList: buttonItem[] = [
-  {
-    name: "Invite friend",
-    icon: invite,
-    click: () => alert("Invite"),
   },
 ];
 
@@ -139,47 +133,67 @@ export const PageArr = React.memo(
 );
 
 // 按钮列表
-export const ButtonArr = React.memo(({ click }: { click?: () => void }) => (
-  <Flex flexDir="column">
-    {buttonList.map((item: buttonItem, index: number) => {
-      return (
-        <Flex
-          key={index}
-          className={styles.leftMenuButton}
-          justifyContent="center"
-          w="213px"
-          h={{ base: px2vw(62), lg: "62px" }}
-          bgColor="green.300"
-          color="green.100"
-          mx="auto"
-          cursor="pointer"
-          onClick={() => {
-            item?.click?.();
-            click?.();
-          }}
-        >
-          {/* icon */}
-          <Flex justifyContent="center" w="27px" h="27px" mr="10px" my="auto">
-            <Image src={item.icon} />
-          </Flex>
-          {/* name */}
-          <Text
-            fontSize="14px"
-            lineHeight="27px"
-            fontFamily="Orbitron"
-            fontWeight="600"
-            my="auto"
+export const ButtonArr = React.memo(
+  ({ click, buttonList }: { click?: () => void; buttonList: buttonItem[] }) => (
+    <Flex flexDir="column">
+      {buttonList.map((item: buttonItem, index: number) => {
+        return (
+          <Flex
+            key={index}
+            className={styles.leftMenuButton}
+            justifyContent="center"
+            w="213px"
+            h={{ base: px2vw(62), lg: "62px" }}
+            bgColor="green.300"
+            color="green.100"
+            mx="auto"
+            cursor="pointer"
+            onClick={() => {
+              item?.click?.();
+              click?.();
+            }}
           >
-            {item.name}
-          </Text>
-        </Flex>
-      );
-    })}
-  </Flex>
-));
+            {/* icon */}
+            <Flex justifyContent="center" w="27px" h="27px" mr="10px" my="auto">
+              <Image src={item.icon} />
+            </Flex>
+            {/* name */}
+            <Text
+              fontSize="14px"
+              lineHeight="27px"
+              fontFamily="Orbitron"
+              fontWeight="600"
+              my="auto"
+            >
+              {item.name}
+            </Text>
+          </Flex>
+        );
+      })}
+    </Flex>
+  )
+);
 
 function Index() {
   const router = useRouter();
+  const [inviteCode] = useState(router.query.inviteCode);
+  const [inviteShow, setInviteShow] = useBoolean(false);
+  const [friendShow, setFriendShow] = useBoolean(false);
+
+  useEffect(() => {
+    if (inviteCode) {
+      setFriendShow.on();
+    }
+  }, [inviteCode]);
+
+  // 按钮数组
+  const buttonList: buttonItem[] = [
+    {
+      name: "Invite friend",
+      icon: invite,
+      click: () => setInviteShow.on(),
+    },
+  ];
   return (
     <Flex
       flexDirection="column"
@@ -189,7 +203,7 @@ function Index() {
       minH="100vh"
       bgColor="black.300"
       pb="50px"
-      zIndex={1}
+      zIndex={2}
     >
       <Flex flexDir="column">
         {/* Avatar */}
@@ -222,7 +236,9 @@ function Index() {
         <PageArr router={router} />
       </Flex>
       {/* button */}
-      <ButtonArr />
+      <ButtonArr buttonList={buttonList} />
+      <InviteFriend isShow={inviteShow} setIsShow={() => setInviteShow.off()} />
+      <FriendCode isShow={friendShow} setIsShow={() => setFriendShow.off()} />
     </Flex>
   );
 }

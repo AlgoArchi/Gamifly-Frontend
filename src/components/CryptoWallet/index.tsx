@@ -11,6 +11,7 @@ export interface IProps extends FlexProps {
   nativeUnit: string;
   otherPrice: string | number;
   otherUnit: string;
+  buttonText?: string;
   buyClick?: () => void;
 }
 
@@ -20,6 +21,7 @@ function Index({
   otherPrice,
   otherUnit,
   buyClick,
+  buttonText,
   ...prop
 }: IProps) {
   return (
@@ -48,11 +50,7 @@ function Index({
           Infinity Wallet
         </Text>
       </Flex>
-      <Flex
-        flexDir="column"
-        pos="relative"
-        mb={{ base: px2vw(20), lg: "20px" }}
-      >
+      <Flex flexDir="column" pos="relative">
         <GamiflyWallet
           withOutButton
           price={nativePrice}
@@ -93,7 +91,7 @@ function Index({
         textStyle="16"
         onClick={() => buyClick?.()}
       >
-        Buy
+        {buttonText || "Buy"}
       </BaseButton>
     </Flex>
   );

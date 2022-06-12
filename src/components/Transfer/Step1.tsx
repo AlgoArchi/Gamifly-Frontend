@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Box, Text } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import BaseButton from "@/components/BaseButton";
 import BaseCheck from "@/components/BaseCheck";
@@ -18,7 +18,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
         mb={{ base: px2vw(30), lg: "30px" }}
         justifyContent="space-between"
       >
-        {/* Credit */}
+        {/* Deposit */}
         <Flex
           w={{ base: "full", lg: `calc(50% - 10px)` }}
           h={{ base: px2vw(96), lg: "96px" }}
@@ -28,12 +28,12 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
           bgColor="black.600"
           cursor="pointer"
           onClick={() => {
-            setChooseType("Credit");
+            setChooseType("Deposit");
           }}
         >
           <BaseCheck
-            isActive={chooseType === "Credit"}
-            bgColor={chooseType === "Credit" ? "green.100" : "gray.100"}
+            isActive={chooseType === "Deposit"}
+            bgColor={chooseType === "Deposit" ? "green.100" : "gray.100"}
             border="none"
           />
           <Text
@@ -44,10 +44,10 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
             lineHeight={{ base: px2vw(26), lg: "26px" }}
             order={{ base: -1, lg: 1 }}
           >
-            Credit
+            Deposit
           </Text>
         </Flex>
-        {/* NFT */}
+        {/* Withdraw */}
         <Flex
           w={{ base: "full", lg: `calc(50% - 10px)` }}
           h={{ base: px2vw(96), lg: "96px" }}
@@ -56,12 +56,12 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
           bgColor="black.600"
           cursor="pointer"
           onClick={() => {
-            setChooseType("NFT");
+            setChooseType("Withdraw");
           }}
         >
           <BaseCheck
-            isActive={chooseType === "NFT"}
-            bgColor={chooseType === "NFT" ? "green.100" : "gray.100"}
+            isActive={chooseType === "Withdraw"}
+            bgColor={chooseType === "Withdraw" ? "green.100" : "gray.100"}
             border="none"
           />
           <Text
@@ -72,7 +72,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
             lineHeight={{ base: px2vw(26), lg: "26px" }}
             order={{ base: -1, lg: 1 }}
           >
-            NFT
+            Withdraw
           </Text>
         </Flex>
       </Flex>

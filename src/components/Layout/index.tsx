@@ -1,10 +1,11 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { Container, Flex } from "@chakra-ui/react";
+import { Container, Flex, Text, useBoolean } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import LeftMenu from "./LeftMenu";
 import Header from "./Header";
 import HeaderMobile from "./HeaderMobile";
+import BaseModal from "../BaseModal";
 
 export interface LayoutProps {
   children: any;
@@ -13,6 +14,8 @@ export interface LayoutProps {
 function Index({ children }: LayoutProps) {
   const router = useRouter();
   const loginRouter = router?.pathname !== "/" && router?.pathname !== "/login";
+  const [showTermsOfService, setShowTermsOfService] = useBoolean(false);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useBoolean(false);
 
   return (
     <Flex
@@ -82,6 +85,8 @@ function Index({ children }: LayoutProps) {
         {/* 页面 */}
         {loginRouter ? (
           <Flex
+            flexDir="column"
+            justifyContent="space-between"
             py={{ base: px2vw(30), lg: "20px" }}
             minH={{
               base: `calc(100vh - ${px2vw(55)})`,
@@ -89,10 +94,140 @@ function Index({ children }: LayoutProps) {
             }}
           >
             {children}
+            <Flex
+              display={{ base: "none", lg: "flex" }}
+              w="245px"
+              mx="auto"
+              mt="50px"
+            >
+              <Text
+                color="blue.100"
+                fontFamily="Nunito"
+                textStyle="14"
+                fontWeight="400"
+                textAlign="center"
+                lineHeight={{ base: px2vw(20), lg: "20px" }}
+              >
+                By continuing you agree to the{" "}
+                <Text
+                  display="inline-flex"
+                  fontWeight="700"
+                  textDecor="underline"
+                  cursor="pointer"
+                  onClick={() => setShowTermsOfService.on()}
+                >
+                  Terms of Service
+                </Text>{" "}
+                and{" "}
+                <Text
+                  display="inline-flex"
+                  fontWeight="700"
+                  textDecor="underline"
+                  cursor="pointer"
+                  onClick={() => setShowPrivacyPolicy.on()}
+                >
+                  Privacy Policy
+                </Text>
+              </Text>
+            </Flex>
           </Flex>
         ) : (
           children
         )}
+        {/* Terms of Service */}
+        <BaseModal
+          isShow={showTermsOfService}
+          close={() => setShowTermsOfService.off()}
+        >
+          <Text
+            fontFamily="Orbitron"
+            color="white.100"
+            fontWeight="600"
+            fontSize={{ base: px2vw(22), lg: "22px" }}
+            lineHeight={{ base: px2vw(28), lg: "28px" }}
+            mb={{ base: px2vw(20), lg: "20px" }}
+          >
+            Terms and Conditions
+          </Text>
+          <Text
+            fontFamily="Nunito"
+            color="white.500"
+            fontWeight="400"
+            fontSize={{ base: px2vw(16), lg: "16px" }}
+            lineHeight={{ base: px2vw(22), lg: "22px" }}
+            mb={{ base: px2vw(20), lg: "20px" }}
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.
+          </Text>
+          <Text
+            fontFamily="Nunito"
+            color="white.500"
+            fontWeight="400"
+            fontSize={{ base: px2vw(16), lg: "16px" }}
+            lineHeight={{ base: px2vw(22), lg: "22px" }}
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.
+          </Text>
+        </BaseModal>
+        {/* Privacy Policy */}
+        <BaseModal
+          isShow={showPrivacyPolicy}
+          close={() => setShowPrivacyPolicy.off()}
+        >
+          <Text
+            fontFamily="Orbitron"
+            color="white.100"
+            fontWeight="600"
+            fontSize={{ base: px2vw(22), lg: "22px" }}
+            lineHeight={{ base: px2vw(28), lg: "28px" }}
+            mb={{ base: px2vw(20), lg: "20px" }}
+          >
+            Privacy Policy
+          </Text>
+          <Text
+            fontFamily="Nunito"
+            color="white.500"
+            fontWeight="400"
+            fontSize={{ base: px2vw(16), lg: "16px" }}
+            lineHeight={{ base: px2vw(22), lg: "22px" }}
+            mb={{ base: px2vw(20), lg: "20px" }}
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.
+          </Text>
+          <Text
+            fontFamily="Nunito"
+            color="white.500"
+            fontWeight="400"
+            fontSize={{ base: px2vw(16), lg: "16px" }}
+            lineHeight={{ base: px2vw(22), lg: "22px" }}
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. Duis aute irure dolor in
+            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+            culpa qui officia deserunt mollit anim id est laborum.
+          </Text>
+        </BaseModal>
       </Flex>
     </Flex>
   );

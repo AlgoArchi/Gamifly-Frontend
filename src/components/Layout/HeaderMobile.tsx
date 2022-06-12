@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Drawer,
@@ -14,16 +14,35 @@ import menu from "@/assets/imgs/menu.webp";
 import userProfile from "@/assets/imgs/userProfile.png";
 import close from "@/assets/imgs/greenClose.webp";
 import logout from "@/assets/imgs/logout.webp";
-import { ButtonArr, PageArr, pageItem, pageList } from "./LeftMenu";
+import invite from "@/assets/imgs/invite.webp";
+import { ButtonArr, buttonItem, PageArr, pageItem, pageList } from "./LeftMenu";
 import LoginOut from "../LoginOut";
 import LogIn from "../LogIn";
+import InviteFriend from "../InviteFriend";
+import FriendCode from "../FriendCode";
 
 function Index() {
   const router = useRouter();
+  const [inviteCode] = useState(router.query.inviteCode);
   const [open, setOpen] = useBoolean(false);
   const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
   const [loginModal, setLoginModal] = useBoolean(false); // 登陆弹窗
   const [isLogin, setIsLogin] = useBoolean(false); // 是否登陆
+  const [inviteShow, setInviteShow] = useBoolean(false);
+  const [friendShow, setFriendShow] = useBoolean(false);
+  // 按钮数组
+  const buttonList: buttonItem[] = [
+    {
+      name: "Invite friend",
+      icon: invite,
+      click: () => setInviteShow.on(),
+    },
+  ];
+  useEffect(() => {
+    if (inviteCode) {
+      setFriendShow.on();
+    }
+  }, [inviteCode]);
   return (
     <Flex
       display={{ base: "flex", lg: "none" }}
@@ -79,7 +98,12 @@ function Index() {
               {/* 页面 */}
               <Flex flexDir="column">
                 <PageArr router={router} click={() => setOpen.off()} />
-                <ButtonArr click={() => setOpen.off()} />
+                <Flex justifyContent="center" mt={px2vw(10)}>
+                  <ButtonArr
+                    click={() => setOpen.off()}
+                    buttonList={buttonList}
+                  />
+                </Flex>
               </Flex>
               {/* 登录登出按钮 */}
               <Flex h={px2vw(27)} ml={px2vw(35)}>
@@ -156,6 +180,8 @@ function Index() {
           boo ? setIsLogin.on() : setIsLogin.off()
         }
       />
+      <InviteFriend isShow={inviteShow} setIsShow={() => setInviteShow.off()} />
+      <FriendCode isShow={friendShow} setIsShow={() => setFriendShow.off()} />
     </Flex>
   );
 }
