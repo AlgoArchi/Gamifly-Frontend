@@ -1,4 +1,4 @@
-import { ComponentStyleConfig } from '@chakra-ui/react'
+import { ComponentStyleConfig } from "@chakra-ui/react";
 
 export default <ComponentStyleConfig>{
   baseStyle: {
@@ -7,11 +7,11 @@ export default <ComponentStyleConfig>{
     },
     thumb: {
       _focus: {
-        boxShadow: 'none',
+        boxShadow: "none",
       },
       _hover: {
         // boxShadow: '2px 2px 6px rgba(255, 51, 119, 0.4)',
       },
     },
   },
-}
+};

@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import BaseButton from "@/components/BaseButton";
 import BaseCheck from "@/components/BaseCheck";

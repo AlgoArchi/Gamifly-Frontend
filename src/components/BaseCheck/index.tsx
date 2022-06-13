@@ -8,7 +8,7 @@ export interface IProps extends FlexProps {
   active?: () => void;
 }
 
-function Index({ isActive, active, ...prop }: IProps) {
+function Index({ isActive, ...prop }: IProps) {
   return (
     <Box
       w={{ base: px2vw(26), lg: "26px" }}

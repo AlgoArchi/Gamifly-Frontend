@@ -1,12 +1,12 @@
-import { ThemeComponents } from '@chakra-ui/react'
+import { ThemeComponents } from "@chakra-ui/react";
 
-import Button from './button'
-import Tabs from './tabs'
-import Popover from './popover'
-import Link from './link'
-import Slider from './slider'
-import Input from './input'
-import NumberInput from './number-input'
+import Button from "./button";
+import Tabs from "./tabs";
+import Popover from "./popover";
+import Link from "./link";
+import Slider from "./slider";
+import Input from "./input";
+import NumberInput from "./number-input";
 
 /**
  * https://chakra-ui.com/docs/theming/customize-theme#customizing-single-components
@@ -34,4 +34,4 @@ export default <ThemeComponents>{
   Slider,
   Input,
   NumberInput,
-}
+};

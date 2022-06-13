@@ -10,7 +10,7 @@ export interface IProps extends FlexProps {
   setIsShow: () => void;
 }
 
-function Index({ children, isShow, progress, setIsShow, ...prop }: IProps) {
+function Index({ isShow, progress, setIsShow, ...prop }: IProps) {
   return (
     <BaseModal
       isShow={isShow}

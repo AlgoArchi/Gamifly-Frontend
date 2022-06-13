@@ -184,6 +184,7 @@ function Index() {
     if (inviteCode) {
       setFriendShow.on();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteCode]);
 
   // 按钮数组

@@ -1,6 +1,5 @@
 import React from "react";
-import { Text, Flex, Image, FlexProps, Box } from "@chakra-ui/react";
-import { CheckIcon } from "@chakra-ui/icons";
+import { Text, Flex, Image, FlexProps } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import { useRouter } from "next/router";
 import BaseCheck from "../BaseCheck";

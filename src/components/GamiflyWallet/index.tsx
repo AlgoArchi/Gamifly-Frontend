@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text, Box, Image, FlexProps } from "@chakra-ui/react";
+import { Flex, Text, Image, FlexProps } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import line from "@/assets/imgs/greenLine.png";
 import BaseButton from "../BaseButton";

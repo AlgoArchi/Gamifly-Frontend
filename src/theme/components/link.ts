@@ -1,7 +1,7 @@
-import { ComponentStyleConfig } from '@chakra-ui/react'
+import { ComponentStyleConfig } from "@chakra-ui/react";
 
 export default <ComponentStyleConfig>{
   baseStyle: {
-    _focus: { boxShadow: 'none' },
+    _focus: { boxShadow: "none" },
   },
-}
+};

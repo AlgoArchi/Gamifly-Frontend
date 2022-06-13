@@ -4,7 +4,6 @@ import px2vw from "@/utils/px2vw";
 import closeIcon from "@/assets/imgs/close.png";
 
 export interface IProps extends FlexProps {
-  children: any;
   isShow: boolean;
   withOutClose?: boolean;
   withOutOverlay?: boolean;

@@ -28,6 +28,7 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
       // @ts-ignore
       inp1.current.focus();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inp1.current]);
 
   return (

@@ -182,6 +182,7 @@ function App() {
         />
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, chooseType, screening, nftList, paymentMethod, totalPrice]);
 
   const contentCredit = useMemo(() => {
@@ -208,6 +209,7 @@ function App() {
         />
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, chooseType, activeGame, paymentMethod, totalPrice]);
 
   return (
@@ -326,9 +328,9 @@ function App() {
             mb={{ base: px2vw(25), lg: "30px" }}
           >
             Your sent
-            <Text color="green.100" display="inline-block" mx="5px">
+            <Box color="green.100" display="inline-block" mx="5px">
               1,2 Gemifly token (12 TRX)
-            </Text>
+            </Box>
             to the Gamifly Wallet.
           </Text>
           <Flex w="full" justifyContent="space-between">
