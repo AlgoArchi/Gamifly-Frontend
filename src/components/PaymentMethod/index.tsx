@@ -25,6 +25,7 @@ function Index({ paymentMethod, withOutWallet, setPaymentMethod }: IProps) {
           w="full"
           bgColor="black.600"
           cursor="pointer"
+          borderRadius="6px"
           justifyContent={{ base: "space-between", lg: "flex-start" }}
           mb={widthOutMb ? 0 : { base: px2vw(10), lg: "10px" }}
           h={{ base: px2vw(55), lg: "76px" }}
@@ -63,13 +64,9 @@ function Index({ paymentMethod, withOutWallet, setPaymentMethod }: IProps) {
         Payment method
       </Text>
       <Flex flexDir="column">
-        {!withOutWallet && <MethodItem type={1} typeName="Gamifly Wallet" />}
-        <MethodItem type={2} typeName="Credit / debit card" />
-        <MethodItem
-          type={3}
-          widthOutMb
-          typeName="External private crypto wallet"
-        />
+        {!withOutWallet && <MethodItem type={1} typeName="Gamifly Account" />}
+        {/* <MethodItem type={2} typeName="Credit / debit card" /> */}
+        <MethodItem type={3} widthOutMb typeName="DeFi Wallet" />
       </Flex>
     </Flex>
   );

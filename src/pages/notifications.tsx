@@ -1,38 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import MessageList, { messageItem } from "@/components/MessageList";
+import { getNotifications } from "@/apis/notifications";
+import useSWR from "swr";
+import globalStore from "@/stores/global";
 
 function App() {
-  const newMessageList: messageItem[] = [
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-  ];
-  const previousMessageList: messageItem[] = [
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-  ];
+  const { userInfo } = globalStore();
+  const [newMessageList, setNewMessageList] = useState<messageItem[]>([]);
+  const [previousMessageList, setPreviousMessageList] = useState<messageItem[]>(
+    []
+  );
+  const { data: getNotificationsData } = useSWR(
+    userInfo && userInfo?.id ? [getNotifications.key] : null,
+    (_) => getNotifications.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+  useEffect(() => {
+    if (getNotificationsData && getNotificationsData.length > 0) {
+      const noList: messageItem[] = [];
+      const list: messageItem[] = [];
+      getNotificationsData.map((item: any) => {
+        item?.status === 0 ? noList.push(item) : list.push(item);
+      });
+      setNewMessageList(noList);
+      setPreviousMessageList(list);
+    }
+  }, [getNotificationsData]);
   return (
     <Box w="full">
       <Text

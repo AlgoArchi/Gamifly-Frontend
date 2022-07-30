@@ -1,20 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, FlexProps, Image, Text } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import messageIcon from "@/assets/imgs/messageIcon.png";
+import { setReadNotification } from "@/apis/notifications";
+import useSWR from "swr";
 
 export interface IProps extends FlexProps {
+  type?: number;
   messageList: messageItem[];
 }
 
 export interface messageItem {
+  id?: number;
   icon?: string;
   title?: string;
   content: string;
-  time: string;
+  datetime: string;
+  status?: number;
+  user_id?: number;
 }
 
-function Index({ messageList }: IProps) {
+function Index({ type = 1, messageList }: IProps) {
+  const [notificationIds, setNotificationIds] = useState<any>(null);
+  const { data: _setReadNotificationData } = useSWR(
+    notificationIds ? [setReadNotification.key, notificationIds] : null,
+    (_) => setReadNotification.fetcher({ notification_id: notificationIds }),
+    { revalidateOnFocus: false }
+  );
+
+  useEffect(() => {
+    if (type === 0 && messageList.length > 0) {
+      setNotificationIds(messageList.map((item) => item?.id));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageList]);
   return (
     <Flex w="full" flexDir="column">
       {messageList.map((item: messageItem, index: number) => (
@@ -66,7 +85,7 @@ function Index({ messageList }: IProps) {
             fontSize={{ base: px2vw(12), lg: "12px" }}
             lineHeight={{ base: px2vw(12), lg: "12px" }}
           >
-            {item.time}
+            {item.datetime}
           </Text>
         </Flex>
       ))}

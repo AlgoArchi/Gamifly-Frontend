@@ -11,12 +11,12 @@ function Index() {
   const [isLogin] = useState(true);
   const [isSetMode, setIsSetMode] = useBoolean(false);
   return (
-    <Flex direction="column" w="full">
+    <Flex direction="column" w={{ base: "full", lg: "max-content" }}>
       <Text
+        mb={{ base: px2vw(20), lg: "20px" }}
         display={{ base: "none", lg: "block" }}
-        mb={{ base: px2vw(25), lg: "25px" }}
         color="white.100"
-        textStyle="36"
+        textStyle="32"
         fontWeight="700"
         lineHeight={{ base: px2vw(45), lg: "45px" }}
       >
@@ -25,7 +25,7 @@ function Index() {
       <Flex
         flexDir={{ base: "column", lg: "row" }}
         alignItems="flex-start"
-        bgColor={{ base: "transparent", lg: "black.300" }}
+        overflow="hidden"
       >
         <ProfileInfo
           isSetMode={isSetMode}

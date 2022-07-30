@@ -1,14 +1,14 @@
 import React from "react";
 import { Flex, Text, Image, FlexProps } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
+import userProfile from "@/assets/imgs/userProfile.png";
 
 export interface VipProp {
-  id?: number | string;
-  place: number | string;
-  userName: string;
-  gemiflyTokens: number | string;
-  nft: number | string;
-  userNameImg?: string;
+  place: number;
+  amount: number | string;
+  name: string;
+  nft_count: number | string;
+  avatar?: string;
 }
 
 export interface IProps extends FlexProps {
@@ -17,7 +17,13 @@ export interface IProps extends FlexProps {
 
 function Index({ list, ...prop }: IProps) {
   return (
-    <Flex flexDir="column" w="full" {...prop}>
+    <Flex
+      flexDir="column"
+      w="full"
+      borderRadius="6px"
+      overflow="hidden"
+      {...prop}
+    >
       <Flex
         h={{ base: px2vw(20), lg: "20px" }}
         px={{ base: px2vw(20), lg: "20px" }}
@@ -75,10 +81,10 @@ function Index({ list, ...prop }: IProps) {
             color="yellow.100"
             bgColor="black.500"
           >
-            Gemifly tokens
+            gamilfy tokens
           </Flex>
           <Flex
-            w={{ base: px2vw(130), lg: "130px" }}
+            w={{ base: px2vw(130), lg: "calc(100% - 568px)" }}
             h={{ base: px2vw(50), lg: "50px" }}
             px={{ base: px2vw(20), lg: "20px" }}
             justifyContent="flex-end"
@@ -121,12 +127,17 @@ function Index({ list, ...prop }: IProps) {
                 bgColor={index % 2 === 0 ? "black.1500" : "black.600"}
               >
                 <Image
-                  src={item.userNameImg}
+                  borderRadius="50%"
+                  src={
+                    item.avatar
+                      ? `${window.imgUrl.imageUrl}${item.avatar}`
+                      : userProfile
+                  }
                   w={{ base: px2vw(30), lg: "30px" }}
                   h={{ base: px2vw(30), lg: "30px" }}
                   mr={{ base: px2vw(10), lg: "10px" }}
                 />
-                {item.userName}
+                {item.name}
               </Flex>
               <Flex
                 w={{ base: px2vw(176), lg: "176px" }}
@@ -136,10 +147,10 @@ function Index({ list, ...prop }: IProps) {
                 color="yellow.100"
                 bgColor={index % 2 === 0 ? "black.1300" : "black.1400"}
               >
-                {item.gemiflyTokens}
+                {item.amount}
               </Flex>
               <Flex
-                w={{ base: px2vw(130), lg: "130px" }}
+                w={{ base: px2vw(130), lg: "calc(100% - 568px)" }}
                 h={{ base: px2vw(50), lg: "50px" }}
                 px={{ base: px2vw(20), lg: "20px" }}
                 justifyContent="flex-end"
@@ -147,7 +158,7 @@ function Index({ list, ...prop }: IProps) {
                 boxSizing="border-box"
                 bgColor={index % 2 === 0 ? "black.1500" : "black.600"}
               >
-                {item.nft}
+                {item.nft_count}
               </Flex>
             </Flex>
           ))}

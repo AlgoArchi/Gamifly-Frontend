@@ -26,6 +26,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
           justifyContent={{ base: "space-between", lg: "flex-start" }}
           mb={{ base: px2vw(5), lg: 0 }}
           bgColor="black.600"
+          borderRadius="6px"
           cursor="pointer"
           onClick={() => {
             setChooseType("Deposit");
@@ -55,6 +56,7 @@ function Index({ chooseType, continueClick, setChooseType }: IProps) {
           justifyContent={{ base: "space-between", lg: "flex-start" }}
           bgColor="black.600"
           cursor="pointer"
+          borderRadius="6px"
           onClick={() => {
             setChooseType("Withdraw");
           }}

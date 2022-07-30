@@ -1,13 +1,20 @@
-import React from "react";
-import { Flex, Box, Text, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Flex, Box, Text, Image, useToast, useBoolean } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import messageIcon from "@/assets/imgs/messageIcon.png";
 import { gameItem } from "@/pages/purchase";
+import transferLine from "@/assets/imgs/transferLine.png";
+import { buyCredit } from "@/apis/NFTs";
+import useSWR from "swr";
 import PaymentMethod from "../PaymentMethod";
 import GamiflyWallet from "../GamiflyWallet";
 import CryptoWallet from "../CryptoWallet";
 import BaseButton from "../BaseButton";
 import GameSelect from "../GameSelect";
+import globalStore from "@/stores/global";
+import { useWeb3React } from "@web3-react/core";
+import { recharge } from "@/connect/wallet";
+import { deposit } from "@/apis/deposit";
 
 export interface IProps {
   gameList: gameItem[];
@@ -28,17 +35,80 @@ function Index({
   setActiveGame,
   success,
 }: IProps) {
+  const toast = useToast();
+  const { userInfo, globalAccount } = globalStore();
+  const { library, account } = useWeb3React();
+  const [hash, setHash] = useState("");
+  const [isDeposit, setIsDeposit] = useBoolean(false);
+  const [loading, setLoading] = useBoolean(false);
+  const [buyPar, setBuyPar] = useState<any>(null);
+  const { data: depositData } = useSWR(
+    userInfo && userInfo?.platform_wallet && hash && isDeposit && deposit.key,
+    () =>
+      deposit.fetcher({
+        hash: hash,
+        wallet_address: userInfo?.platform_wallet,
+      }),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  const { data: buyCreditData } = useSWR(
+    buyPar && buyPar.game_id ? [buyCredit.key, buyPar] : null,
+    () => buyCredit.fetcher(buyPar),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+
+  useEffect(() => {
+    if (!buyCreditData) return;
+    if (buyCreditData.result) {
+      setLoading.off();
+      success();
+    } else {
+      toast({
+        title: "error",
+        description: buyCreditData.result,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyCreditData]);
+
+  useEffect(() => {
+    if (hash) {
+      setIsDeposit.on();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hash]);
+
+  useEffect(() => {
+    if (depositData) {
+      setBuyPar({
+        user_id: userInfo?.id,
+        game_id: activeGame?.id,
+        amount: 1,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [depositData]);
+
   return (
     <Flex
       flexDir={{ base: "column", lg: "row" }}
       bgColor={{ base: "transparent", lg: "black.300" }}
       pb={{ base: px2vw(148), lg: 0 }}
+      borderRadius="6px"
       overflow={"hidden"}
     >
       {/* left */}
       <Flex
         pos="relative"
         flexDir="column"
+        mr="2px"
         w={{ base: "full", lg: "70%" }}
         p={{
           base: 0,
@@ -69,12 +139,10 @@ function Index({
             setPaymentMethod={(type: number) => setPaymentMethod(type)}
           />
         </Box>
-        <Box
+        <Image
           display={{ base: "none", lg: "block" }}
-          w="full"
-          h="2px"
-          bg="linear-gradient(270deg, #5EC6B8 50%, rgba(94, 198, 184, 0) 73.46%)"
-          transform="matrix(0, -1, -1, 0, 408, 350)"
+          src={transferLine}
+          h="100%"
           pos="absolute"
           right="0"
           top="0"
@@ -98,14 +166,39 @@ function Index({
           Total amount
         </Text>
         {paymentMethod === 1 || paymentMethod === 2 ? (
-          <GamiflyWallet price={7.7} unit="GMF" buyClick={() => success()} />
+          <GamiflyWallet
+            price={activeGame?.credit_price}
+            unit="GMF"
+            buttonLoading={loading}
+            loadingText="Buy"
+            buyClick={() => {
+              setLoading.on();
+              setBuyPar({
+                user_id: userInfo?.id,
+                game_id: activeGame?.id,
+                amount: 1,
+              });
+            }}
+          />
         ) : (
           <CryptoWallet
-            nativePrice={7.7}
-            nativeUnit="GMF"
-            otherPrice={21.3}
-            otherUnit="TRX"
-            buyClick={() => success()}
+            buttonLoading={loading}
+            loadingText="Recharge"
+            buttonText="Recharge"
+            nativePrice={activeGame?.credit_price}
+            nativeUnit="USDC"
+            buyClick={() => {
+              setLoading.on();
+              recharge(
+                library,
+                String(account || globalAccount),
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+                userInfo,
+                totalPrice.toString(),
+                (res: string) => setHash(res),
+                () => setLoading.off()
+              );
+            }}
           />
         )}
       </Flex>
@@ -120,6 +213,8 @@ function Index({
         bgColor="black.1200"
         color="white.100"
         pos="fixed"
+        borderTopLeftRadius="6px"
+        borderTopRightRadius="6px"
         bottom={0}
         left={0}
         zIndex={1}
@@ -153,7 +248,7 @@ function Index({
               color="green.100"
               lineHeight={px2vw(20)}
             >
-              {totalPrice}
+              {activeGame?.credit_price}
             </Text>
           </Flex>
         </Flex>
@@ -161,9 +256,33 @@ function Index({
           fontFamily="Nunito"
           textStyle="16"
           w="full"
-          onClick={() => success()}
+          isLoading={loading}
+          loadingText={
+            paymentMethod === 1 || paymentMethod === 2 ? "Buy" : "Recharge"
+          }
+          onClick={() => {
+            if (paymentMethod === 1 || paymentMethod === 2) {
+              setLoading.on();
+              setBuyPar({
+                user_id: userInfo?.id,
+                game_id: activeGame?.id,
+                amount: 1,
+              });
+            } else {
+              setLoading.on();
+              recharge(
+                library,
+                String(account || globalAccount),
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+                userInfo,
+                totalPrice.toString(),
+                (res: string) => setHash(res),
+                () => setLoading.off()
+              );
+            }
+          }}
         >
-          Buy
+          {paymentMethod === 1 || paymentMethod === 2 ? "Buy" : "Recharge"}
         </BaseButton>
       </Flex>
     </Flex>

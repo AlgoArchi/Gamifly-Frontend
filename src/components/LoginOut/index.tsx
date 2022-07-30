@@ -3,6 +3,8 @@ import { Flex, Text } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import BaseModal from "../BaseModal";
 import BaseButton from "../BaseButton";
+import { deleteStore } from "@/utils/storage";
+import globalStore from "@/stores/global";
 
 export interface IProps {
   logOut: boolean;
@@ -52,9 +54,17 @@ function Index({ logOut, setLogOut, confirmLogOut }: IProps) {
             border="2px solid"
             borderColor="blue.100"
             color="blue.100"
-            onClick={() => {
+            onClick={async () => {
+              window.walletConnectProvider?.disconnect();
+              globalStore.setState({
+                userInfo: null,
+              });
+              window.walletConnectProvider = null;
               setLogOut(false);
+              deleteStore("userInfo");
               confirmLogOut?.();
+              deleteStore("referralCode");
+              deleteStore("friendCode");
             }}
           >
             Log out

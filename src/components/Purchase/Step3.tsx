@@ -1,13 +1,20 @@
-import React from "react";
-import { Flex, Box, Text, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Flex, Box, Text, Image, useBoolean, useToast } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import closeIcon from "@/assets/imgs/greenClose.webp";
 import messageIcon from "@/assets/imgs/messageIcon.png";
+import transferLine from "@/assets/imgs/transferLine.png";
+import useSWR from "swr";
+import { buyNFT } from "@/apis/NFTs";
 import NFTItem, { NFTItemProp } from "../NFTItem";
 import PaymentMethod from "../PaymentMethod";
 import GamiflyWallet from "../GamiflyWallet";
 import CryptoWallet from "../CryptoWallet";
 import BaseButton from "../BaseButton";
+import globalStore from "@/stores/global";
+import { recharge } from "@/connect/wallet";
+import { useWeb3React } from "@web3-react/core";
+import { deposit } from "@/apis/deposit";
 
 export interface IProps {
   nftList: NFTItemProp[];
@@ -26,17 +33,87 @@ function Index({
   setPaymentMethod,
   success,
 }: IProps) {
+  const toast = useToast();
+  const { userInfo, globalAccount } = globalStore();
+  const { library, account } = useWeb3React();
+  const [hash, setHash] = useState("");
+  const [isDeposit, setIsDeposit] = useBoolean(false);
+  const [loading, setLoading] = useBoolean(false);
+  const [buyPar, setBuyPar] = useState<any>(null);
+  const { data: buyNFTData } = useSWR(
+    buyPar && buyPar.nft_list ? buyNFT.key : null,
+    () => buyNFT.fetcher(buyPar),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  const { data: depositData } = useSWR(
+    userInfo && userInfo?.platform_wallet && hash && isDeposit && deposit.key,
+    () =>
+      deposit.fetcher({
+        hash: hash,
+        wallet_address: userInfo?.platform_wallet,
+      }),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+
+  useEffect(() => {
+    if (!buyNFTData) return;
+    if (buyNFTData.result === "success") {
+      setLoading.off();
+      success();
+    } else {
+      toast({
+        title: "error",
+        description: buyNFTData.result,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buyNFTData]);
+
+  useEffect(() => {
+    if (hash) {
+      setIsDeposit.on();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hash]);
+
+  useEffect(() => {
+    if (depositData) {
+      buyClick();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [depositData]);
+
+  const buyClick = () => {
+    setLoading.on();
+    const nft_list = nftList
+      .filter((item) => item.isActive)
+      .map((item) => item?.id)
+      .toString();
+    setBuyPar({
+      user_id: userInfo?.id,
+      nft_list: nft_list,
+    });
+  };
   return (
     <Flex
       flexDir={{ base: "column", lg: "row" }}
       bgColor={{ base: "transparent", lg: "black.300" }}
       pb={{ base: px2vw(148), lg: 0 }}
+      borderRadius="6px"
       overflow={"hidden"}
     >
       {/* left */}
       <Flex
         pos="relative"
         flexDir="column"
+        mr="2px"
         w={{ base: "full", lg: "70%" }}
         p={{
           base: 0,
@@ -101,12 +178,11 @@ function Index({
             setPaymentMethod={(type: number) => setPaymentMethod(type)}
           />
         </Box>
-        <Box
+
+        <Image
           display={{ base: "none", lg: "block" }}
-          w="full"
-          h="2px"
-          bg="linear-gradient(270deg, #5EC6B8 50%, rgba(94, 198, 184, 0) 73.46%)"
-          transform="matrix(0, -1, -1, 0, 408, 350)"
+          src={transferLine}
+          h="100%"
           pos="absolute"
           right="0"
           top="0"
@@ -130,14 +206,32 @@ function Index({
           Total amount
         </Text>
         {paymentMethod === 1 || paymentMethod === 2 ? (
-          <GamiflyWallet price={7.7} unit="GMF" buyClick={() => success()} />
+          <GamiflyWallet
+            price={totalPrice}
+            unit="GMF"
+            buttonLoading={loading}
+            loadingText="Buy"
+            buyClick={() => buyClick()}
+          />
         ) : (
           <CryptoWallet
-            nativePrice={7.7}
-            nativeUnit="GMF"
-            otherPrice={21.3}
-            otherUnit="TRX"
-            buyClick={() => success()}
+            nativePrice={totalPrice}
+            nativeUnit="USDC"
+            buttonText="Recharge"
+            buttonLoading={loading}
+            loadingText="Recharge"
+            buyClick={() => {
+              setLoading.on();
+              recharge(
+                library,
+                String(account || globalAccount),
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+                userInfo,
+                totalPrice.toString(),
+                (res: string) => setHash(res),
+                () => setLoading.off()
+              );
+            }}
           />
         )}
       </Flex>
@@ -152,6 +246,8 @@ function Index({
         bgColor="black.1200"
         color="white.100"
         pos="fixed"
+        borderTopLeftRadius="6px"
+        borderTopRightRadius="6px"
         bottom={0}
         left={0}
         zIndex={1}
@@ -193,9 +289,28 @@ function Index({
           fontFamily="Nunito"
           textStyle="16"
           w="full"
-          onClick={() => success()}
+          isLoading={loading}
+          loadingText={
+            paymentMethod === 1 || paymentMethod === 2 ? "Buy" : "Recharge"
+          }
+          onClick={() => {
+            if (paymentMethod === 1 || paymentMethod === 2) {
+              buyClick();
+            } else {
+              setLoading.on();
+              recharge(
+                library,
+                String(account || globalAccount),
+                "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+                userInfo,
+                totalPrice.toString(),
+                (res: string) => setHash(res),
+                () => setLoading.off()
+              );
+            }
+          }}
         >
-          Buy
+          {paymentMethod === 1 || paymentMethod === 2 ? "Buy" : "Recharge"}
         </BaseButton>
       </Flex>
     </Flex>

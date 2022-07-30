@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Flex, Image, Text, useBoolean } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import userProfile from "@/assets/imgs/userProfile.png";
 import gamesIcon from "@/assets/imgs/games.webp";
 import tournaments from "@/assets/imgs/tournaments.webp";
 import leaderboard from "@/assets/imgs/leaderboard.webp";
@@ -11,9 +10,11 @@ import transfer from "@/assets/imgs/transfer.webp";
 import invite from "@/assets/imgs/invite.webp";
 import px2vw from "@/utils/px2vw";
 import notificationIcon from "@/assets/imgs/notificationIcon.webp";
+import leftLogo from "@/assets/imgs/leftLogo.png";
 import styles from "./style.module.scss";
 import InviteFriend from "../InviteFriend";
 import FriendCode from "../FriendCode";
+import globalStore from "@/stores/global";
 
 export interface pageItem {
   name: string;
@@ -55,12 +56,12 @@ export const pageList: pageItem[] = [
     icon: gamiflyInfo,
   },
   {
-    name: "Make a Purchase",
+    name: "NFTs",
     path: "/purchase",
     icon: purchase,
   },
   {
-    name: "Make a Transfer",
+    name: "Top up and Withdraw",
     path: "/transfer",
     icon: transfer,
   },
@@ -81,7 +82,7 @@ export const PageArr = React.memo(
             justifyContent="flex-start"
             w="full"
             h={{ base: px2vw(63), lg: "73px" }}
-            pl="30px"
+            pl="15px"
             color="green.100"
             cursor="pointer"
             pos="relative"
@@ -176,17 +177,22 @@ export const ButtonArr = React.memo(
 
 function Index() {
   const router = useRouter();
+  const { userInfo, showInviteFriend } = globalStore();
   const [inviteCode] = useState(router.query.inviteCode);
   const [inviteShow, setInviteShow] = useBoolean(false);
   const [friendShow, setFriendShow] = useBoolean(false);
 
   useEffect(() => {
     if (inviteCode) {
-      setFriendShow.on();
+      if (
+        (userInfo && userInfo?.id && !userInfo?.referral_id) ||
+        !userInfo?.id
+      ) {
+        setFriendShow.on();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteCode]);
-
   // 按钮数组
   const buttonList: buttonItem[] = [
     {
@@ -195,17 +201,9 @@ function Index() {
       click: () => setInviteShow.on(),
     },
   ];
-  return (
-    <Flex
-      flexDirection="column"
-      justifyContent="space-between"
-      display={{ base: "none", lg: "flex" }}
-      w="237px"
-      minH="100vh"
-      bgColor="black.300"
-      pb="50px"
-      zIndex={2}
-    >
+
+  const avatar = useMemo(
+    () => (
       <Flex flexDir="column">
         {/* Avatar */}
         <Flex
@@ -215,31 +213,45 @@ function Index() {
           py="25px"
           pl="30px"
           cursor="pointer"
-          onClick={() => router.push("/profile")}
         >
-          <Image
-            src={userProfile}
-            w="42px"
-            h="42px"
-            mr="15px"
-            borderRadius="50%"
-          />
-          <Text
-            textStyle="14"
-            lineHeight="42px"
-            fontFamily="Orbitron"
-            color="white.100"
-          >
-            User Name
-          </Text>
+          <Image src={leftLogo} onClick={() => router.push("/")} />
         </Flex>
         {/* pages */}
         <PageArr router={router} />
       </Flex>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userInfo, router]
+  );
+  return (
+    <Flex
+      flexDirection="column"
+      justifyContent="space-between"
+      display={{ base: "none", lg: "flex" }}
+      w="237px"
+      minH="100vh"
+      bgColor="black.300"
+      pb="50px"
+      pos="fixed"
+      top="0"
+      left="0"
+      zIndex={8}
+    >
+      {avatar}
       {/* button */}
-      <ButtonArr buttonList={buttonList} />
-      <InviteFriend isShow={inviteShow} setIsShow={() => setInviteShow.off()} />
-      <FriendCode isShow={friendShow} setIsShow={() => setFriendShow.off()} />
+      {userInfo && userInfo?.id && <ButtonArr buttonList={buttonList} />}
+      <InviteFriend
+        isShow={inviteShow || showInviteFriend}
+        setIsShow={() => {
+          setInviteShow.off();
+          globalStore.setState({ showInviteFriend: false });
+        }}
+      />
+      <FriendCode
+        isShow={friendShow}
+        code={inviteCode}
+        setIsShow={() => setFriendShow.off()}
+      />
     </Flex>
   );
 }

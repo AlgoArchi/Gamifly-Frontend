@@ -1,17 +1,31 @@
-import React from "react";
-import { Flex, Text, Image, FlexProps } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import {
+  Flex,
+  Text,
+  Image,
+  FlexProps,
+  useBoolean,
+  Spinner,
+  Box,
+} from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import cryptoIc from "@/assets/imgs/cryptoIcon.png";
-import arrows from "@/assets/imgs/arrows.png";
+import { getGMFPrice } from "@/apis/deposit";
+import useSWR from "swr";
 import GamiflyWallet from "../GamiflyWallet";
 import BaseButton from "../BaseButton";
 
 export interface IProps extends FlexProps {
   nativePrice: string | number;
   nativeUnit: string;
-  otherPrice: string | number;
-  otherUnit: string;
+  otherPrice?: string | number;
+  otherUnit?: string;
   buttonText?: string;
+  isInput?: boolean;
+  buttonLoading?: boolean;
+  loadingText?: string;
+  withOutConversions?: boolean;
+  inputValueChange?: (val: string) => void;
   buyClick?: () => void;
 }
 
@@ -22,8 +36,47 @@ function Index({
   otherUnit,
   buyClick,
   buttonText,
+  isInput,
+  buttonLoading,
+  loadingText,
+  withOutConversions,
+  inputValueChange,
   ...prop
 }: IProps) {
+  const [getNewPriceLoading, setGetNewPriceLoading] = useBoolean(false);
+  const [usdcPrice, setUsdcPrice] = useState("0");
+  const [getNewPrice, setGetNewPrice] = useState(0);
+  const [gmfPrice, setGmfPrice] = useState("");
+  const { data: getGMFPriceData } = useSWR(
+    !withOutConversions && usdcPrice && Number(usdcPrice) && getNewPrice
+      ? [getGMFPrice.key, getNewPrice]
+      : null,
+    () => getGMFPrice.fetcher(usdcPrice),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  useEffect(() => {
+    if (getGMFPriceData) {
+      setGmfPrice(getGMFPriceData.value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getGMFPriceData]);
+
+  useEffect(() => {
+    setGetNewPriceLoading.off();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gmfPrice]);
+
+  useEffect(() => {
+    if (nativePrice && Number(nativePrice)) {
+      setGetNewPriceLoading.on();
+      setUsdcPrice(nativePrice as string);
+      setGetNewPrice(Math.random());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nativePrice]);
+
   return (
     <Flex flexDir="column" {...prop}>
       <Flex
@@ -34,6 +87,7 @@ function Index({
         boxSizing="border-box"
         bgColor="black.600"
         w="full"
+        borderRadius="6px"
       >
         <Image
           src={cryptoIc}
@@ -47,23 +101,37 @@ function Index({
           textStyle="16"
           color="white.100"
         >
-          Infinity Wallet
+          Gamifly Account
         </Text>
       </Flex>
       <Flex flexDir="column" pos="relative">
         <GamiflyWallet
           withOutButton
           price={nativePrice}
-          unit={nativeUnit}
+          unit={nativeUnit || ""}
+          isInput={isInput}
+          inputValueChange={(val: string) => {
+            inputValueChange?.(val);
+            if (val === "") return;
+            setGetNewPriceLoading.on();
+            setUsdcPrice(val);
+            setTimeout(() => {
+              setGetNewPrice(Math.random());
+            }, 1000);
+          }}
           mb="3px"
         />
-        <GamiflyWallet
-          withOutButton
-          price={otherPrice}
-          unit={otherUnit}
-          mb="3px"
-        />
-        <Flex
+        {!withOutConversions && (
+          <Box>
+            {getNewPriceLoading ? (
+              <Spinner size="xs" mt="5px" />
+            ) : (
+              <Text mt="5px">≈ {Number(gmfPrice)} GMF</Text>
+            )}
+          </Box>
+        )}
+
+        {/* <Flex
           w="23px"
           h="23px"
           borderRadius="50%"
@@ -80,11 +148,13 @@ function Index({
         >
           <Image src={arrows} w="5px" h="7px" transform="rotate(90deg)" />
           <Image src={arrows} w="5px" h="7px" transform="rotate(-90deg)" />
-        </Flex>
+        </Flex> */}
       </Flex>
       <BaseButton
-        display={{ base: "none", lg: "block" }}
-        w={{ base: "full", lg: "314px" }}
+        isLoading={buttonLoading || false}
+        loadingText={loadingText}
+        display={{ base: "none", lg: "flex" }}
+        w={{ base: "full", lg: "full" }}
         mt={{ base: px2vw(20), lg: "20px" }}
         fontFamily="Nunito"
         fontWeight="600"

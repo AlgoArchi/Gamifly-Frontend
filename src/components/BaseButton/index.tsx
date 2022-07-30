@@ -14,6 +14,7 @@ function Index({ children, buttonClick, ...prop }: IProps) {
       textStyle="16"
       w={{ base: px2vw(195), lg: "195px" }}
       h={{ base: px2vw(52), lg: "52px" }}
+      borderRadius="6px"
       onClick={() => buttonClick && buttonClick()}
       _hover={{
         bgColor: "blue.100",

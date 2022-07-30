@@ -1,13 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Flex, Text, Image } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import arrows from "@/assets/imgs/arrows.png";
-import VIP from "@/components/VIP";
-import { vipList } from "./leaderBoards";
+import VIP, { VipProp } from "@/components/VIP";
+import useSWR from "swr";
+import { getTopPlayers } from "@/apis/leaderBoards";
 
 function Index() {
   const router = useRouter();
+  const [vipList, setVipList] = useState<VipProp[]>([]);
+  const { data: getTopPlayersData } = useSWR(
+    getTopPlayers.key,
+    () => getTopPlayers.fetcher(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  useEffect(() => {
+    if (getTopPlayersData) {
+      setVipList(
+        getTopPlayersData.map((item: any, index: number) => {
+          return { ...item, place: index + 1 };
+        })
+      );
+    }
+  }, [getTopPlayersData]);
   return (
     <Flex direction="column" w="full">
       <Flex

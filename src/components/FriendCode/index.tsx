@@ -1,22 +1,37 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Flex, Image, Text, FlexProps, Input } from "@chakra-ui/react";
+import {
+  Flex,
+  Image,
+  Text,
+  FlexProps,
+  Input,
+  useToast,
+} from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
-import friendCode from "@/assets/imgs/friendCode.png";
+import friendCodeImg from "@/assets/imgs/friendCode.png";
 import BaseModal from "../BaseModal";
 import BaseButton from "../BaseButton";
+import { setStore } from "@/utils/storage";
+import globalStore from "@/stores/global";
+import { setReferral } from "@/apis/userInfo";
+import useSWR from "swr";
 
 export interface IProps extends FlexProps {
   isShow: boolean;
+  code: any;
   setIsShow: () => void;
 }
 
-function Index({ isShow, setIsShow, ...prop }: IProps) {
-  const [input1, setInput1] = useState("");
-  const [input2, setInput2] = useState("");
-  const [input3, setInput3] = useState("");
-  const [input4, setInput4] = useState("");
-  const [input5, setInput5] = useState("");
-  const [input6, setInput6] = useState("");
+function Index({ isShow, code, setIsShow, ...prop }: IProps) {
+  const { userInfo } = globalStore();
+  const toast = useToast();
+  const [friendCode, setFriendCode] = useState(null);
+  const [input1, setInput1] = useState(code?.substring(0, 1) || "");
+  const [input2, setInput2] = useState(code?.substring(1, 2) || "");
+  const [input3, setInput3] = useState(code?.substring(2, 3) || "");
+  const [input4, setInput4] = useState(code?.substring(3, 4) || "");
+  const [input5, setInput5] = useState(code?.substring(4, 5) || "");
+  const [input6, setInput6] = useState(code?.substring(5, 6) || "");
   const inp1 = useRef(null);
   const inp2 = useRef(null);
   const inp3 = useRef(null);
@@ -31,6 +46,40 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inp1.current]);
 
+  const { data: setReferralData } = useSWR(
+    userInfo && userInfo?.id && friendCode
+      ? [setReferral.key, friendCode]
+      : null,
+    (_) =>
+      setReferral.fetcher({
+        user_id: userInfo?.id,
+        code: friendCode,
+      }),
+    { revalidateOnFocus: false }
+  );
+
+  useEffect(() => {
+    if (setReferralData === undefined) return;
+    if (setReferralData && setReferralData?.result === "success") {
+      toast({
+        title: "success",
+        description: "Inviter binding success",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Inviter binding fail",
+        description: setReferralData?.reason,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setReferralData]);
+
   return (
     <BaseModal
       isShow={isShow}
@@ -43,7 +92,7 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
       <Flex w="full" flexDir="column" alignItems="center" fontFamily="Orbitron">
         <Image
           mx="auto"
-          src={friendCode}
+          src={friendCodeImg}
           w={{ base: px2vw(177), lg: "177px" }}
           h={{ base: px2vw(172), lg: "172px" }}
           mb={{ base: px2vw(30), lg: "30px" }}
@@ -346,7 +395,18 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
           fontFamily="Nunito"
           fontWeight="600"
           textStyle="16"
-          onClick={() => setIsShow()}
+          onClick={() => {
+            if (
+              (userInfo && userInfo?.id && !userInfo?.referral_id) ||
+              !userInfo?.id
+            ) {
+              setStore("friendCode", code);
+              setIsShow();
+            }
+            if (userInfo && userInfo?.id && !userInfo?.referral_id) {
+              setFriendCode(code);
+            }
+          }}
         >
           Apply
         </BaseButton>

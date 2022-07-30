@@ -5,14 +5,17 @@ import { useRouter } from "next/router";
 import BaseCheck from "../BaseCheck";
 
 export interface NFTItemProp {
-  img: string;
+  image: string;
   id?: string | number;
   name?: string;
   price?: string;
+  total_amount?: string;
   unit?: string;
   unitIcon?: string;
-  description?: string;
+  content?: string;
   isActive?: boolean;
+  created?: string;
+  status?: number;
 }
 
 export interface IProps extends FlexProps {
@@ -20,6 +23,7 @@ export interface IProps extends FlexProps {
   item: NFTItemProp;
   isSimple?: boolean;
   multiple?: boolean;
+  listLength?: number;
   itemClick?: (obj: NFTItemProp) => void;
   activeClick?: (index: number, obj: NFTItemProp) => void;
 }
@@ -31,6 +35,7 @@ function Index({
   multiple,
   itemClick,
   activeClick,
+  listLength,
   ...prop
 }: IProps) {
   const router = useRouter();
@@ -41,11 +46,12 @@ function Index({
       px={{ base: px2vw(10), lg: "10px" }}
       py={{ base: px2vw(12), lg: "12px" }}
       mt={{ base: px2vw(10), lg: "10px" }}
-      bgImage={item.img}
+      bgImage={item.image}
       bgSize="100% 100%"
       bgRepeat="no-repeat"
       boxSizing="border-box"
       pos="relative"
+      borderRadius="6px"
       cursor={isSimple ? "default" : "pointer"}
       onClick={() => {
         itemClick?.(item);
@@ -87,19 +93,19 @@ function Index({
             mr={{ base: px2vw(5), lg: "5px" }}
           />
         )}
-        {item?.price && item?.unit && (
+        {item?.price && (
           <Text
             fontFamily="Nunito"
             fontWeight="700"
             fontSize={{ base: px2vw(14), lg: "12px" }}
             lineHeight={{ base: px2vw(15), lg: "15px" }}
           >
-            {item?.price}
-            {item?.unit}
+            {item?.price} {item?.unit || "GMF"}
           </Text>
         )}
       </Flex>
-      {index === 7 &&
+      {listLength &&
+        index === listLength - 1 &&
         router.pathname !== "/myNft" &&
         router.pathname !== "/purchase" && (
           <Flex

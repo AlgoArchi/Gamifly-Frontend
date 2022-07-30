@@ -1,0 +1,77 @@
+name: ci-dev
+
+on:
+  push:
+    branches: ['dev']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.2
+        with:
+          always-auth: false
+          node-version: 16.x
+
+      - name: Checkout code repo
+        uses: actions/checkout@v2
+
+      - name: Check cache for yarn
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-dev-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install yarn
+        run: yarn install
+
+      - name: Build and export project
+        run: |
+          chmod +x ./build.sh
+          ./build.sh dev install
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: gamilfy-dev
+          path: drum-nodejs-dist/*
+          retention-days: 1
+
+  deploy-to-server:
+    name: deploy the gamilfy-dev website frontend to static server
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: gamilfy-dev
+
+      - name: Send files to server
+        uses: easingthemes/ssh-deploy@v2
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.STATIC_SERVER_PK }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.STATIC_PROD_SERVER_HOST }}
+          REMOTE_USER: "ubuntu"
+          TARGET: "/home/ubuntu/gamilfy-dev/temp/"
+
+      - name: Execute SSH commmands on remote server
+        uses: JimCronqvist/action-ssh@master
+        with:
+          hosts: "ubuntu@${{ secrets.STATIC_PROD_SERVER_HOST }}"
+          privateKey: ${{ secrets.STATIC_SERVER_PK }}
+          debug: false
+          command: |
+            cd /home/ubuntu/gamilfy-dev
+            rm -rf gamilfy-dev-frontend && mv temp gamilfy-dev-frontend && mkdir temp
+            cd gamilfy-dev-frontend
+            yarn install --devuction --ignore-scripts
+            sudo systemctl restart gamilfy-fe-dev.service
+
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: gamilfy-dev

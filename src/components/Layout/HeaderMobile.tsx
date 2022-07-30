@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Drawer,
@@ -20,16 +20,35 @@ import LoginOut from "../LoginOut";
 import LogIn from "../LogIn";
 import InviteFriend from "../InviteFriend";
 import FriendCode from "../FriendCode";
+import { useWeb3React } from "@web3-react/core";
+import { deleteStore, setStore } from "@/utils/storage";
+import { connectorLocalStorageKey } from "@/connect/connectors";
+import globalStore from "@/stores/global";
 
-function Index() {
+export interface IProps {
+  loginOutClick: () => void;
+}
+function Index({ loginOutClick }: IProps) {
   const router = useRouter();
+  const { userInfo } = globalStore();
+  const { deactivate } = useWeb3React();
   const [inviteCode] = useState(router.query.inviteCode);
   const [open, setOpen] = useBoolean(false);
   const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
   const [loginModal, setLoginModal] = useBoolean(false); // 登陆弹窗
-  const [isLogin, setIsLogin] = useBoolean(false); // 是否登陆
+  const [isLogin, setIsLogin] = useBoolean(userInfo?.id); // 是否登陆
   const [inviteShow, setInviteShow] = useBoolean(false);
   const [friendShow, setFriendShow] = useBoolean(false);
+
+  const disconnectWallet = async () => {
+    try {
+      await deactivate();
+      deleteStore(connectorLocalStorageKey);
+      setStore("isLogin", false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   // 按钮数组
   const buttonList: buttonItem[] = [
     {
@@ -38,12 +57,44 @@ function Index() {
       click: () => setInviteShow.on(),
     },
   ];
+
   useEffect(() => {
     if (inviteCode) {
-      setFriendShow.on();
+      if (
+        (userInfo && userInfo?.id && !userInfo?.referral_id) ||
+        !userInfo?.id
+      ) {
+        setFriendShow.on();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteCode]);
+
+  useEffect(() => {
+    if (userInfo && userInfo?.id) {
+      setIsLogin.on();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo]);
+
+  const userImg = useMemo(
+    () => (
+      <Image
+        src={
+          userInfo?.avatar
+            ? `${window.imgUrl.imageUrl}${userInfo?.avatar}`
+            : userProfile
+        }
+        w={px2vw(40)}
+        h={px2vw(40)}
+        borderRadius="50%"
+        my="auto"
+        onClick={() => router.push("/profile")}
+      />
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [userInfo]
+  );
   return (
     <Flex
       display={{ base: "flex", lg: "none" }}
@@ -71,13 +122,7 @@ function Index() {
             ?.name
         }
       </Text>
-      <Image
-        src={userProfile}
-        w={px2vw(40)}
-        h={px2vw(40)}
-        my="auto"
-        onClick={() => router.push("/profile")}
-      />
+      {userImg}
       {/* Drawer */}
       <Drawer isOpen={open} placement="left" onClose={() => setOpen.off()}>
         <DrawerContent bgColor="black.1100" pt={px2vw(60)} pb={px2vw(20)}>
@@ -99,12 +144,14 @@ function Index() {
               {/* 页面 */}
               <Flex flexDir="column">
                 <PageArr router={router} click={() => setOpen.off()} />
-                <Flex justifyContent="center" mt={px2vw(10)}>
-                  <ButtonArr
-                    click={() => setOpen.off()}
-                    buttonList={buttonList}
-                  />
-                </Flex>
+                {userInfo && userInfo?.id && (
+                  <Flex justifyContent="center" mt={px2vw(10)}>
+                    <ButtonArr
+                      click={() => setOpen.off()}
+                      buttonList={buttonList}
+                    />
+                  </Flex>
+                )}
               </Flex>
               {/* 登录登出按钮 */}
               <Flex h={px2vw(27)} ml={px2vw(35)}>
@@ -114,6 +161,7 @@ function Index() {
                     onClick={() => {
                       setOpen.off();
                       setLogOut.on();
+                      disconnectWallet();
                     }}
                   >
                     <Image
@@ -169,7 +217,10 @@ function Index() {
       <LoginOut
         logOut={logOut}
         setLogOut={(boo: boolean) => (boo ? setLogOut.on() : setLogOut.off())}
-        confirmLogOut={() => setIsLogin.off()}
+        confirmLogOut={() => {
+          setIsLogin.off();
+          loginOutClick();
+        }}
       />
       {/* login modal */}
       <LogIn
@@ -182,7 +233,11 @@ function Index() {
         }
       />
       <InviteFriend isShow={inviteShow} setIsShow={() => setInviteShow.off()} />
-      <FriendCode isShow={friendShow} setIsShow={() => setFriendShow.off()} />
+      <FriendCode
+        code={inviteCode}
+        isShow={friendShow}
+        setIsShow={() => setFriendShow.off()}
+      />
     </Flex>
   );
 }

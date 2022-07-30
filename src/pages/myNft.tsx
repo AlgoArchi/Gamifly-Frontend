@@ -1,17 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Flex, Text, Image, Box, useBoolean } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import NFTItem, { NFTItemProp } from "@/components/NFTItem";
 import BaseModal from "@/components/BaseModal";
 import arrows from "@/assets/imgs/arrows.png";
-import { nftList } from "@/components/ProfileData";
 import closeIcon from "@/assets/imgs/greenClose.webp";
+import useSWR from "swr";
+import { getMyNFTs } from "@/apis/userInfo";
+import globalStore from "@/stores/global";
 
 function Index() {
+  const { userInfo } = globalStore();
   const router = useRouter();
   const [chooseNft, setChooseNft] = useState<null | NFTItemProp>(null);
   const [isShow, setIsShow] = useBoolean(false);
+  const [nftList, setNftList] = useState<NFTItemProp[]>([]);
+  // 获取我的NFT
+  const { data: getMyNFTsData } = useSWR(
+    userInfo && userInfo?.id ? [getMyNFTs.key] : null,
+    (_) => getMyNFTs.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  useEffect(() => {
+    if (getMyNFTsData) {
+      setNftList(getMyNFTsData);
+    }
+  }, [getMyNFTsData]);
   return (
     <Flex direction="column" w="full">
       <Flex
@@ -138,7 +154,7 @@ function Index() {
             onClick={() => setIsShow.off()}
           />
           <Image
-            src={chooseNft?.img}
+            src={chooseNft?.image}
             w={{ base: "full", lg: "327px" }}
             h={{ base: px2vw(345), lg: "327px" }}
           />
@@ -160,12 +176,14 @@ function Index() {
               {chooseNft?.name}
             </Text>
             <Flex mb={{ base: px2vw(30), lg: "30px" }}>
-              <Image
-                src={chooseNft?.unitIcon}
-                w={{ base: px2vw(20), lg: "20px" }}
-                h={{ base: px2vw(20), lg: "20px" }}
-                mr={{ base: px2vw(10), lg: "10px" }}
-              />
+              {chooseNft?.unitIcon && (
+                <Image
+                  src={chooseNft?.unitIcon}
+                  w={{ base: px2vw(20), lg: "20px" }}
+                  h={{ base: px2vw(20), lg: "20px" }}
+                  mr={{ base: px2vw(10), lg: "10px" }}
+                />
+              )}
               <Text
                 fontFamily="Orbitron"
                 fontWeight="700"
@@ -173,8 +191,8 @@ function Index() {
                 fontSize={{ base: px2vw(16), lg: "16px" }}
                 lineHeight={{ base: px2vw(20), lg: "20px" }}
               >
-                {chooseNft?.price}
-                {chooseNft?.unit}
+                {chooseNft?.total_amount}
+                {chooseNft?.unit || ""}
               </Text>
             </Flex>
             <Text
@@ -184,7 +202,7 @@ function Index() {
               fontSize={{ base: px2vw(16), lg: "16px" }}
               lineHeight={{ base: px2vw(22), lg: "22px" }}
             >
-              {chooseNft?.description}
+              {chooseNft?.content}
             </Text>
           </Flex>
         </Flex>

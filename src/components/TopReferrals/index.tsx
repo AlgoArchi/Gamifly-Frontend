@@ -1,13 +1,13 @@
 import React from "react";
 import { Flex, Text, Image, FlexProps } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
+import userProfile from "@/assets/imgs/userProfile.png";
 
 export interface TopReferralsProp {
-  id?: number | string;
   place: number | string;
-  userName: string;
-  invitedFriends: number | string;
-  userNameImg?: string;
+  name: string;
+  referral_count: number | string;
+  avatar?: string;
 }
 
 export interface IProps extends FlexProps {
@@ -16,7 +16,13 @@ export interface IProps extends FlexProps {
 
 function Index({ list, ...prop }: IProps) {
   return (
-    <Flex flexDir="column" w="full" {...prop}>
+    <Flex
+      flexDir="column"
+      w="full"
+      borderRadius="6px"
+      overflow="hidden"
+      {...prop}
+    >
       <Flex
         h={{ base: px2vw(20), lg: "20px" }}
         px={{ base: px2vw(20), lg: "20px" }}
@@ -67,7 +73,7 @@ function Index({ list, ...prop }: IProps) {
             User Name
           </Flex>
           <Flex
-            w={{ base: px2vw(103), lg: "135px" }}
+            w={{ base: px2vw(103), lg: "calc(100% - 317px)" }}
             h={{ base: px2vw(50), lg: "50px" }}
             pr={{ base: px2vw(20), lg: "20px" }}
             justifyContent="flex-end"
@@ -111,15 +117,20 @@ function Index({ list, ...prop }: IProps) {
                 bgColor={index % 2 === 0 ? "black.1500" : "black.600"}
               >
                 <Image
-                  src={item.userNameImg}
+                  borderRadius="50%"
+                  src={
+                    item.avatar
+                      ? `${window.imgUrl.imageUrl}${item.avatar}`
+                      : userProfile
+                  }
                   w={{ base: px2vw(30), lg: "30px" }}
                   h={{ base: px2vw(30), lg: "30px" }}
                   mr={{ base: px2vw(10), lg: "10px" }}
                 />
-                {item.userName}
+                {item.name}
               </Flex>
               <Flex
-                w={{ base: px2vw(103), lg: "135px" }}
+                w={{ base: px2vw(103), lg: "calc(100% - 317px)" }}
                 h={{ base: px2vw(50), lg: "50px" }}
                 px={{ base: px2vw(20), lg: "20px" }}
                 justifyContent="flex-end"
@@ -128,7 +139,7 @@ function Index({ list, ...prop }: IProps) {
                 color="blue.100"
                 bgColor={index % 2 === 0 ? "black.700" : "black.1200"}
               >
-                {item.invitedFriends}
+                {item.referral_count}
               </Flex>
             </Flex>
           ))}

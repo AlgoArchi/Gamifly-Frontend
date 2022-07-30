@@ -1,13 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Flex, Text, Image } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import arrows from "@/assets/imgs/arrows.png";
-import TopReferrals from "@/components/TopReferrals";
-import { topList } from "./leaderBoards";
+import TopReferrals, { TopReferralsProp } from "@/components/TopReferrals";
+import useSWR from "swr";
+import { getTopReferrals } from "@/apis/leaderBoards";
 
 function Index() {
   const router = useRouter();
+  const [topList, setTopList] = useState<TopReferralsProp[]>([]);
+  const { data: getTopReferralsData } = useSWR(
+    getTopReferrals.key,
+    () => getTopReferrals.fetcher(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  useEffect(() => {
+    if (getTopReferralsData) {
+      setTopList(
+        getTopReferralsData.map((item: any, index: number) => {
+          return { ...item, place: index + 1 };
+        })
+      );
+    }
+  }, [getTopReferralsData]);
   return (
     <Flex direction="column" w="full">
       <Flex

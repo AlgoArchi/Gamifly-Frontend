@@ -4,6 +4,7 @@ import px2vw from "@/utils/px2vw";
 import { touRakingItem, tournamentsItem } from "@/pages/tournaments";
 import tournamentLine from "@/assets/imgs/tournamentLine.png";
 import tournamentTime from "@/assets/imgs/tournamentTime.png";
+import userProfile from "@/assets/imgs/userProfile.png";
 import BaseButton from "../BaseButton";
 import { useRouter } from "next/router";
 
@@ -21,6 +22,7 @@ function Index({ item, isDetail, ...prop }: IProps) {
       bgColor="black.600"
       flexDir={{ base: "column", lg: "row" }}
       mb={{ base: px2vw(20), lg: "20px" }}
+      borderRadius="6px"
       {...prop}
     >
       {/* TOURNAMENT */}
@@ -36,6 +38,7 @@ function Index({ item, isDetail, ...prop }: IProps) {
           fontWeight="700"
           textStyle="14"
           bgColor="green.100"
+          borderTopLeftRadius="6px"
         >
           TOURNAMENT
         </Flex>
@@ -44,10 +47,11 @@ function Index({ item, isDetail, ...prop }: IProps) {
           {/* photo */}
           <Flex pos="relative">
             <Image
-              src={item.photo}
+              src={`${window.imgUrl.gameUrl}${item.image}`}
               w={{ base: "full", lg: "240px" }}
               h={{ base: px2vw(190), lg: "310px" }}
               mr={{ base: 0, lg: "2px" }}
+              borderBottomLeftRadius="6px"
             />
             <Image
               src={tournamentLine}
@@ -73,7 +77,7 @@ function Index({ item, isDetail, ...prop }: IProps) {
               textStyle={{ base: "18", lg: "22" }}
               mb={{ base: px2vw(10), lg: "15px" }}
             >
-              {item.name}
+              {item.title}
             </Text>
             {/* Time */}
             <Flex alignItems="flex-end" mb={{ base: px2vw(20), lg: "25px" }}>
@@ -101,16 +105,21 @@ function Index({ item, isDetail, ...prop }: IProps) {
               overflowY={isDetail ? "visible" : { base: "hidden", lg: "auto" }}
               lineHeight={{ base: px2vw(22), lg: "22px" }}
               mb={{ base: px2vw(20), lg: "40px" }}
-              w={{ base: "full", lg: "542px" }}
+              maxW={{ base: "full", lg: "542px" }}
               h={isDetail ? "max-content" : { base: px2vw(132), lg: "88px" }}
-              dangerouslySetInnerHTML={{ __html: item.description }}
+              dangerouslySetInnerHTML={{ __html: item.content }}
             />
             {/* buttons */}
             <Flex
               display={isDetail ? "none" : "flex"}
               justifyContent="space-between"
             >
-              <BaseButton w={{ base: px2vw(150), lg: "195px" }}>Go</BaseButton>
+              <BaseButton
+                w={{ base: px2vw(150), lg: "195px" }}
+                onClick={() => window.open(item?.link)}
+              >
+                Go
+              </BaseButton>
               <BaseButton
                 w={px2vw(150)}
                 display={{ base: "block", lg: "none" }}
@@ -150,10 +159,10 @@ function Index({ item, isDetail, ...prop }: IProps) {
         {/* info */}
         <Flex
           w="full"
-          h={{ base: "max-content", lg: "290px" }}
+          // h={{ base: "max-content", lg: "310px" }}
           overflowY={{ base: "visible", lg: "auto" }}
           flexDir="column"
-          display={item.rankings.length > 0 ? "flex" : "none"}
+          display={item.rank.length > 0 ? "flex" : "none"}
         >
           {/* header */}
           <Flex
@@ -191,8 +200,13 @@ function Index({ item, isDetail, ...prop }: IProps) {
             </Flex>
           </Flex>
           {/* list */}
-          <Flex w="full" flexDir="column">
-            {item.rankings.map((item: touRakingItem, index: number) => (
+          <Flex
+            w="full"
+            h={{ base: px2vw(260), lg: "260px" }}
+            bgColor="black.600"
+            flexDir="column"
+          >
+            {item.rank.map((item: touRakingItem, index: number) => (
               <Flex
                 key={index}
                 w="full"
@@ -209,16 +223,15 @@ function Index({ item, isDetail, ...prop }: IProps) {
                   px={{ base: px2vw(20), lg: "20px" }}
                   alignItems="center"
                   boxSizing="border-box"
-                  bgColor={index % 2 === 0 ? "black.1500" : "black.600"}
                 >
                   {item.rank}
                   <Image
-                    src={item.userIcon}
+                    src={item.avatar || userProfile}
                     w={{ base: px2vw(30), lg: "30px" }}
                     h={{ base: px2vw(30), lg: "30px" }}
                     mx={{ base: px2vw(10), lg: "10px" }}
                   />
-                  {item.userName}
+                  {item.name}
                 </Flex>
                 <Flex
                   w={{
@@ -240,7 +253,7 @@ function Index({ item, isDetail, ...prop }: IProps) {
         </Flex>
         {/* No information yet */}
         <Flex
-          display={item.rankings.length > 0 ? "none" : "flex"}
+          display={item.rank.length > 0 ? "none" : "flex"}
           justifyContent="center"
           alignItems="center"
           bgColor="black.600"

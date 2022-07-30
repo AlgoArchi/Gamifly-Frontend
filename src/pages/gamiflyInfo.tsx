@@ -5,6 +5,14 @@ import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import downLoad from "@/assets/imgs/downLoad.png";
 
 function App() {
+  const downFile = () => {
+    const oa = document.createElement("a");
+    oa.href =
+      "https://app.gamifly.co/gamifly_server/server/assets/files/whitepaper.pdf";
+    oa.setAttribute("target", "_blank");
+    document.body.appendChild(oa);
+    oa.click();
+  };
   return (
     <Flex w="full" flexDir="column">
       <Text
@@ -21,11 +29,14 @@ function App() {
         w="full"
         h={{ base: px2vw(175), lg: "233px" }}
         bgColor="black.300"
+        borderRadius="6px"
       >
         <Center
           w={{ base: px2vw(215), lg: "215px" }}
           h={{ base: px2vw(53), lg: "63px" }}
           bgColor="green.300"
+          cursor="pointer"
+          onClick={() => downFile()}
         >
           <Image
             my="auto"
@@ -41,7 +52,7 @@ function App() {
             fontSize={{ base: px2vw(14), lg: "14px" }}
             lineHeight={{ base: px2vw(53), lg: "63px" }}
           >
-            Open Gamifly info
+            Whitepaper
           </Text>
         </Center>
       </Center>

@@ -1,11 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Container, Flex, Text, useBoolean } from "@chakra-ui/react";
+import {
+  Container,
+  Flex,
+  Text,
+  Image,
+  useBoolean,
+  useToast,
+} from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
+import { login } from "@/apis/login";
+import { getReferralCode, setReferral } from "@/apis/userInfo";
+import { requestReward } from "@/apis/login";
+import { getNotifications } from "@/apis/notifications";
+import useSWR from "swr";
+import { getStore, setStore } from "@/utils/storage";
+import globalStore from "@/stores/global";
+import footer1 from "@/assets/imgs/footer1.png";
+import footer2 from "@/assets/imgs/footer2.png";
+import footer3 from "@/assets/imgs/footer3.png";
+import footer4 from "@/assets/imgs/footer4.png";
 import LeftMenu from "./LeftMenu";
 import Header from "./Header";
 import HeaderMobile from "./HeaderMobile";
 import BaseModal from "../BaseModal";
+import TermsOfUse from "../TermsOfUse";
+import PrivacyPolicy from "../PrivacyPolicy";
 
 export interface LayoutProps {
   children: any;
@@ -13,17 +33,147 @@ export interface LayoutProps {
 
 function Index({ children }: LayoutProps) {
   const router = useRouter();
-  const loginRouter = router?.pathname !== "/" && router?.pathname !== "/login";
+  const toast = useToast();
+  const [interVals, setInterVals] = useState<any>(null);
+  const [getRequestReward, setGetRequestReward] = useState(0);
+  const [notificationsRandom, setNotificationsRandom] = useState(0);
+  const [notificationList, setNotificationList] = useState([]);
+  const { userInfo } = globalStore();
+  const [friendCode, setFriendCode] = useState(null);
+  const [accessToken, setAccessToken] = useState<any>(null);
+  const loginRouter =
+    router?.pathname !== "/" &&
+    router?.pathname !== "/login" &&
+    router.pathname !== "/advertisement";
   const [showTermsOfService, setShowTermsOfService] = useBoolean(false);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useBoolean(false);
+  const { data: loginData } = useSWR(
+    accessToken ? [login.key] : null,
+    (_) =>
+      login.fetcher({
+        accessToken: accessToken,
+      }),
+    { revalidateOnFocus: false }
+  );
+  const { data: getReferralCodeData } = useSWR(
+    userInfo && userInfo?.id ? [getReferralCode.key] : null,
+    (_) => getReferralCode.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+  const { data: setReferralData } = useSWR(
+    userInfo && userInfo?.id && friendCode
+      ? [setReferral.key, friendCode]
+      : null,
+    (_) =>
+      setReferral.fetcher({
+        user_id: userInfo?.id,
+        code: friendCode,
+      }),
+    { revalidateOnFocus: false }
+  );
+  const { data: _requestRewardData } = useSWR(
+    userInfo && userInfo?.id && getRequestReward
+      ? [requestReward.key, getRequestReward]
+      : null,
+    (_) =>
+      requestReward.fetcher({
+        user_id: userInfo?.id,
+        type: 1,
+      }),
+    { revalidateOnFocus: false }
+  );
+  const { data: getNotificationsData } = useSWR(
+    userInfo && userInfo?.id && notificationsRandom
+      ? [getNotifications.key, notificationsRandom]
+      : null,
+    (_) => getNotifications.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  useEffect(() => {
+    if (loginData) {
+      setStore("userInfo", loginData);
+      globalStore.setState({
+        userInfo: loginData,
+      });
+      setStore("isLogin", true);
+      console.log("login success");
+      setFriendCode(getStore("friendCode"));
+      setNotificationsRandom(Math.random());
+    }
+  }, [loginData]);
+
+  useEffect(() => {
+    setAccessToken(router.query.accessToken);
+  }, [router]);
+
+  // 当用户刷新页面时，url不具有accessToken，且store中含有userInfo时，增加userInfo数据,检查store中是否含有userInfo，如果有，增加计时器
+  useEffect(() => {
+    setStore("time", new Date().getTime());
+    if (!router.query.accessToken && getStore("userInfo")) {
+      globalStore.setState({
+        userInfo: getStore("userInfo"),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 当用户刷新页面时,检查store中是否含有userInfo，如果有，增加计时器。同时，获取通知接口
+  useEffect(() => {
+    if (getStore("userInfo") || userInfo?.id) {
+      const interV = setInterval(() => {
+        setGetRequestReward(Math.random);
+      }, 600000);
+      setInterVals(interV);
+      setNotificationsRandom(Math.random());
+    } else {
+      clearInterval(interVals);
+      setGetRequestReward(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
+
+  useEffect(() => {
+    if (getReferralCodeData) {
+      setStore("referralCode", getReferralCodeData);
+    }
+  }, [getReferralCodeData]);
+
+  useEffect(() => {
+    if (setReferralData === undefined) return;
+    if (setReferralData && setReferralData?.result === "success") {
+      toast({
+        title: "success",
+        description: "Inviter binding success",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Inviter binding fail",
+        description: setReferralData?.reason,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setReferralData]);
+
+  useEffect(() => {
+    if (getNotificationsData) {
+      setNotificationList(getNotificationsData);
+    }
+  }, [getNotificationsData]);
 
   return (
     <Flex
-      w="full"
       justifyContent="flex-start"
-      bg="black.900"
+      bg={loginRouter ? "black.900" : "#17192E"}
+      pl={{ base: "0", lg: loginRouter ? "237px" : "0" }}
       pos="relative"
-      overflowX="hidden"
+      overflowX={{ base: "hidden", lg: "auto" }}
       _before={{
         content: "''",
         pos: "absolute",
@@ -54,7 +204,7 @@ function Index({ children }: LayoutProps) {
             pos="absolute"
             top={{ base: "auto", lg: "35%" }}
             bottom={{ base: "15%", lg: "auto" }}
-            right={{ base: px2vw(-100), lg: "-100px" }}
+            right="0"
             w={{ base: px2vw(230), lg: "326px" }}
             h={{ base: px2vw(190), lg: "318px" }}
             bgColor="green.100"
@@ -68,7 +218,7 @@ function Index({ children }: LayoutProps) {
       {loginRouter && <LeftMenu />}
       {/* 右侧内容 */}
       <Flex
-        w={loginRouter ? { base: "full", lg: "calc(100% - 237px)" } : "full"}
+        w="full"
         pl={loginRouter ? { base: px2vw(15), lg: "20px" } : 0}
         pr={loginRouter ? { base: px2vw(15), lg: "20px" } : 0}
         flexDirection="column"
@@ -78,8 +228,19 @@ function Index({ children }: LayoutProps) {
         {/* 顶部Header */}
         {loginRouter && (
           <>
-            <Header />
-            <HeaderMobile />
+            <Header
+              notificationList={notificationList}
+              loginOutClick={() => {
+                clearInterval(interVals);
+                setGetRequestReward(0);
+              }}
+            />
+            <HeaderMobile
+              loginOutClick={() => {
+                clearInterval(interVals);
+                setGetRequestReward(0);
+              }}
+            />
           </>
         )}
         {/* 页面 */}
@@ -92,43 +253,116 @@ function Index({ children }: LayoutProps) {
               base: `calc(100vh - ${px2vw(55)})`,
               lg: "calc(100vh - 72px)",
             }}
+            // overflowX="auto"
           >
             {children}
             <Flex
-              display={{ base: "none", lg: "flex" }}
-              w="245px"
+              w={{ base: "full", lg: "360px" }}
+              h={{ base: px2vw(300), lg: "300px" }}
+              flexDir="column"
+              alignItems="center"
+              justifyContent="center"
+              // display={{ base: "none", lg: "flex" }}
               mx="auto"
               mt="50px"
             >
               <Text
-                color="blue.100"
-                fontFamily="Nunito"
-                textStyle="14"
-                fontWeight="400"
+                textStyle="18"
+                color="white.100"
                 textAlign="center"
-                lineHeight={{ base: px2vw(20), lg: "20px" }}
+                fontWeight="700"
+                mb={{ base: px2vw(20), lg: "20px" }}
               >
-                By continuing you agree to the{" "}
+                Join Our Community
+              </Text>
+              <Flex mb={{ base: px2vw(28), lg: "28px" }}>
+                {/* Discord */}
+                <Flex
+                  w={{ base: px2vw(46), lg: "46px" }}
+                  h={{ base: px2vw(46), lg: "46px" }}
+                  mr={{ base: px2vw(15), lg: "15px" }}
+                  borderRadius={{ base: px2vw(12), lg: "12px" }}
+                  bgColor="black.100"
+                  justifyContent="center"
+                  alignItems="center"
+                  boxShadow="0px 2px 26px #3d50ff"
+                  cursor="pointer"
+                  onClick={() => window.open(" https://discord.gg/FMGNrjk75k")}
+                >
+                  <Image src={footer1} />
+                </Flex>
+                {/* Instagram */}
+                <Flex
+                  w={{ base: px2vw(46), lg: "46px" }}
+                  h={{ base: px2vw(46), lg: "46px" }}
+                  mr={{ base: px2vw(15), lg: "15px" }}
+                  borderRadius={{ base: px2vw(12), lg: "12px" }}
+                  bgColor="black.100"
+                  justifyContent="center"
+                  alignItems="center"
+                  boxShadow="0px 2px 26px #3d50ff"
+                  cursor="pointer"
+                  onClick={() =>
+                    window.open(
+                      "https://instagram.com/gamifly?igshid=YmMyMTA2M2Y="
+                    )
+                  }
+                >
+                  <Image src={footer2} />
+                </Flex>
+                {/* Telegram */}
+                <Flex
+                  w={{ base: px2vw(46), lg: "46px" }}
+                  h={{ base: px2vw(46), lg: "46px" }}
+                  mr={{ base: px2vw(15), lg: "15px" }}
+                  borderRadius={{ base: px2vw(12), lg: "12px" }}
+                  bgColor="black.100"
+                  justifyContent="center"
+                  alignItems="center"
+                  boxShadow="0px 2px 26px #3d50ff"
+                  cursor="pointer"
+                  onClick={() => window.open("http://t.me/gamifly")}
+                >
+                  <Image src={footer3} />
+                </Flex>
+                {/* twitter */}
+                <Flex
+                  w={{ base: px2vw(46), lg: "46px" }}
+                  h={{ base: px2vw(46), lg: "46px" }}
+                  borderRadius={{ base: px2vw(12), lg: "12px" }}
+                  bgColor="black.100"
+                  justifyContent="center"
+                  alignItems="center"
+                  boxShadow="0px 2px 26px #3d50ff"
+                  cursor="pointer"
+                  onClick={() => window.open("https://twitter.com/Gamiflyco")}
+                >
+                  <Image src={footer4} />
+                </Flex>
+              </Flex>
+              <Flex
+                fontSize={{ base: px2vw(15), lg: "15px" }}
+                lineHeight={{ base: px2vw(15), lg: "15px" }}
+                fontWeight="700"
+                color="white.100"
+                opacity="0.6"
+              >
                 <Text
-                  display="inline-flex"
-                  fontWeight="700"
                   textDecor="underline"
                   cursor="pointer"
                   onClick={() => setShowTermsOfService.on()}
                 >
-                  Terms of Service
-                </Text>{" "}
-                and{" "}
+                  Term of service
+                </Text>
+                <Text mx="10px">and</Text>
                 <Text
-                  display="inline-flex"
-                  fontWeight="700"
                   textDecor="underline"
                   cursor="pointer"
                   onClick={() => setShowPrivacyPolicy.on()}
                 >
-                  Privacy Policy
+                  Privacy policy
                 </Text>
-              </Text>
+              </Flex>
             </Flex>
           </Flex>
         ) : (
@@ -139,94 +373,14 @@ function Index({ children }: LayoutProps) {
           isShow={showTermsOfService}
           close={() => setShowTermsOfService.off()}
         >
-          <Text
-            fontFamily="Orbitron"
-            color="white.100"
-            fontWeight="600"
-            fontSize={{ base: px2vw(22), lg: "22px" }}
-            lineHeight={{ base: px2vw(28), lg: "28px" }}
-            mb={{ base: px2vw(20), lg: "20px" }}
-          >
-            Terms and Conditions
-          </Text>
-          <Text
-            fontFamily="Nunito"
-            color="white.500"
-            fontWeight="400"
-            fontSize={{ base: px2vw(16), lg: "16px" }}
-            lineHeight={{ base: px2vw(22), lg: "22px" }}
-            mb={{ base: px2vw(20), lg: "20px" }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </Text>
-          <Text
-            fontFamily="Nunito"
-            color="white.500"
-            fontWeight="400"
-            fontSize={{ base: px2vw(16), lg: "16px" }}
-            lineHeight={{ base: px2vw(22), lg: "22px" }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </Text>
+          <TermsOfUse />
         </BaseModal>
         {/* Privacy Policy */}
         <BaseModal
           isShow={showPrivacyPolicy}
           close={() => setShowPrivacyPolicy.off()}
         >
-          <Text
-            fontFamily="Orbitron"
-            color="white.100"
-            fontWeight="600"
-            fontSize={{ base: px2vw(22), lg: "22px" }}
-            lineHeight={{ base: px2vw(28), lg: "28px" }}
-            mb={{ base: px2vw(20), lg: "20px" }}
-          >
-            Privacy Policy
-          </Text>
-          <Text
-            fontFamily="Nunito"
-            color="white.500"
-            fontWeight="400"
-            fontSize={{ base: px2vw(16), lg: "16px" }}
-            lineHeight={{ base: px2vw(22), lg: "22px" }}
-            mb={{ base: px2vw(20), lg: "20px" }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </Text>
-          <Text
-            fontFamily="Nunito"
-            color="white.500"
-            fontWeight="400"
-            fontSize={{ base: px2vw(16), lg: "16px" }}
-            lineHeight={{ base: px2vw(22), lg: "22px" }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
-          </Text>
+          <PrivacyPolicy />
         </BaseModal>
       </Flex>
     </Flex>

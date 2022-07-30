@@ -9,15 +9,15 @@ import Deposit from "@/components/Transfer/Deposit";
 import BaseButton from "@/components/BaseButton";
 import buySuccess from "@/assets/imgs/buySuccess.png";
 import BaseModal from "@/components/BaseModal";
-import { useRouter } from "next/router";
 
 function App() {
-  const router = useRouter();
   const [step, setStep] = useState(1); // 步骤
   const [chooseType, setChooseType] = useState("Deposit"); // Deposit / Withdraw
-  const [paymentMethod, setPaymentMethod] = useState(2); // 支付类型
-  const [totalPrice] = useState(21.3); // 总价格
-  const [priceUnit] = useState("TRX"); // 总价格
+  const [paymentMethod, setPaymentMethod] = useState(3); // 支付类型
+  const [totalPrice] = useState(0); // 总价格
+  const [priceUnit] = useState("GMF"); // 总价格
+  const [transferVal, setTransferVal] = useState("0");
+  const [hash, setHash] = useState("");
   const [showSuccess, setShowSuccess] = useBoolean(false);
 
   const contentDeposit = useMemo(() => {
@@ -35,7 +35,9 @@ function App() {
           totalPrice={totalPrice}
           paymentMethod={paymentMethod}
           setPaymentMethod={(type: number) => setPaymentMethod(type)}
-          success={() => {
+          success={(val: string, hash: string) => {
+            setTransferVal(val);
+            setHash(hash);
             setShowSuccess.on();
           }}
         />
@@ -58,7 +60,9 @@ function App() {
         <Withdraw
           totalPrice={totalPrice}
           priceUnit={priceUnit}
-          success={() => {
+          success={(hash: string, val: string) => {
+            setTransferVal(val);
+            setHash(hash);
             setShowSuccess.on();
           }}
         />
@@ -78,7 +82,7 @@ function App() {
         fontSize="36px"
         color="white.100"
       >
-        Make a Purchase
+        Make a Transfer
       </Text>
       <Flex flexDir="column">
         {/* Purchase type */}
@@ -134,7 +138,7 @@ function App() {
         isShow={showSuccess}
         close={() => {
           setShowSuccess.off();
-          router.push("/games");
+          setStep(1);
         }}
         w={{ base: `calc(100% - ${px2vw(30)})`, lg: "454px" }}
         h={{ base: "400px", lg: "430px" }}
@@ -157,7 +161,10 @@ function App() {
           >
             Your transaction is on the way!
           </Text>
-          <Text
+          <Flex
+            w="full"
+            flexWrap="wrap"
+            justifyContent="center"
             fontFamily="Nunito"
             fontWeight="400"
             color="white.500"
@@ -166,12 +173,20 @@ function App() {
             lineHeight={{ base: px2vw(22), lg: "22px" }}
             mb={{ base: px2vw(25), lg: "30px" }}
           >
-            Your sent
-            <Text color="green.100" display="inline-block" mx="5px">
-              1,2 Gemifly token (12 TRX)
+            <Text display="inline-block">Your sent</Text>
+            {chooseType === "Deposit" ? (
+              <Text color="green.100" display="inline-block" mx="5px">
+                {transferVal} gamilfy token ({transferVal} GMF)
+              </Text>
+            ) : (
+              <Text color="green.100" display="inline-block" mx="5px">
+                {transferVal} USDC
+              </Text>
+            )}
+            <Text display={chooseType === "Deposit" ? "inline-block" : "none"}>
+              to the Gamifly Account.
             </Text>
-            to the Gamifly Wallet.
-          </Text>
+          </Flex>
           <Flex w="full" justifyContent="space-between">
             <BaseButton
               w={{ base: px2vw(140), lg: "190px" }}
@@ -181,7 +196,10 @@ function App() {
               boxShadow="none"
               onClick={() => {
                 setShowSuccess.off();
-                router.push("/games");
+                setStep(1);
+                setChooseType("Deposit");
+                setHash("");
+                setTransferVal("0");
               }}
             >
               Cancel
@@ -190,7 +208,11 @@ function App() {
               w={{ base: px2vw(140), lg: "190px" }}
               onClick={() => {
                 setShowSuccess.off();
-                router.push("/games");
+                setStep(1);
+                setChooseType("Deposit");
+                setHash("");
+                setTransferVal("0");
+                window.open(`https://polygonscan.com/tx/${hash}`);
               }}
             >
               View details

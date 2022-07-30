@@ -42,13 +42,13 @@ function Index({ activeOption, options, setActiveOption, ...prop }: IProps) {
       >
         <Flex>
           <Image
-            src={item.img}
+            src={`${window.imgUrl.gameUrl}${item.image}`}
             w={{ base: px2vw(115), lg: "115px" }}
             h={{ base: px2vw(75), lg: "75px" }}
             mr={{ base: px2vw(22), lg: "22px" }}
             my="auto"
           />
-          <Text>{item.name}</Text>
+          <Text>{item.title}</Text>
         </Flex>
         {!isOption && (
           <Image
@@ -65,7 +65,7 @@ function Index({ activeOption, options, setActiveOption, ...prop }: IProps) {
   );
 
   return (
-    <Flex flexDir="column" pos="relative">
+    <Flex flexDir="column" pos="relative" borderRadius="6px">
       {/* active option */}
       <SelectItem item={activeOption} />
       {/* option */}
@@ -73,8 +73,9 @@ function Index({ activeOption, options, setActiveOption, ...prop }: IProps) {
         flexDir="column"
         w="full"
         pos="absolute"
-        overflow="hidden"
-        h={showOption ? "min-content" : "0"}
+        overflow="auto"
+        bgColor="black.100"
+        h={showOption ? { base: px2vw(230), lg: "230px" } : "0"}
         top={{ base: px2vw(70), lg: "70px" }}
         zIndex={1}
       >

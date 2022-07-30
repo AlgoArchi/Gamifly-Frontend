@@ -2,7 +2,7 @@ import getConfig from "next/config";
 
 const { publicRuntimeConfig } = getConfig();
 
-const prefix = publicRuntimeConfig.localStoragePrefix;
+const prefix = publicRuntimeConfig.localStoragePrefix || "";
 
 const separatorStr = `/@@/`;
 

@@ -1,14 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Flex, Text, Image, Box } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import arrows from "@/assets/imgs/arrows.png";
-import { transactionsList } from "@/components/ProfileData";
 import TransactionItem, { transactionItem } from "@/components/TransactionItem";
 import styles from "@/components/ProfileData/style.module.scss";
+import { getGamiflyWalletTransactions } from "@/apis/userInfo";
+import useSWR from "swr";
+import globalStore from "@/stores/global";
 
 function Index() {
   const router = useRouter();
+  const { userInfo } = globalStore();
+  const [transactionsList, setTransactionsList] = useState<transactionItem[]>(
+    []
+  );
+
+  // 获取我的转账记录
+  const { data: getGamiflyWalletTransactionsData } = useSWR(
+    userInfo && userInfo?.id ? [getGamiflyWalletTransactions.key] : null,
+    (_) => getGamiflyWalletTransactions.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  // 获取我的转账记录回调
+  useEffect(() => {
+    if (getGamiflyWalletTransactionsData) {
+      setTransactionsList(getGamiflyWalletTransactionsData);
+    }
+  }, [getGamiflyWalletTransactionsData]);
+
   return (
     <Flex direction="column" w="full">
       <Flex
@@ -58,7 +79,7 @@ function Index() {
           lineHeight={{ base: px2vw(23), lg: "45px" }}
           mb="25px"
         >
-          Gamifly Wallet transactions
+          Gamifly Account transactions
         </Text>
         <Image
           display={{ base: "block", lg: "none" }}
@@ -87,13 +108,13 @@ function Index() {
           <Flex w={{ base: px2vw(163), lg: "163px" }}>
             <Text>Time</Text>
           </Flex>
-          <Flex w={{ base: px2vw(110), lg: "110px" }}>
+          <Flex w={{ base: px2vw(110), lg: "140px" }}>
             <Text>Type</Text>
           </Flex>
           <Flex w={{ base: px2vw(107), lg: "107px" }}>
             <Text>Asset</Text>
           </Flex>
-          <Flex w={{ base: px2vw(109), lg: "109px" }}>
+          <Flex w={{ base: px2vw(109), lg: "79px" }}>
             <Text>Amount</Text>
           </Flex>
           <Flex w={{ base: px2vw(217), lg: "217px" }}>

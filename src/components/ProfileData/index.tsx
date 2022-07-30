@@ -1,308 +1,211 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Text, Image, Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import px2vw from "@/utils/px2vw";
-import tokenIc from "@/assets/imgs/tokenIcon.png";
-import cryptoIc from "@/assets/imgs/cryptoIcon.png";
-import NFTIcon from "@/assets/imgs/NFT.png";
-import messageIcon from "@/assets/imgs/messageIcon.png";
-import nullGreen from "@/assets/imgs/nullGreen.png";
-import nullBlue from "@/assets/imgs/nullBlue.png";
-import meta from "@/assets/imgs/meta.svg";
+import eth from "@/assets/imgs/eth.png";
+import wallet from "@/assets/imgs/wallet.png";
+import coin from "@/assets/imgs/coin.png";
+import usdc from "@/assets/imgs/usdc.png";
+import globalStore from "@/stores/global";
+import useSWR from "swr";
+import {
+  getGamiflyWalletBalance,
+  getGamiflyWalletTransactions,
+  getMyNFTs,
+  getRewardAmount,
+} from "@/apis/userInfo";
 import TransactionItem, { transactionItem } from "../TransactionItem";
 import NFTItem, { NFTItemProp } from "../NFTItem";
 import styles from "./style.module.scss";
 
-export const transactionsList: transactionItem[] = [
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Success",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "In progress",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Failed",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Success",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Success",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Success",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Success",
-  },
-  {
-    time: "21-12-2021 18:02",
-    type: "Deposit",
-    asset: "GMF",
-    amount: "0,012325",
-    destination: "1D3pb46546785123dafadje83g",
-    txID: "3684ab5646123ddafdfsa11167w",
-    status: "Success",
-  },
-];
-
-export const nftList: NFTItemProp[] = [
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-  {
-    img: NFTIcon,
-    name: "Snow forest",
-    unit: "GT",
-    unitIcon: messageIcon,
-    price: "1.5",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
-  },
-];
-
 function Index() {
+  const { userInfo } = globalStore();
   const router = useRouter();
-  const [gamiflyWallet] = useState<any>("--");
-  const [privateCryptoWallet] = useState<any>("--");
+  const [transactionsList, setTransactionsList] = useState<any>([]);
+  const [nftList, setNftList] = useState<any>([]);
+  const [gamiflyWallet, setGamiflyWallet] = useState<any>("--");
+  const [rewards, setRewards] = useState<any>("--");
+
+  // 获取钱包余额
+  const { data: getGamiflyWalletBalanceData } = useSWR(
+    userInfo && userInfo?.id ? [getGamiflyWalletBalance.key] : null,
+    (_) => getGamiflyWalletBalance.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  // 获取我的转账记录
+  const { data: getGamiflyWalletTransactionsData } = useSWR(
+    userInfo && userInfo?.id ? [getGamiflyWalletTransactions.key] : null,
+    (_) => getGamiflyWalletTransactions.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  // 获取我的NFT
+  const { data: getMyNFTsData } = useSWR(
+    userInfo && userInfo?.id ? [getMyNFTs.key] : null,
+    (_) => getMyNFTs.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  // 获取我的NFT
+  const { data: getRewardAmountData } = useSWR(
+    userInfo && userInfo?.id ? [getRewardAmount.key] : null,
+    (_) => getRewardAmount.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  // 钱包余额获取回调
+  useEffect(() => {
+    if (getGamiflyWalletBalanceData && getGamiflyWalletBalanceData?.value) {
+      setGamiflyWallet(getGamiflyWalletBalanceData?.value);
+    } else {
+      setGamiflyWallet("--");
+    }
+  }, [getGamiflyWalletBalanceData]);
+
+  // 获取我的转账记录回调
+  useEffect(() => {
+    if (getGamiflyWalletTransactionsData) {
+      setTransactionsList(getGamiflyWalletTransactionsData);
+    }
+  }, [getGamiflyWalletTransactionsData]);
+
+  // 获取我的NFT回调
+  useEffect(() => {
+    if (getMyNFTsData) {
+      setNftList(getMyNFTsData);
+    }
+  }, [getMyNFTsData]);
+
+  useEffect(() => {
+    if (getRewardAmountData) {
+      getRewardAmountData?.value === 0
+        ? setRewards("--")
+        : setRewards(getRewardAmountData?.value);
+    }
+  }, [getRewardAmountData]);
+
   return (
     <Flex
       direction="column"
       w={{ base: "100%", lg: "705px" }}
-      p={{
-        base: `${px2vw(30)} 0 ${px2vw(40)}`,
-        lg: "30px 18px 40px",
-      }}
+      ml={{ base: 0, lg: "55px" }}
+      mt={{ base: px2vw(20), lg: 0 }}
     >
-      <Flex
-        flexDir={{ base: "column", lg: "row" }}
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        {/* Gamifly Wallet */}
-        <Flex w="full" direction="column">
-          <Text
-            mb={{ base: px2vw(10), lg: "15px" }}
-            textStyle={{ base: "16", lg: "18" }}
-            lineHeight={{ base: px2vw(20), lg: "22px" }}
-            fontWeight="600"
-          >
-            Gamifly Wallet
+      {/* info */}
+      <Flex flexDir={{ base: "column", lg: "row" }} alignItems="center">
+        {/* Gamifly Account */}
+        <Flex
+          w={{ base: "full", lg: "275px" }}
+          h={{ base: px2vw(170), lg: "170px" }}
+          borderRadius={{ base: px2vw(10), lg: "10px" }}
+          px={{ base: px2vw(17), lg: "17px" }}
+          py={{ base: px2vw(15), lg: "15px" }}
+          mr={{ base: 0, lg: "30px" }}
+          mb={{ base: px2vw(20), lg: 0 }}
+          direction="column"
+          justifyContent="space-between"
+          boxSizing="border-box"
+          bgColor="black.100"
+          bgImage={wallet}
+          bgSize="100% 100%"
+          boxShadow="0px 10px 15px #0F0F0F"
+        >
+          <Text textStyle={{ base: "16", lg: "18" }} fontWeight="700">
+            Gamifly Account
           </Text>
-          <Flex
-            alignItems="center"
-            w={{ base: "100%", lg: "330px" }}
-            h={{ base: px2vw(70), lg: "75px" }}
-            color="green.100"
-            bgColor="black.600"
-          >
-            <Image
-              src={tokenIc}
-              w={{ base: px2vw(35), lg: "35px" }}
-              h={{ base: px2vw(35), lg: "35px" }}
-              mr={{ base: px2vw(10), lg: "15px" }}
-              ml={{ base: px2vw(15), lg: "20px" }}
-              ignoreFallback
-            />
-            <Flex alignItems="baseline">
-              {gamiflyWallet === "--" ? (
-                <Image
-                  src={nullGreen}
-                  w={{ base: px2vw(20), lg: "30px" }}
-                  h={{ base: px2vw(20), lg: "30px" }}
-                />
-              ) : (
-                <Text
-                  textStyle={{ base: "24", lg: "36" }}
-                  lineHeight={{ base: px2vw(45), lg: "45px" }}
-                >
-                  {gamiflyWallet}
-                </Text>
-              )}
-
+          <Flex flexDir="column">
+            <Text
+              fontSize={{ base: px2vw(36), lg: "43px" }}
+              lineHeight={{ base: px2vw(50), lg: "60px" }}
+              color="blue.100"
+            >
+              {gamiflyWallet === "--" ? "0" : Number(gamiflyWallet).toFixed(2)}
+            </Text>
+            <Flex>
+              <Image
+                src={eth}
+                w={{ base: px2vw(20), lg: "20px" }}
+                h={{ base: px2vw(20), lg: "20px" }}
+                mr={{ base: px2vw(7), lg: "7px" }}
+                ignoreFallback
+              />
               <Text
-                ml={{ base: px2vw(4), lg: "8px" }}
-                textStyle="16"
+                textStyle="14"
                 lineHeight={{ base: px2vw(20), lg: "20px" }}
-                fontWeight="700"
+                fontWeight="400"
+                color="white.100"
               >
-                tokens
+                TOKENS
               </Text>
             </Flex>
           </Flex>
         </Flex>
-        {/* Private Crypto Wallet */}
-        <Flex direction="column" w="full" mt={{ base: px2vw(25), lg: 0 }}>
-          <Text
-            mb={{ base: px2vw(10), lg: "15px" }}
-            textStyle={{ base: "16", lg: "18" }}
-            lineHeight={{ base: px2vw(20), lg: "22px" }}
-            fontWeight="600"
-          >
-            Private Crypto Wallet
+        {/* Gamifly Rewards */}
+        <Flex
+          w={{ base: "full", lg: "275px" }}
+          h={{ base: px2vw(170), lg: "170px" }}
+          borderRadius={{ base: px2vw(10), lg: "10px" }}
+          px={{ base: px2vw(17), lg: "17px" }}
+          py={{ base: px2vw(15), lg: "15px" }}
+          direction="column"
+          justifyContent="space-between"
+          boxSizing="border-box"
+          bgColor="black.100"
+          bgImage={coin}
+          bgSize="100% 100%"
+          boxShadow="0px 10px 15px #0F0F0F"
+        >
+          <Text textStyle={{ base: "16", lg: "18" }} fontWeight="700">
+            Rewards
           </Text>
-          <Flex
-            alignItems="center"
-            w={{ base: "full", lg: "330px" }}
-            h={{ base: px2vw(75), lg: "75px" }}
-            color="blue.100"
-            bgColor="black.600"
-          >
-            <Image
-              src={cryptoIc}
-              w={{ base: px2vw(35), lg: "35px" }}
-              h={{ base: px2vw(35), lg: "35px" }}
-              mr={{ base: px2vw(10), lg: "15px" }}
-              ml={{ base: px2vw(15), lg: "20px" }}
-              ignoreFallback
-            />
-            <Flex alignItems="baseline">
-              {privateCryptoWallet === "--" ? (
-                <Image
-                  src={nullBlue}
-                  w={{ base: px2vw(20), lg: "30px" }}
-                  h={{ base: px2vw(20), lg: "30px" }}
-                />
-              ) : (
-                <Text
-                  textStyle={{ base: "24", lg: "36" }}
-                  lineHeight={{ base: px2vw(45), lg: "45px" }}
-                >
-                  {privateCryptoWallet}
-                </Text>
-              )}
+          <Flex flexDir="column">
+            <Text
+              fontSize={{ base: px2vw(36), lg: "43px" }}
+              lineHeight={{ base: px2vw(50), lg: "60px" }}
+              color="yellow.100"
+            >
+              {rewards === "--" ? "0" : Number(rewards).toFixed(2)}
+            </Text>
+            <Flex>
+              <Image
+                src={usdc}
+                w={{ base: px2vw(20), lg: "20px" }}
+                h={{ base: px2vw(20), lg: "20px" }}
+                mr={{ base: px2vw(7), lg: "7px" }}
+                ignoreFallback
+              />
               <Text
-                ml={{ base: px2vw(8), lg: "8px" }}
-                textStyle="16"
+                textStyle="14"
                 lineHeight={{ base: px2vw(20), lg: "20px" }}
-                fontWeight="700"
+                fontWeight="400"
+                color="white.100"
               >
-                tokens
+                USDC
               </Text>
             </Flex>
           </Flex>
         </Flex>
       </Flex>
-      {/* Gamifly Wallet transactions */}
-      <Flex direction="column" mt={{ base: px2vw(25), lg: "35px" }}>
+      {/* Gamifly Account transactions */}
+      <Flex
+        w={{ base: "full", lg: "580px" }}
+        my={{ base: px2vw(20), lg: "30px" }}
+        py={{ base: px2vw(10), lg: "10px" }}
+        px={{ base: px2vw(15), lg: "15px" }}
+        borderRadius="10px"
+        direction="column"
+        bgColor="black.100"
+        boxSizing="border-box"
+        boxShadow="0px 10px 15px #0F0F0F"
+      >
         <Text
           mb={{ base: px2vw(10), lg: "15px" }}
           textStyle={{ base: "16", lg: "18" }}
           lineHeight={{ base: px2vw(20), lg: "22px" }}
-          fontWeight="600"
+          fontWeight="700"
         >
-          Gamifly Wallet transactions
+          Gamifly Account transactions
         </Text>
         {/* table */}
         <Flex
@@ -328,13 +231,13 @@ function Index() {
             <Flex w={{ base: px2vw(163), lg: "163px" }}>
               <Text>Time</Text>
             </Flex>
-            <Flex w={{ base: px2vw(110), lg: "110px" }}>
+            <Flex w={{ base: px2vw(110), lg: "140px" }}>
               <Text>Type</Text>
             </Flex>
-            <Flex w={{ base: px2vw(107), lg: "107px" }}>
+            {/* <Flex w={{ base: px2vw(107), lg: "107px" }}>
               <Text>Asset</Text>
-            </Flex>
-            <Flex w={{ base: px2vw(109), lg: "109px" }}>
+            </Flex> */}
+            <Flex w={{ base: px2vw(109), lg: "79px" }}>
               <Text>Amount</Text>
             </Flex>
             <Flex
@@ -429,7 +332,16 @@ function Index() {
       </Flex>
 
       {/* My NFT */}
-      <Flex flexDir="column" mt={{ base: px2vw(32), lg: "32px" }}>
+      <Flex
+        py={{ base: px2vw(10), lg: "10px" }}
+        px={{ base: px2vw(5), lg: "15px" }}
+        w={{ base: "full", lg: "580px" }}
+        flexDir="column"
+        borderRadius="10px"
+        bgColor="black.100"
+        boxSizing="border-box"
+        boxShadow="0px 10px 15px #0F0F0F"
+      >
         <Text
           mb={{ base: px2vw(10), lg: "15px" }}
           textStyle={{ base: "16", lg: "18" }}
@@ -448,14 +360,15 @@ function Index() {
               if (index < 8) {
                 return (
                   <NFTItem
+                    listLength={nftList.length}
                     isSimple
                     key={index}
                     index={index}
                     mr={{
-                      base:
-                        index !== 0 && (index + 1) % 2 === 0 ? 0 : px2vw(10),
-                      lg: index !== 0 && (index + 1) % 4 === 0 ? 0 : "10px",
+                      base: index !== 0 && (index + 1) % 2 === 0 ? 0 : px2vw(5),
+                      lg: index !== 0 && (index + 1) % 3 === 0 ? 0 : "38px",
                     }}
+                    mb={{ base: 0, lg: "10px" }}
                     item={item}
                     w={{ base: px2vw(164), lg: "158px" }}
                     h={{ base: px2vw(164), lg: "158px" }}
@@ -480,41 +393,6 @@ function Index() {
             No NFT yet
           </Box>
         )}
-      </Flex>
-
-      {/* Login method */}
-      <Flex flexDir="column" mt={{ base: px2vw(35), lg: "35px" }}>
-        <Text
-          mb={{ base: px2vw(10), lg: "15px" }}
-          textStyle={{ base: "16", lg: "18" }}
-          lineHeight={{ base: px2vw(20), lg: "22px" }}
-          fontWeight="600"
-        >
-          Login method
-        </Text>
-        <Flex
-          w="full"
-          bgColor="black.600"
-          h={{ base: px2vw(80), lg: "80px" }}
-          px={{ base: px2vw(20), lg: "20px" }}
-        >
-          <Image
-            src={meta}
-            w={{ base: px2vw(50), lg: "50px" }}
-            h={{ base: px2vw(50), lg: "50px" }}
-            mr={{ base: px2vw(10), lg: "10px" }}
-            my="auto"
-          />
-
-          <Text
-            fontFamily="Nunito"
-            textStyle="18"
-            fontWeight="700"
-            lineHeight={{ base: px2vw(80), lg: "80px" }}
-          >
-            Meta Mask
-          </Text>
-        </Flex>
       </Flex>
     </Flex>
   );

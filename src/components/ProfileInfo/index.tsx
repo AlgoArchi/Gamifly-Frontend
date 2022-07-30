@@ -1,10 +1,15 @@
-import React, { useState } from "react";
-import { Flex, Text, Image, Input } from "@chakra-ui/react";
-import nullGreen from "@/assets/imgs/nullGreen.png";
+import React, { useEffect, useRef, useState } from "react";
+import { Flex, Text, Image, Input, useBoolean } from "@chakra-ui/react";
 import BaseButton from "@/components/BaseButton";
 import px2vw from "@/utils/px2vw";
 import avatar from "@/assets/imgs/avatar.png";
-import changePhoto from "@/assets/imgs/changePhoto.png";
+import editIcon from "@/assets/imgs/editIcon.png";
+import camera from "@/assets/imgs/camera.png";
+import globalStore from "@/stores/global";
+import { getUserInfo, getReferralCount } from "@/apis/userInfo";
+import useSWR from "swr";
+import axios from "axios";
+import { setStore } from "@/utils/storage";
 
 export interface IProps {
   isSetMode: boolean;
@@ -12,218 +17,308 @@ export interface IProps {
 }
 
 function Index({ isSetMode, saveClick }: IProps) {
-  const [refferal] = useState<any>("--");
-  const [tournaments] = useState<any>("--");
-  const [games] = useState<any>("--");
+  const { userInfo, dataRadom } = globalStore();
+  const [inputValue, setInputValue] = useState("");
+  const [updateClick, setUpdateClick] = useBoolean(false);
+  const [imgsSrc, setImgsSrc] = useState<any>();
+  const [imgsSrcForUp, setImgsSrcForUp] = useState<any>();
+  const [refferal, setRefferal] = useState<any>("--");
+
+  const refs = useRef(null);
+  // 获取用户信息
+  const { data: getUserInfoData } = useSWR(
+    userInfo && userInfo?.id ? [getUserInfo.key, dataRadom] : null,
+    (_) => getUserInfo.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+  // 获取邀请数据
+  const { data: getReferralCountData } = useSWR(
+    userInfo && userInfo?.id ? [getReferralCount.key, dataRadom] : null,
+    (_) => getReferralCount.fetcher(userInfo?.id),
+    { revalidateOnFocus: false }
+  );
+
+  // 获取用户信息回调
+  useEffect(() => {
+    if (getUserInfoData) {
+      setStore("userInfo", getUserInfoData);
+      globalStore.setState({
+        userInfo: getUserInfoData,
+      });
+      setUpdateClick.off();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getUserInfoData]);
+
+  // 修改用户信息
+  useEffect(() => {
+    if (
+      updateClick &&
+      userInfo &&
+      userInfo?.id &&
+      (imgsSrcForUp || inputValue)
+    ) {
+      const formData = new FormData();
+      formData.append("id", userInfo?.id);
+      formData.append("name", inputValue || userInfo?.name);
+      formData.append("avatar", imgsSrcForUp || userInfo?.avatar);
+      console.log(imgsSrcForUp, 123);
+      axios({
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "post",
+        url: "https://app.gamifly.co:3001/api/updateUserInfo",
+        data: formData,
+      }).then((res) => {
+        if (res) {
+          globalStore.setState({
+            dataRadom: Math.random(),
+          });
+          setUpdateClick.off();
+          saveClick();
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateClick]);
+
+  useEffect(() => {
+    if (getReferralCountData) {
+      getReferralCountData?.value === 0
+        ? setRefferal("--")
+        : setRefferal(getReferralCountData?.value);
+    }
+  }, [getReferralCountData]);
+
+  // 选图头像
+  const onChange = (changeEvent: any) => {
+    for (const file of changeEvent.target.files) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        setImgsSrcForUp(file);
+        setImgsSrc(reader.result);
+      };
+      reader.onerror = () => {
+        console.log(reader.error);
+      };
+    }
+  };
+
   return (
     <Flex
-      w={{ base: "full", lg: "456px" }}
+      w={{ base: "full", lg: "190px" }}
       position="relative"
       direction="column"
       boxSizing="border-box"
       borderBottom="none"
     >
       <Flex w="full" position="relative">
-        <Image w="full" src={avatar} fallbackSrc={avatar} />
-        {isSetMode ? (
-          // change Photo
+        <Flex
+          pos="relative"
+          w={{ base: px2vw(190), lg: "190px" }}
+          h={{ base: px2vw(190), lg: "190px" }}
+          mx="auto"
+          mb={{ base: px2vw(30), lg: "30px" }}
+          cursor={!isSetMode ? "default" : "pointer"}
+          onClick={() => {
+            if (isSetMode) {
+              const obj: any = refs?.current;
+              obj?.click();
+            }
+          }}
+        >
+          <Image
+            w="full"
+            borderRadius="50%"
+            src={
+              imgsSrc ||
+              (userInfo?.avatar
+                ? `${window.imgUrl.imageUrl}${userInfo?.avatar}`
+                : avatar)
+            }
+          />
           <Flex
-            m="auto"
-            position="absolute"
-            left="0"
-            right="0"
-            bgColor="green.300"
+            display={!isSetMode ? "none" : "flex"}
             justifyContent="center"
-            cursor="pointer"
-            bottom={{ base: px2vw(25), lg: "25px" }}
-            w={{ base: px2vw(253), lg: "253px" }}
-            h={{ base: px2vw(45), lg: "45px" }}
+            alignItems="center"
+            pos="absolute"
+            bottom="0"
+            bgColor="black.100"
+            borderRadius="50%"
+            w={{ base: px2vw(42), lg: "42px" }}
+            h={{ base: px2vw(42), lg: "42px" }}
+            right={{ base: px2vw(10), lg: "10px" }}
           >
             <Image
-              src={changePhoto}
-              w={{ base: px2vw(16.67), lg: "16.67px" }}
-              h={{ base: px2vw(15), lg: "15px" }}
-              mr={{ base: px2vw(11.67), lg: "11.67px" }}
-              my="auto"
+              w={{ base: px2vw(25), lg: "25px" }}
+              h={{ base: px2vw(25), lg: "25px" }}
+              src={camera}
             />
-            <Text
-              color="green.100"
-              fontFamily="Nunito"
-              fontWeight="700"
-              fontSize={{ base: px2vw(14), lg: "14px" }}
-              lineHeight={{ base: px2vw(45), lg: "45px" }}
-            >
-              Change Photo
-            </Text>
           </Flex>
-        ) : (
-          // user name
-          <Text
-            position="absolute"
-            left={{ base: px2vw(17), lg: "17px" }}
-            bottom={{ base: px2vw(20), lg: "20px" }}
-            color="white.100"
-            fontWeight="600"
-            fontSize={{ base: px2vw(18), lg: "22px" }}
-            lineHeight={{ base: px2vw(28), lg: "28px" }}
-          >
-            User Name
-          </Text>
-        )}
+        </Flex>
       </Flex>
-      <Flex
-        w="full"
-        direction="column"
-        pt={{ base: px2vw(5), lg: "18px" }}
-        pb={{ base: 0, lg: "18px" }}
-        px={{ base: 0, lg: "18px" }}
-      >
+      <Flex w="full" direction="column">
         {isSetMode ? (
           // setting user name
           <Flex>
             <Input
+              h={{ base: px2vw(30), lg: "30px" }}
+              mb={{ base: px2vw(16), lg: "16px" }}
               w="full"
-              bgColor="black.600"
+              bgColor="transparent"
               outline="none"
-              border="none"
+              border="1px solid"
               borderRadius="0"
-              placeholder="User Name"
-              h={{ base: px2vw(70), lg: "70px" }}
+              borderColor="blue.100"
+              placeholder={userInfo?.name || "User Name"}
               _placeholder={{
                 fontFamily: "Nunito",
-                fontSize: { base: px2vw(18), lg: "18px" },
+                fontSize: { base: px2vw(16), lg: "16px" },
                 fontWeight: 600,
-                color: "white.100",
+                color: "blue.100",
               }}
+              _focusVisible={{
+                borderColor: "blue.100",
+              }}
+              _hover={{
+                color: "blue.100",
+                borderColor: "blue.100",
+              }}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
           </Flex>
         ) : (
-          // data
-          <Flex w="full" justifyContent="center">
-            <Flex
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-              w={{ base: px2vw(134), lg: "134px" }}
-              h={{ base: px2vw(76), lg: "76px" }}
-              mr={{ base: px2vw(10), lg: "10px" }}
-              color="green.100"
-              bgColor="green.500"
-            >
-              {refferal === "--" ? (
-                <Image
-                  src={nullGreen}
-                  w={{ base: px2vw(20), lg: "20px" }}
-                  h={{ base: px2vw(20), lg: "20px" }}
-                />
-              ) : (
-                <Text
-                  textStyle="26"
-                  fontWeight="700"
-                  lineHeight={{ base: px2vw(32), lg: "32px" }}
-                >
-                  {refferal}
-                </Text>
-              )}
-
-              <Text
-                mt={{ base: px2vw(5), lg: "5px" }}
-                textStyle="12"
-                fontWeight="500"
-                lineHeight={{ base: px2vw(16), lg: "16px" }}
-              >
-                Refferal
-              </Text>
-            </Flex>
-            <Flex
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-              w={{ base: px2vw(134), lg: "134px" }}
-              h={{ base: px2vw(76), lg: "76px" }}
-              mr={{ base: px2vw(10), lg: "10px" }}
-              color="green.100"
-              bgColor="green.500"
-            >
-              {tournaments === "--" ? (
-                <Image
-                  src={nullGreen}
-                  w={{ base: px2vw(20), lg: "20px" }}
-                  h={{ base: px2vw(20), lg: "20px" }}
-                />
-              ) : (
-                <Text
-                  textStyle="26"
-                  fontWeight="700"
-                  lineHeight={{ base: px2vw(32), lg: "32px" }}
-                >
-                  {tournaments}
-                </Text>
-              )}
-              <Text
-                mt={{ base: px2vw(5), lg: "5px" }}
-                textStyle="12"
-                fontWeight="500"
-                lineHeight={{ base: px2vw(16), lg: "16px" }}
-              >
-                Tournaments
-              </Text>
-            </Flex>
-            <Flex
-              direction="column"
-              alignItems="center"
-              justifyContent="center"
-              w={{ base: px2vw(134), lg: "134px" }}
-              h={{ base: px2vw(76), lg: "76px" }}
-              color="green.100"
-              bgColor="green.500"
-            >
-              {games === "--" ? (
-                <Image
-                  src={nullGreen}
-                  w={{ base: px2vw(20), lg: "20px" }}
-                  h={{ base: px2vw(20), lg: "20px" }}
-                />
-              ) : (
-                <Text
-                  textStyle="26"
-                  fontWeight="700"
-                  lineHeight={{ base: px2vw(32), lg: "32px" }}
-                >
-                  {games}
-                </Text>
-              )}
-              <Text
-                mt={{ base: px2vw(5), lg: "5px" }}
-                textStyle="12"
-                fontWeight="500"
-                lineHeight={{ base: px2vw(16), lg: "16px" }}
-              >
-                Games
-              </Text>
-            </Flex>
-          </Flex>
+          <Text
+            color="white.100"
+            fontWeight="600"
+            fontSize={{ base: px2vw(16), lg: "18px" }}
+            lineHeight={{ base: px2vw(18), lg: "18px" }}
+            mb={{ base: px2vw(16), lg: "16px" }}
+          >
+            {userInfo?.name || "User Name"}
+          </Text>
         )}
+        {/* 修改按钮 */}
         {isSetMode ? (
           <BaseButton
             w="full"
-            mt={{ base: px2vw(15), lg: "15px" }}
+            bgColor="transparent"
+            border="1px solid"
+            borderColor="blue.100"
+            color="blue.100"
+            boxShadow="none"
+            fontWeight="400"
+            fontSize={{ base: px2vw(14), lg: "14px" }}
+            _hover={{
+              bgColor: "transparent",
+              borderColor: "blue.100",
+              color: "blue.100",
+              boxShadow: "none",
+            }}
+            isLoading={updateClick}
+            mb={{ base: px2vw(15), lg: "15px" }}
             h={{ base: px2vw(52), lg: "52px" }}
-            onClick={() => saveClick()}
+            onClick={() => {
+              if (inputValue !== "" || imgsSrc) {
+                setUpdateClick.on();
+              } else {
+                saveClick();
+              }
+            }}
           >
+            <Image
+              w={{ base: px2vw(16), lg: "16px" }}
+              h={{ base: px2vw(16), lg: "16px" }}
+              mr={{ base: px2vw(10), lg: "10px" }}
+              src={editIcon}
+              my="auto"
+            />
             Save changes
           </BaseButton>
         ) : (
-          <BaseButton
-            w="full"
-            mt={{ base: px2vw(15), lg: "15px" }}
-            h={{ base: px2vw(52), lg: "52px" }}
-            onClick={() => saveClick()}
-          >
-            Edit profile
-          </BaseButton>
+          userInfo?.id && (
+            <BaseButton
+              w="full"
+              bgColor="transparent"
+              border="1px solid"
+              borderColor="blue.100"
+              color="blue.100"
+              boxShadow="none"
+              fontWeight="400"
+              fontSize={{ base: px2vw(14), lg: "14px" }}
+              _hover={{
+                bgColor: "transparent",
+                borderColor: "blue.100",
+                color: "blue.100",
+                boxShadow: "none",
+              }}
+              mb={{ base: px2vw(15), lg: "15px" }}
+              h={{ base: px2vw(52), lg: "52px" }}
+              onClick={() => saveClick()}
+            >
+              <Image
+                w={{ base: px2vw(16), lg: "16px" }}
+                h={{ base: px2vw(16), lg: "16px" }}
+                mr={{ base: px2vw(10), lg: "10px" }}
+                src={editIcon}
+                my="auto"
+              />
+              Edit profile
+            </BaseButton>
+          )
         )}
+        {/* invitation */}
+        <Flex
+          flexDir="column"
+          w="full"
+          border="1px solid"
+          borderColor="blue.100"
+          borderRadius="5px"
+        >
+          <Flex
+            py={{ base: px2vw(12), lg: "12px" }}
+            justifyContent="center"
+            alignItems="center"
+            color={refferal === "--" ? "gray.200" : "white.100"}
+            textStyle="14"
+            textAlign="center"
+          >
+            {refferal !== "--"
+              ? `${refferal} Invitation done!`
+              : "You haven't invited friends yet"}
+          </Flex>
+          {userInfo?.id && (
+            <Flex
+              py={{ base: px2vw(12), lg: "12px" }}
+              justifyContent="center"
+              alignItems="center"
+              textStyle="14"
+              textAlign="center"
+              color="white.100"
+              bgColor="blue.100"
+              cursor="pointer"
+              onClick={() => globalStore.setState({ showInviteFriend: true })}
+            >
+              {refferal !== "--" ? "Invite more" : "Invite to get rewards"}
+            </Flex>
+          )}
+        </Flex>
       </Flex>
+      {/* 上传头像 */}
+      <Input
+        w={0}
+        h={0}
+        border="none"
+        ref={refs}
+        onChange={onChange}
+        type="file"
+        name="file"
+        accept="image/*"
+        opacity={0}
+      />
     </Flex>
   );
 }

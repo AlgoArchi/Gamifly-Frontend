@@ -9,4 +9,6 @@ declare interface Window {
   ethereum: any;
   web3: any;
   createjs: any;
+  imgUrl: any;
+  walletConnectProvider: any;
 }

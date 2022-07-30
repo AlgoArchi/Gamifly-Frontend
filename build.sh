@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 RED='\033[1;31m'    # 红
 GREEN='\033[1;32m'  # 绿
 YELLOW='\033[1;33m' # 黄
@@ -51,7 +53,7 @@ rm -rf $BUILD_DIR
 
 mkdir -p $BUILD_DIR/config/client
 
-for dir in '.next' 'public' 'abis' 'next-i18next.config.js' 'next.config.js' 'package.json' 'yarn.lock' 'config/index.js' 'config/client/common.js' "config/client/${1}.js"; do
+for dir in '.next' 'public' 'next-i18next.config.js' 'next.config.js' 'package.json' 'yarn.lock' 'config/index.js' 'config/client/common.js' "config/client/${1}.js"; do
   echo "Copy ${dir}"
   cp -rf $dir $BUILD_DIR/$dir
 done

@@ -1,319 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Text, Image } from "@chakra-ui/react";
 import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import VIP, { VipProp } from "@/components/VIP";
-import userProfile from "@/assets/imgs/userProfile.png";
 import TopReferrals, { TopReferralsProp } from "@/components/TopReferrals";
 import px2vw from "@/utils/px2vw";
 import arrows from "@/assets/imgs/arrows.png";
 import { useRouter } from "next/router";
+import useSWR from "swr";
+import { getTopPlayers, getTopReferrals } from "@/apis/leaderBoards";
 
-export const vipList: VipProp[] = [
-  {
-    id: 1,
-    place: 1,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 500000,
-    nft: 1322,
-  },
-  {
-    id: 2,
-    place: 2,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 456000,
-    nft: 441,
-  },
-  {
-    id: 3,
-    place: 3,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 4,
-    place: 4,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 5,
-    place: 5,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 6,
-    place: 6,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 500000,
-    nft: 1322,
-  },
-  {
-    id: 7,
-    place: 7,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 456000,
-    nft: 441,
-  },
-  {
-    id: 8,
-    place: 8,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 9,
-    place: 9,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 10,
-    place: 10,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 11,
-    place: 11,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 500000,
-    nft: 1322,
-  },
-  {
-    id: 12,
-    place: 12,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 456000,
-    nft: 441,
-  },
-  {
-    id: 13,
-    place: 13,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 14,
-    place: 14,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 15,
-    place: 15,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 16,
-    place: 16,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 500000,
-    nft: 1322,
-  },
-  {
-    id: 17,
-    place: 17,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 456000,
-    nft: 441,
-  },
-  {
-    id: 18,
-    place: 18,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 19,
-    place: 19,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-  {
-    id: 20,
-    place: 20,
-    userName: "User Name",
-    userNameImg: userProfile,
-    gemiflyTokens: 232300,
-    nft: 765,
-  },
-];
-export const topList: TopReferralsProp[] = [
-  {
-    id: 1,
-    place: 1,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 2,
-    place: 2,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 3,
-    place: 3,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 4,
-    place: 4,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 5,
-    place: 5,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 6,
-    place: 6,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 7,
-    place: 7,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 8,
-    place: 8,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 9,
-    place: 9,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 10,
-    place: 10,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 11,
-    place: 11,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 12,
-    place: 12,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 13,
-    place: 13,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 14,
-    place: 14,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 15,
-    place: 15,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 16,
-    place: 16,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 17,
-    place: 17,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 18,
-    place: 18,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 19,
-    place: 19,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-  {
-    id: 20,
-    place: 20,
-    userName: "User Name",
-    userNameImg: userProfile,
-    invitedFriends: 1211,
-  },
-];
-function App() {
+function Index() {
   const router = useRouter();
+  const [vipList, setVipList] = useState<VipProp[]>([]);
+  const [topList, setTopList] = useState<TopReferralsProp[]>([]);
+  const { data: getTopPlayersData } = useSWR(
+    getTopPlayers.key,
+    () => getTopPlayers.fetcher(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  const { data: getTopReferralsData } = useSWR(
+    getTopReferrals.key,
+    () => getTopReferrals.fetcher(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+
+  useEffect(() => {
+    if (getTopPlayersData) {
+      setVipList(
+        getTopPlayersData.map((item: any, index: number) => {
+          return { ...item, place: index + 1 };
+        })
+      );
+    }
+  }, [getTopPlayersData]);
+
+  useEffect(() => {
+    if (getTopReferralsData) {
+      setTopList(
+        getTopReferralsData.map((item: any, index: number) => {
+          return { ...item, place: index + 1 };
+        })
+      );
+    }
+  }, [getTopReferralsData]);
   return (
     <Flex
       w="full"
@@ -323,6 +56,7 @@ function App() {
       <Flex
         display={{ base: "none", lg: "flex" }}
         w={{ base: "full", lg: "60%" }}
+        borderRadius="6px"
       >
         <VIP list={vipList} />
       </Flex>
@@ -387,4 +121,4 @@ export const getServerSideProps = async (ctx: GetI18nServerSideProps) => {
     props: { ...(await getI18nSSRProps(ctx, ["home"])) },
   };
 };
-export default App;
+export default Index;

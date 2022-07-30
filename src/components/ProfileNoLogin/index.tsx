@@ -77,9 +77,9 @@ function Index() {
         lineHeight={{ base: px2vw(20), lg: "22px" }}
         fontWeight="600"
       >
-        Private Crypto Wallet
+        DeFi Wallet
       </Text>
-      <LoginItem icon={cryptoIc} name="Infinity Wallet" withOutButton />
+      <LoginItem icon={cryptoIc} name="Gamifly Account" withOutButton />
       <Text
         mt={{ base: px2vw(25), lg: "25px" }}
         textStyle={{ base: "16", lg: "18" }}

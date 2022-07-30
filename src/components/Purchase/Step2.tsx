@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Box, Text, Image, useBoolean } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import BaseButton from "@/components/BaseButton";
 import closeIcon from "@/assets/imgs/greenClose.webp";
 import messageIcon from "@/assets/imgs/messageIcon.png";
 import styles from "@/components/ProfileData/style.module.scss";
+import useSWR from "swr";
+import { getNFTTypes } from "@/apis/NFTs";
 import NFTItem, { NFTItemProp } from "../NFTItem";
 import BaseModal from "../BaseModal";
 
 export interface screeningItem {
   id: string;
-  text: string;
+  title: string;
 }
 
 export interface IProps {
@@ -32,36 +34,26 @@ function Index({
 }: IProps) {
   const [chooseNft, setChooseNft] = useState<null | NFTItemProp>(null);
   const [isShow, setIsShow] = useBoolean(false);
-  const screeningList: screeningItem[] = [
+  const [screeningList, setScreeningList] = useState<screeningItem[]>([
     {
       id: "all",
-      text: "All",
+      title: "All",
     },
+  ]);
+  const { data: getNFTTypesData } = useSWR(
+    getNFTTypes.key,
+    () => getNFTTypes.fetcher(),
     {
-      id: "abstract",
-      text: "Abstract",
-    },
-    {
-      id: "digital",
-      text: "Digital",
-    },
-    {
-      id: "paiting",
-      text: "Paiting",
-    },
-    {
-      id: "photography",
-      text: "Photography",
-    },
-    {
-      id: "3d",
-      text: "3D",
-    },
-    {
-      id: "2d",
-      text: "2D",
-    },
-  ];
+      revalidateOnFocus: false,
+    }
+  );
+
+  useEffect(() => {
+    if (getNFTTypesData) {
+      setScreeningList([...screeningList, ...getNFTTypesData]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getNFTTypesData]);
 
   return (
     <Flex
@@ -70,7 +62,7 @@ function Index({
       overflowX="hidden"
       pb={{ base: px2vw(148), lg: "0" }}
     >
-      {/* mobile TOtal amount */}
+      {/* mobile Total amount */}
       {nftList.filter((item: NFTItemProp) => item?.isActive).length > 0 && (
         <Flex
           flexDir="column"
@@ -82,6 +74,8 @@ function Index({
           bgColor="black.1200"
           color="white.100"
           pos="fixed"
+          borderTopLeftRadius="6px"
+          borderTopRightRadius="6px"
           bottom={0}
           left={0}
           zIndex={1}
@@ -141,6 +135,7 @@ function Index({
           w="full"
           bgColor="black.300"
           boxSizing="border-box"
+          borderRadius="6px"
         >
           {/* active NFT */}
           <Flex flexWrap="wrap" w="70%">
@@ -148,7 +143,13 @@ function Index({
               .filter((item: NFTItemProp) => item?.isActive)
               .map((item: NFTItemProp, index: number) => (
                 <Box key={index} pos="relative">
-                  <Image src={item.img} w="68px" h="68px" mr="15px" mb="15px" />
+                  <Image
+                    src={item.image}
+                    w="68px"
+                    h="68px"
+                    mr="15px"
+                    mb="15px"
+                  />
                   <Image
                     src={closeIcon}
                     w="15px"
@@ -227,7 +228,7 @@ function Index({
                 {totalPrice}
               </Text>
               <Text fontWeight="700" textStyle="16" lineHeight="28px">
-                tokens
+                GMF
               </Text>
             </Flex>
             <BaseButton
@@ -259,6 +260,7 @@ function Index({
             }
             border="2px solid"
             borderColor="green.100"
+            borderRadius="6px"
             p={{ base: `${px2vw(10)} ${px2vw(20)}`, lg: "10px 20px" }}
             mr={{ base: px2vw(15), lg: "15px" }}
             color={
@@ -281,7 +283,7 @@ function Index({
             }}
             onClick={() => chooseScreening(item)}
           >
-            {item.text}
+            {item.title}
           </Box>
         ))}
       </Flex>
@@ -345,7 +347,7 @@ function Index({
             onClick={() => setIsShow.off()}
           />
           <Image
-            src={chooseNft?.img}
+            src={chooseNft?.image}
             w={{ base: "full", lg: "327px" }}
             h={{ base: px2vw(345), lg: "327px" }}
           />
@@ -367,12 +369,15 @@ function Index({
               {chooseNft?.name}
             </Text>
             <Flex mb={{ base: px2vw(30), lg: "30px" }}>
-              <Image
-                src={chooseNft?.unitIcon}
-                w={{ base: px2vw(20), lg: "20px" }}
-                h={{ base: px2vw(20), lg: "20px" }}
-                mr={{ base: px2vw(10), lg: "10px" }}
-              />
+              {chooseNft?.unitIcon && (
+                <Image
+                  src={chooseNft?.unitIcon}
+                  w={{ base: px2vw(20), lg: "20px" }}
+                  h={{ base: px2vw(20), lg: "20px" }}
+                  mr={{ base: px2vw(10), lg: "10px" }}
+                />
+              )}
+
               <Text
                 fontFamily="Orbitron"
                 fontWeight="700"
@@ -380,8 +385,7 @@ function Index({
                 fontSize={{ base: px2vw(16), lg: "16px" }}
                 lineHeight={{ base: px2vw(20), lg: "20px" }}
               >
-                {chooseNft?.price}
-                {chooseNft?.unit}
+                {chooseNft?.price} {chooseNft?.unit || "GMF"}
               </Text>
             </Flex>
             <Text
@@ -391,7 +395,7 @@ function Index({
               fontSize={{ base: px2vw(16), lg: "16px" }}
               lineHeight={{ base: px2vw(22), lg: "22px" }}
             >
-              {chooseNft?.description}
+              {chooseNft?.content}
             </Text>
           </Flex>
         </Flex>

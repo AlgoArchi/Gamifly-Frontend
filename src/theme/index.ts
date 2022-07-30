@@ -57,6 +57,7 @@ const colors = {
   },
   gray: {
     "100": "rgba(104, 104, 104, 0.3)",
+    "200": "#5E5E5E",
   },
   yellow: { "100": "#EFC049", "200": "#EDAB06" },
 };
@@ -150,6 +151,16 @@ const textStyles = {
     lineHeight: {
       base: px2vw(30),
       lg: "30px",
+    },
+  },
+  "32": {
+    fontSize: {
+      base: px2vw(32),
+      lg: "32px",
+    },
+    lineHeight: {
+      base: px2vw(32),
+      lg: "32px",
     },
   },
   "36": {

@@ -1,9 +1,11 @@
 import React from "react";
-import { Flex, Text, Image, FlexProps } from "@chakra-ui/react";
+import { Flex, Text, Image, FlexProps, useToast } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import invite from "@/assets/imgs/invite.png";
-import share from "@/assets/imgs/share.png";
+// import share from "@/assets/imgs/share.png";
 import copy from "@/assets/imgs/copy.png";
+import { getStore } from "@/utils/storage";
+import copyFunction from "copy-to-clipboard";
 import BaseModal from "../BaseModal";
 import BaseButton from "../BaseButton";
 
@@ -13,6 +15,7 @@ export interface IProps extends FlexProps {
 }
 
 function Index({ isShow, setIsShow, ...prop }: IProps) {
+  const toast = useToast();
   return (
     <BaseModal
       isShow={isShow}
@@ -49,7 +52,7 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
           letterSpacing={5}
           mb={{ base: px2vw(20), lg: "20px" }}
         >
-          007CB1
+          {getStore("referralCode")}
         </Text>
         <Text
           fontWeight="400"
@@ -66,9 +69,9 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
           px={{ base: px2vw(25), lg: "30px" }}
           w="full"
           boxSizing="border-box"
-          justifyContent="space-between"
+          justifyContent="center"
         >
-          <BaseButton
+          {/* <BaseButton
             w={{ base: px2vw(140), lg: "190px" }}
             border="1px solid"
             borderColor="blue.100"
@@ -96,7 +99,7 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
               mr={{ base: px2vw(5), lg: "5px" }}
             />
             Share
-          </BaseButton>
+          </BaseButton> */}
           <BaseButton
             w={{ base: px2vw(140), lg: "190px" }}
             border="1px solid"
@@ -116,7 +119,19 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
               color: "blue.100",
               boxShadow: "none",
             }}
-            onClick={() => setIsShow()}
+            onClick={() => {
+              copyFunction(
+                `https://www.gamifly.co/games?inviteCode=${getStore(
+                  "referralCode"
+                )}`
+              );
+              toast({
+                title: "success",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+              });
+            }}
           >
             <Image
               src={copy}
@@ -124,7 +139,7 @@ function Index({ isShow, setIsShow, ...prop }: IProps) {
               h={{ base: px2vw(18), lg: "18px" }}
               mr={{ base: px2vw(5), lg: "5px" }}
             />
-            Copy
+            Copy Link
           </BaseButton>
         </Flex>
       </Flex>

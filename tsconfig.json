@@ -26,5 +26,5 @@
     "incremental": false // 不生成tsconfig.tsbuildinfo文件
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "typings.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", "typings.d.ts", "src/utils/test.js"]
 }

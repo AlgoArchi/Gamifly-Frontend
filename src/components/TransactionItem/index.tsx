@@ -1,15 +1,18 @@
 import React from "react";
-import { Text, Flex, FlexProps } from "@chakra-ui/react";
+import { Text, Flex, Image, FlexProps, useToast } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
+import copyFunction from "copy-to-clipboard";
+import scan from "@/assets/imgs/scan.png";
+import copy from "@/assets/imgs/transactionsCopy.png";
 
 export interface transactionItem {
-  time: string;
+  datetime: string;
   type: string;
   asset: string;
-  amount: string;
+  amount: string | number;
   destination: string;
-  txID: string;
-  status: string;
+  transaction_id: string;
+  status: number;
 }
 
 export interface IProps extends FlexProps {
@@ -19,6 +22,21 @@ export interface IProps extends FlexProps {
 }
 
 function Index({ index, item, isSimple }: IProps) {
+  const toast = useToast();
+  // 处理日期格式
+  const returnTime = (time: string) => {
+    const date = new Date(time);
+    const year = date.getFullYear();
+    const month =
+      date.getMonth() + 1 < 10
+        ? `0${date.getMonth() + 1}`
+        : date.getMonth() + 1;
+    const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
+    const hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+    const min =
+      date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+    return `${day}-${month}-${year} ${hour}:${min}`;
+  };
   return (
     <Flex
       w={{ base: "max-content", lg: "100%" }}
@@ -34,15 +52,17 @@ function Index({ index, item, isSimple }: IProps) {
       bgColor={index % 2 === 0 ? "black.300" : "black.400"}
     >
       <Flex w={{ base: px2vw(163), lg: "163px" }}>
-        <Text>{item.time}</Text>
+        <Text>{returnTime(item.datetime)}</Text>
       </Flex>
-      <Flex w={{ base: px2vw(110), lg: "110px" }}>
+      <Flex w={{ base: px2vw(110), lg: "140px" }}>
         <Text>{item.type}</Text>
       </Flex>
-      <Flex w={{ base: px2vw(107), lg: "107px" }}>
-        <Text>{item.asset}</Text>
-      </Flex>
-      <Flex w={{ base: px2vw(109), lg: "109px" }}>
+      {!isSimple && (
+        <Flex w={{ base: px2vw(107), lg: "107px" }}>
+          <Text>{item.asset}</Text>
+        </Flex>
+      )}
+      <Flex w={{ base: px2vw(109), lg: "79px" }}>
         <Text>{item.amount}</Text>
       </Flex>
       {!isSimple && (
@@ -55,15 +75,75 @@ function Index({ index, item, isSimple }: IProps) {
                 item.destination.length
               )}
           </Text>
+          {/* <Image
+            src={scan}
+            w={{ base: px2vw(14), lg: "14px" }}
+            h={{ base: px2vw(14), lg: "14px" }}
+            ml={{ base: px2vw(10), lg: "10px" }}
+            mr={{ base: px2vw(5), lg: "5px" }}
+            my="auto"
+            cursor="pointer"
+            onClick={() =>
+              window.open(`https://polygonscan.com/tx/${item.destination}`)
+            }
+          /> */}
+          <Image
+            src={copy}
+            w={{ base: px2vw(14), lg: "14px" }}
+            h={{ base: px2vw(14), lg: "14px" }}
+            my="auto"
+            ml={{ base: px2vw(10), lg: "10px" }}
+            cursor="pointer"
+            onClick={() => {
+              copyFunction(item.destination);
+              toast({
+                title: "success",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+              });
+            }}
+          />
         </Flex>
       )}
       {!isSimple && (
         <Flex w={{ base: px2vw(109), lg: "109px" }}>
           <Text>
-            {item.txID.substring(0, 5) +
+            {item.transaction_id.substring(0, 5) +
               "..." +
-              item.txID.substring(item.txID.length - 6, item.txID.length)}
+              item.transaction_id.substring(
+                item.transaction_id.length - 6,
+                item.transaction_id.length
+              )}
           </Text>
+          <Image
+            src={scan}
+            w={{ base: px2vw(14), lg: "14px" }}
+            h={{ base: px2vw(14), lg: "14px" }}
+            ml={{ base: px2vw(10), lg: "10px" }}
+            mr={{ base: px2vw(5), lg: "5px" }}
+            my="auto"
+            cursor="pointer"
+            onClick={() =>
+              window.open(`https://polygonscan.com/tx/${item.transaction_id}`)
+            }
+          />
+          <Image
+            src={copy}
+            w={{ base: px2vw(14), lg: "14px" }}
+            h={{ base: px2vw(14), lg: "14px" }}
+            my="auto"
+            cursor="pointer"
+            onClick={() => {
+              copyFunction(item.transaction_id);
+              toast({
+                title: "success",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+              });
+            }}
+          />
         </Flex>
       )}
       <Flex justifyContent="flex-end" w={{ base: px2vw(140), lg: "140px" }}>
@@ -71,9 +151,9 @@ function Index({ index, item, isSimple }: IProps) {
           flexDir="column"
           justifyContent="center"
           bgColor={
-            item.status === "Success"
+            item.status === 0
               ? "green.100"
-              : item.status === "In progress"
+              : item.status === 1
               ? "yellow.200"
               : "red"
           }
@@ -81,7 +161,13 @@ function Index({ index, item, isSimple }: IProps) {
           w={{ base: px2vw(85), lg: "85px" }}
           h={{ base: px2vw(22), lg: "22px" }}
         >
-          <Text textAlign="center">{item.status}</Text>
+          <Text textAlign="center">
+            {item.status === 0
+              ? "Success"
+              : item.status === 1
+              ? "In progress"
+              : "Fail"}
+          </Text>
         </Flex>
       </Flex>
     </Flex>

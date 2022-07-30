@@ -1,17 +1,60 @@
-import React from "react";
-import { Flex, Image, Text } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Flex, Image, Text, useBoolean, useToast } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import messageIcon from "@/assets/imgs/messageIcon.png";
+import { withdraw } from "@/apis/withdraw";
+import useSWR from "swr";
 import CryptoWallet from "../CryptoWallet";
 import BaseButton from "../BaseButton";
+import globalStore from "@/stores/global";
 
 export interface IProps {
   totalPrice: number;
   priceUnit: string;
-  success: () => void;
+  success: (hash: string, val: string) => void;
 }
 
-function Index({ totalPrice, priceUnit, success }: IProps) {
+function Index({ success }: IProps) {
+  const toast = useToast();
+  const { userInfo } = globalStore();
+  const [loading, setLoading] = useBoolean(false);
+  const [isWithdraw, setWithdraw] = useBoolean(false);
+  const [inputValue, setInputValue] = useState("");
+  const { data: withdrawData } = useSWR(
+    userInfo && userInfo?.platform_wallet && isWithdraw
+      ? [withdraw.key, isWithdraw, inputValue]
+      : null,
+    () =>
+      withdraw.fetcher({
+        user_id: userInfo?.id,
+        amount: inputValue,
+        accessToken: userInfo?.access_token,
+        external_wallet: userInfo?.external_wallet_address,
+      }),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+
+  useEffect(() => {
+    if (withdrawData?.result) {
+      success(withdrawData?.hash, inputValue);
+      setLoading.off();
+      setWithdraw.off();
+    } else if (withdrawData?.message) {
+      toast({
+        title: "Fail",
+        description: withdrawData?.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      setLoading.off();
+      setWithdraw.off();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [withdrawData]);
+
   return (
     <Flex
       p={{ base: px2vw(20), lg: "20px" }}
@@ -19,6 +62,8 @@ function Index({ totalPrice, priceUnit, success }: IProps) {
       w="full"
       boxSizing="border-box"
       bgColor="black.300"
+      borderRadius="6px"
+      overflow="hidden"
     >
       <Text
         fontFamily="Orbitron"
@@ -31,13 +76,22 @@ function Index({ totalPrice, priceUnit, success }: IProps) {
         Amount
       </Text>
       <CryptoWallet
+        isInput
+        withOutConversions
         w={{ base: "full", lg: "314px" }}
-        nativePrice={77.7}
-        nativeUnit="GMF"
-        otherPrice={21.3}
-        otherUnit="TRX"
+        nativePrice={inputValue}
+        buttonLoading={loading}
+        loadingText="Withdraw"
+        nativeUnit="USDC"
         buttonText="Withdraw"
-        buyClick={() => success()}
+        inputValueChange={(val: string) => setInputValue(val)}
+        buyClick={() => {
+          if (inputValue !== "" && !isNaN(Number(inputValue))) {
+            setLoading.on();
+            setWithdraw.on();
+          }
+          // success();
+        }}
       />
       {/* mobile buy */}
       <Flex
@@ -50,6 +104,8 @@ function Index({ totalPrice, priceUnit, success }: IProps) {
         bgColor="black.1200"
         color="white.100"
         pos="fixed"
+        borderTopLeftRadius="6px"
+        borderTopRightRadius="6px"
         bottom={0}
         left={0}
         zIndex={1}
@@ -83,16 +139,23 @@ function Index({ totalPrice, priceUnit, success }: IProps) {
               color="green.100"
               lineHeight={px2vw(20)}
             >
-              {totalPrice}
-              {priceUnit}
+              {inputValue}
+              USDC
             </Text>
           </Flex>
         </Flex>
         <BaseButton
+          isLoading={loading}
+          loadingText="Withdraw"
           fontFamily="Nunito"
           textStyle="16"
           w="full"
-          onClick={() => success()}
+          onClick={() => {
+            if (inputValue !== "" && !isNaN(Number(inputValue))) {
+              setLoading.on();
+              setWithdraw.on();
+            }
+          }}
         >
           Withdraw
         </BaseButton>

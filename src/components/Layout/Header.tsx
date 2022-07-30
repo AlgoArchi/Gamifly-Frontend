@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Drawer,
@@ -13,47 +13,69 @@ import {
 import px2vw from "@/utils/px2vw";
 import notificationIcon from "@/assets/imgs/notificationIcon.webp";
 import close from "@/assets/imgs/greenClose.webp";
+import userProfile from "@/assets/imgs/userProfile.png";
 import BaseButton from "../BaseButton";
 import styles from "./style.module.scss";
 import LoginOut from "../LoginOut";
 import LogIn from "../LogIn";
 import MessageList, { messageItem } from "../MessageList";
+import { deleteStore, setStore } from "@/utils/storage";
+import { useWeb3React } from "@web3-react/core";
+import { connectorLocalStorageKey } from "@/connect/connectors";
+import globalStore from "@/stores/global";
+import { useRouter } from "next/router";
 
-function Index() {
+export interface IProps {
+  notificationList: any;
+  loginOutClick: () => void;
+}
+
+function Index({ notificationList, loginOutClick }: IProps) {
+  const router = useRouter();
+  const { userInfo } = globalStore();
+  const { deactivate } = useWeb3React();
   const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
   const [loginModal, setLoginModal] = useBoolean(false); // 登陆弹窗
-  const [isLogin, setIsLogin] = useBoolean(false); // 是否登陆
-  const [notification] = useState(1); // 未读消息数量
+  const [isLogin, setIsLogin] = useBoolean(userInfo?.id); // 是否登陆
+  const [notification, setNotification] = useState(1); // 未读消息数量
   const [open, setOpen] = useBoolean(false);
-  const newMessageList: messageItem[] = [
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-  ];
-  const previousMessageList: messageItem[] = [
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-    {
-      content:
-        "You received an Reward  21 Gamefly token. Check it in your Gamifly wallet!",
-      time: "12.02.2022",
-    },
-  ];
+  const [newMessageList, setNewMessageList] = useState<messageItem[]>([]);
+  const [previousMessageList, setPreviousMessageList] = useState<messageItem[]>(
+    []
+  );
+  const [loginLoading, setLoginLoading] = useBoolean(false);
+
+  const disconnectWallet = async () => {
+    try {
+      await deactivate();
+      deleteStore(connectorLocalStorageKey);
+      setStore("isLogin", false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (userInfo && userInfo?.id) {
+      setIsLogin.on();
+    } else {
+      setIsLogin.off();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo]);
+
+  useEffect(() => {
+    if (notificationList && notificationList.length > 0) {
+      const noList: messageItem[] = [];
+      const list: messageItem[] = [];
+      notificationList.map((item: any) => {
+        item?.status === 0 ? noList.push(item) : list.push(item);
+      });
+      setNewMessageList(noList);
+      setPreviousMessageList(list);
+      setNotification(noList.length);
+    }
+  }, [notificationList]);
 
   return (
     <Flex
@@ -64,20 +86,6 @@ function Index() {
     >
       {isLogin ? (
         <HStack spacing="20px">
-          <BaseButton
-            w="133px"
-            h="52px"
-            bgColor="transparent"
-            border="2px solid"
-            borderColor="blue.100"
-            boxShadow="none"
-            fontFamily="Nunito"
-            fontSize="16px"
-            fontWeight="600"
-            color="blue.100"
-          >
-            Earn Rewards
-          </BaseButton>
           <BaseButton
             className={styles.notificationIcon}
             w="64px"
@@ -129,6 +137,8 @@ function Index() {
       ) : (
         <HStack>
           <BaseButton
+            isLoading={loginLoading}
+            loadingText="Log In"
             w="133px"
             h="52px"
             bgColor="transparent"
@@ -149,7 +159,12 @@ function Index() {
       <LoginOut
         logOut={logOut}
         setLogOut={(boo: boolean) => (boo ? setLogOut.on() : setLogOut.off())}
-        confirmLogOut={() => setIsLogin.off()}
+        confirmLogOut={() => {
+          setIsLogin.off();
+          disconnectWallet();
+          loginOutClick();
+          setLoginLoading.off();
+        }}
       />
       {/* login modal */}
       <LogIn
@@ -157,9 +172,35 @@ function Index() {
         setLoginModal={(boo: boolean) =>
           boo ? setLoginModal.on() : setLoginModal.off()
         }
-        setIsLogin={(boo: boolean) =>
-          boo ? setIsLogin.on() : setIsLogin.off()
+        setIsLogin={(boo: boolean) => {
+          {
+            console.log(boo, "收到的boo");
+            if (boo) {
+              setStore("isLogin", true);
+              setIsLogin.on();
+            } else {
+              setStore("isLogin", false);
+              setIsLogin.off();
+            }
+          }
+        }}
+        setLoginLoading={(boo: boolean) => {
+          boo ? setLoginLoading.on() : setLoginLoading.off();
+        }}
+      />
+      <Image
+        src={
+          userInfo?.avatar
+            ? `${window.imgUrl.imageUrl}${userInfo?.avatar}`
+            : userProfile
         }
+        w="52px"
+        h="52px"
+        ml="15px"
+        my="auto"
+        borderRadius="50%"
+        cursor="pointer"
+        onClick={() => router.push("/profile")}
       />
       {/* Drawer */}
       <Drawer
@@ -199,7 +240,7 @@ function Index() {
             >
               New
             </Text>
-            <MessageList messageList={newMessageList} />
+            <MessageList type={0} messageList={newMessageList} />
             <Text
               fontFamily="Nunito"
               textStyle="14"
