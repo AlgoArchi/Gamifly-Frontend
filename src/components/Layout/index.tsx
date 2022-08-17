@@ -14,7 +14,7 @@ import { getReferralCode, setReferral } from "@/apis/userInfo";
 import { requestReward } from "@/apis/login";
 import { getNotifications } from "@/apis/notifications";
 import useSWR from "swr";
-import { getStore, setStore } from "@/utils/storage";
+import { deleteStore, getStore, setStore } from "@/utils/storage";
 import globalStore from "@/stores/global";
 import footer1 from "@/assets/imgs/footer1.png";
 import footer2 from "@/assets/imgs/footer2.png";
@@ -44,7 +44,8 @@ function Index({ children }: LayoutProps) {
   const loginRouter =
     router?.pathname !== "/" &&
     router?.pathname !== "/login" &&
-    router.pathname !== "/advertisement";
+    router.pathname !== "/advertisement" &&
+    router.pathname !== "/test";
   const [showTermsOfService, setShowTermsOfService] = useBoolean(false);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useBoolean(false);
   const { data: loginData } = useSWR(
@@ -98,7 +99,7 @@ function Index({ children }: LayoutProps) {
       });
       setStore("isLogin", true);
       console.log("login success");
-      setFriendCode(getStore("friendCode"));
+      setFriendCode(getStore("inviteCode"));
       setNotificationsRandom(Math.random());
     }
   }, [loginData]);
@@ -149,6 +150,7 @@ function Index({ children }: LayoutProps) {
         duration: 3000,
         isClosable: true,
       });
+      deleteStore("inviteCode");
     } else {
       toast({
         title: "Inviter binding fail",
@@ -157,6 +159,7 @@ function Index({ children }: LayoutProps) {
         duration: 3000,
         isClosable: true,
       });
+      deleteStore("inviteCode");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setReferralData]);

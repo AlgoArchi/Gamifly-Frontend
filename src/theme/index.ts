@@ -11,7 +11,7 @@ const config: ThemeConfig = {};
 const breakpoints = createBreakpoints({
   sm: "640px",
   md: "768px",
-  lg: "1024px",
+  lg: "1280px",
   xl: "1920px",
 });
 
@@ -54,6 +54,7 @@ const colors = {
     "500": "rgba(94, 198, 184, 0.11)",
     "600": "rgba(94, 198, 184, 0.21)",
     "700": "rgba(94, 198, 184, 0.35)",
+    "800": "#6CCCB0",
   },
   gray: {
     "100": "rgba(104, 104, 104, 0.3)",

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Text, Image, useBoolean } from "@chakra-ui/react";
 import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import px2vw from "@/utils/px2vw";
@@ -23,6 +23,7 @@ function App() {
   const [isLogin, setIsLogin] = useBoolean(userInfo?.id); // 是否登陆
   const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
   const [loginLoading, setLoginLoading] = useBoolean(false);
+  const [inviteCode] = useState(router.query.inviteCode);
   const disconnectWallet = async () => {
     try {
       await deactivate();
@@ -32,10 +33,24 @@ function App() {
       console.error(err);
     }
   };
+
   useEffect(() => {
     if (userInfo && userInfo?.id) setIsLogin.on();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userInfo]);
+
+  useEffect(() => {
+    if (inviteCode) {
+      if (
+        (userInfo && userInfo?.id && !userInfo?.referral_id) ||
+        !userInfo?.id
+      ) {
+        setStore("inviteCode", inviteCode);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteCode]);
+
   return (
     <Flex
       w="full"

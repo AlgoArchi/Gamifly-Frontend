@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Flex, Image, Text, useBoolean } from "@chakra-ui/react";
+import React, { useMemo } from "react";
+import { Flex, Image, Text, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import gamesIcon from "@/assets/imgs/games.webp";
 import tournaments from "@/assets/imgs/tournaments.webp";
@@ -12,9 +12,11 @@ import px2vw from "@/utils/px2vw";
 import notificationIcon from "@/assets/imgs/notificationIcon.webp";
 import leftLogo from "@/assets/imgs/leftLogo.png";
 import styles from "./style.module.scss";
-import InviteFriend from "../InviteFriend";
-import FriendCode from "../FriendCode";
+// import InviteFriend from "../InviteFriend";
+import { getStore } from "@/utils/storage";
+// import FriendCode from "../FriendCode";
 import globalStore from "@/stores/global";
+import copyFunction from "copy-to-clipboard";
 
 export interface pageItem {
   name: string;
@@ -158,16 +160,27 @@ export const ButtonArr = React.memo(
             <Flex justifyContent="center" w="27px" h="27px" mr="10px" my="auto">
               <Image src={item.icon} />
             </Flex>
-            {/* name */}
-            <Text
-              fontSize="14px"
-              lineHeight="27px"
-              fontFamily="Orbitron"
-              fontWeight="600"
-              my="auto"
-            >
-              {item.name}
-            </Text>
+            <Flex flexDir="column" my="auto">
+              {/* name */}
+              <Text
+                fontSize="14px"
+                lineHeight="24px"
+                fontFamily="Orbitron"
+                fontWeight="600"
+                textAlign="center"
+              >
+                {item.name}
+              </Text>
+              <Text
+                fontSize="12px"
+                lineHeight="12px"
+                fontFamily="Orbitron"
+                fontWeight="600"
+                textAlign="center"
+              >
+                Copy Link
+              </Text>
+            </Flex>
           </Flex>
         );
       })}
@@ -177,28 +190,39 @@ export const ButtonArr = React.memo(
 
 function Index() {
   const router = useRouter();
-  const { userInfo, showInviteFriend } = globalStore();
-  const [inviteCode] = useState(router.query.inviteCode);
-  const [inviteShow, setInviteShow] = useBoolean(false);
-  const [friendShow, setFriendShow] = useBoolean(false);
+  const toast = useToast();
+  const { userInfo } = globalStore();
+  // const [inviteCode] = useState(router.query.inviteCode);
+  // const [inviteShow, setInviteShow] = useBoolean(false);
+  // const [friendShow, setFriendShow] = useBoolean(false);
 
-  useEffect(() => {
-    if (inviteCode) {
-      if (
-        (userInfo && userInfo?.id && !userInfo?.referral_id) ||
-        !userInfo?.id
-      ) {
-        setFriendShow.on();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inviteCode]);
+  // useEffect(() => {
+  //   if (inviteCode) {
+  //     if (
+  //       (userInfo && userInfo?.id && !userInfo?.referral_id) ||
+  //       !userInfo?.id
+  //     ) {
+  //       setFriendShow.on();
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [inviteCode]);
   // 按钮数组
   const buttonList: buttonItem[] = [
     {
       name: "Invite friend",
       icon: invite,
-      click: () => setInviteShow.on(),
+      click: () => {
+        copyFunction(
+          `https://www.gamifly.co?inviteCode=${getStore("referralCode")}`
+        );
+        toast({
+          title: "success",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
     },
   ];
 
@@ -240,18 +264,18 @@ function Index() {
       {avatar}
       {/* button */}
       {userInfo && userInfo?.id && <ButtonArr buttonList={buttonList} />}
-      <InviteFriend
+      {/* <InviteFriend
         isShow={inviteShow || showInviteFriend}
         setIsShow={() => {
           setInviteShow.off();
           globalStore.setState({ showInviteFriend: false });
         }}
-      />
-      <FriendCode
+      /> */}
+      {/* <FriendCode
         isShow={friendShow}
         code={inviteCode}
         setIsShow={() => setFriendShow.off()}
-      />
+      /> */}
     </Flex>
   );
 }
