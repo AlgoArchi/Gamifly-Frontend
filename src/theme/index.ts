@@ -45,6 +45,7 @@ const colors = {
   },
   blue: {
     "100": "#3D50FF",
+    "200": "#3DC2FF",
   },
   green: {
     "100": "#5EC6B8",
@@ -59,6 +60,7 @@ const colors = {
   gray: {
     "100": "rgba(104, 104, 104, 0.3)",
     "200": "#5E5E5E",
+    "300": "#D8D8D8",
   },
   yellow: { "100": "#EFC049", "200": "#EDAB06" },
 };
@@ -183,7 +185,7 @@ const theme = extendTheme({
   config,
   colors,
   fonts: {
-    body: "'Orbitron','Nunito','sans-serif'",
+    body: "'Orbitron','Nunito','Eurostile','SofiaPro','sans-serif'",
   },
   sizes: {
     xl: "1080px",

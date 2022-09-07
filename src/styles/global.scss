@@ -90,6 +90,25 @@
   font-style: normal;
   src: url("../../public/fonts/Nunito-Black.ttf") format("truetype");
 }
+@font-face {
+  font-weight: 400;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Cond-Regular-Italic.otf")
+    format("truetype");
+}
+@font-face {
+  font-weight: 400;
+  font-family: "SofiaPro";
+  font-style: normal;
+  src: url("../../public/fonts/Sofia-Pro-Regular.otf") format("truetype");
+}
+@font-face {
+  font-weight: 700;
+  font-family: "SofiaPro";
+  font-style: normal;
+  src: url("../../public/fonts/Sofia-Pro-Semi-Bold.otf") format("truetype");
+}
 
 // 清浮动
 .clearfix {
