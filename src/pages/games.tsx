@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Text, Image, useBoolean } from "@chakra-ui/react";
+import { Flex, Text, Image } from "@chakra-ui/react";
 import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import useSWR from "swr";
 import px2vw from "@/utils/px2vw";
-import LoadingPage from "@/components/LoadingPage";
 import { getGameList, getGameTypes } from "@/apis/games";
-import gaminIcon from "@/assets/imgs/gameIcon.png";
+import TopSeller from "@/components/TopSeller";
+import playIcon from "@/assets/imgs/playIcon.png";
+import featuresIcon from "@/assets/imgs/featuresIcon.png";
+import randomPlay from "@/assets/imgs/randomPlay.png";
 
 function App() {
-  const [loadingShow, setLoadingShow] = useBoolean(true);
   const [gamesTypes, setGamesTypes] = useState<any>(null);
   const [activeGameType, setActiveGameType] = useState({ index: 0, id: 0 });
   const [gameList, setGameList] = useState<any>([]);
+  const [newList, setNewList] = useState<any>([]);
 
   const { data: getGameListData } = useSWR(
     activeGameType?.id > 0 ? [getGameList.key, activeGameType] : null,
@@ -49,140 +51,216 @@ function App() {
         list: getGameListData,
       };
       setGameList([...gameList, ...[obj]]);
-      activeGameType.index + 1 === gamesTypes.length && setLoadingShow.off();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getGameListData, setLoadingShow]);
+  }, [getGameListData]);
+
+  useEffect(() => {
+    const list = newList;
+    gameList.map((item: any) => {
+      item.list.map((ite: any) => {
+        if (!list.includes(ite)) {
+          list.push(ite);
+        }
+      });
+    });
+    setNewList(list);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameList]);
+
+  const randomClick = () => {
+    const random_number = Math.floor(
+      Math.random() * Math.floor(newList.length)
+    );
+    window.open(newList[random_number]?.link);
+  };
+
+  const returnTypeName = (type: any) => {
+    let val = "";
+    gamesTypes.map((item: any) => {
+      if (type === String(item?.id)) {
+        val = item?.name;
+      }
+    });
+    return val;
+  };
 
   return (
-    <Flex w="full" flexDir="column">
-      <Text
-        display={{ base: "none", lg: "block" }}
-        fontFamily="Orbitron"
-        fontWeight="400"
-        fontSize={{ base: px2vw(32), lg: "32px" }}
-        lineHeight={{ base: px2vw(32), lg: "32px" }}
-        mb="20px"
-        color="white.100"
+    <Flex w="full" minH="100vh" flexDir="column" pt={{ base: 0, lg: "150px" }}>
+      <TopSeller
+        w="full"
+        h={{ base: "420px", lg: "423px" }}
+        mt={{ base: px2vw(20), lg: 0 }}
+        mb={{ base: px2vw(60), lg: "60px" }}
       >
-        Games
-      </Text>
-      {gameList && gameList.length && (
-        <Flex flexDir="column">
-          {gameList.map((ite: any, ind: number) => {
+        <Flex
+          px={{ base: px2vw(16), lg: 0 }}
+          flexDir="column"
+          justifyContent="center"
+          color="black.1600"
+          fontFamily="Eurostile"
+          fontWeight="400"
+          boxSizing="border-box"
+        >
+          <Text
+            fontWeight="bolder"
+            fontSize={{ base: px2vw(25), lg: "35px" }}
+            lineHeight={{ base: px2vw(25), lg: "35px" }}
+            mb={{ base: px2vw(10), lg: "10px" }}
+          >
+            CRICKET GAME
+          </Text>
+          <Flex
+            fontSize={{ base: px2vw(13), lg: "13px" }}
+            lineHeight={{ base: px2vw(13), lg: "13px" }}
+            mb={{ base: px2vw(10), lg: "10px" }}
+            opacity="0.8"
+          >
+            <Text mr={{ base: px2vw(20), lg: "20px" }}>Date：2022-07-24</Text>
+            <Text>ESPORTS GAME</Text>
+          </Flex>
+          <Text
+            fontWeight="600"
+            fontSize={{ base: px2vw(14), lg: "14px" }}
+            lineHeight={{ base: px2vw(22), lg: "22px" }}
+            mb={{ base: px2vw(10), lg: "20px" }}
+          >
+            Bat-and-Ball Game, Play to earn. Welcome to the first Cricket
+            Metaverse!
+          </Text>
+          <Flex
+            w={{ base: px2vw(173), lg: "173px" }}
+            h={{ base: px2vw(52), lg: "52px" }}
+            fontSize={{ base: px2vw(17), lg: "17px" }}
+            borderRadius="5px"
+            bgColor="transparent"
+            border="1px solid"
+            borderColor="black.1600"
+            color="black.1600"
+            justifyContent="center"
+            alignItems="center"
+            fontFamily="Eurostile"
+            fontWeight="bolder"
+            cursor="pointer"
+            onClick={() =>
+              window.open("https://app.gamifly.co/games/cricket/index.html")
+            }
+          >
+            <Image src={playIcon} mr="10px" />
+            <Text mt="8px" fontWeight="bolder">
+              PLAY NOW
+            </Text>
+          </Flex>
+        </Flex>
+      </TopSeller>
+      {/* gameList */}
+      <Flex
+        flexDir="column"
+        borderTop="1px solid"
+        borderColor={{ base: "black.1800", lg: "transparent" }}
+        pt={{ base: px2vw(30), lg: 0 }}
+      >
+        {/* title */}
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          mb={{ base: px2vw(25), lg: "60px" }}
+        >
+          <Image
+            src={randomPlay}
+            display={{ base: "none", lg: "flex" }}
+            opacity="0"
+          />
+          <Flex justifyContent="center">
+            <Text
+              fontFamily="Eurostile"
+              fontWeight="bolder"
+              color="white.100"
+              mt={{ base: px2vw(5), lg: "5px" }}
+              fontSize={{ base: px2vw(23), lg: "35px" }}
+              lineHeight={{ base: px2vw(23), lg: "35px" }}
+            >
+              GAME LOBBY
+            </Text>
+            <Image
+              src={featuresIcon}
+              w={{ base: px2vw(30), lg: "30px" }}
+              h={{ base: px2vw(23), lg: "23px" }}
+              ml={{ base: px2vw(5), lg: "5px" }}
+            />
+          </Flex>
+          <Image
+            src={randomPlay}
+            w={{ base: px2vw(119), lg: "119px" }}
+            h={{ base: px2vw(31), lg: "31px" }}
+            cursor="pointer"
+            onClick={() => randomClick()}
+          />
+        </Flex>
+        {/* list */}
+        <Flex flexWrap="wrap" justifyContent="space-between">
+          {newList.map((item: any, index: number) => {
             return (
               <Flex
-                display={ite.list.length ? "flex" : "none"}
+                key={index}
+                mb={{ base: px2vw(10), lg: "20px" }}
                 flexDir="column"
-                key={ind}
-                mb={{ base: px2vw(10), lg: "10px" }}
               >
-                <Flex>
+                <Flex
+                  w={{ base: px2vw(160), lg: "258px" }}
+                  h={{ base: px2vw(90), lg: "194px" }}
+                  p={{ base: px2vw(15), lg: "15px" }}
+                  bgImage={`${window.imgUrl.gameUrl}${item?.image}`}
+                  borderRadius="15px"
+                  flexDir="column"
+                  justifyContent="flex-end"
+                  bgSize="100% 100%"
+                  bgRepeat="no-repeat"
+                  boxSizing="border-box"
+                  cursor="pointer"
+                  onClick={() => window.open(item?.link)}
+                >
                   <Flex
-                    px={{ base: px2vw(18), lg: "18px" }}
-                    h={{ base: px2vw(36), lg: "36px" }}
-                    mb={{ base: px2vw(18), lg: "18px" }}
-                    border="1px solid"
-                    borderColor="blue.100"
-                    justifyContent="center"
-                    alignItems="center"
-                    borderRadius="4px"
+                    display={{ base: "none", lg: "flex" }}
+                    fontFamily="SofiaPro"
+                    fontWeight="600"
+                    fontSize="18px"
+                    lineHeight="18px"
+                    color="white.100"
+                    mb="10px"
                   >
-                    <Text
-                      fontFamily="Orbitron"
-                      fontWeight="700"
-                      textStyle="18"
-                      color="green.100"
-                    >
-                      {ite?.title}
-                    </Text>
+                    {item?.title}
                   </Flex>
-                  <Image
-                    h={{ base: px2vw(36), lg: "36px" }}
-                    w={{ base: px2vw(17), lg: "17px" }}
-                    ml={{ base: px2vw(10), lg: "10px" }}
-                    src={gaminIcon}
-                  />
+                  <Flex
+                    display={{ base: "none", lg: "flex" }}
+                    justifyContent="space-between"
+                    fontFamily="Eurostile"
+                    fontWeight="400"
+                    fontSize="13px"
+                    lineHeight="13px"
+                    color="white.100"
+                  >
+                    <Text>{returnTypeName(item?.game_type)}</Text>
+                    {item?.views && <Text>1487 views</Text>}
+                  </Flex>
                 </Flex>
                 <Flex
-                  w="full"
-                  justifyContent={{ base: "space-between", lg: "flex-start" }}
-                  flexWrap="wrap"
+                  display={{ base: "flex", lg: "none" }}
+                  fontSize={px2vw(13)}
+                  lineHeight={px2vw(13)}
+                  mt={px2vw(5)}
+                  justifyContent="center"
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="white.100"
                 >
-                  {ite.list.map((item: any, index: number) => {
-                    return (
-                      <Flex
-                        key={index}
-                        w={{ base: "48%", lg: "10%" }}
-                        h={{ base: "max-content", lg: "auto" }}
-                        mr={{ base: 0, lg: "20px" }}
-                        mb={{ base: px2vw(20), lg: "20px" }}
-                        onClick={() => window.open(item?.link)}
-                        borderRadius="6px"
-                        flexDir="column"
-                        cursor="pointer"
-                      >
-                        <Image
-                          src={`${window.imgUrl.gameUrl}${item?.image}`}
-                          w={{ base: "100%", lg: "100%" }}
-                          h={{ base: px2vw(100), lg: "80px" }}
-                          borderRadius="6px"
-                        />
-                        <Flex
-                          flexDir="column"
-                          mt={{ base: px2vw(10), lg: "10px" }}
-                        >
-                          <Text
-                            w="full"
-                            h={{ base: px2vw(12), lg: "14px" }}
-                            fontSize={{ base: px2vw(12), lg: "14px" }}
-                            lineHeight={{ base: px2vw(12), lg: "14px" }}
-                            textAlign="center"
-                            fontFamily="Orbitron"
-                            fontWeight="700"
-                            color="white.100"
-                            overflow="hidden"
-                            whiteSpace="nowrap"
-                            textOverflow="ellipsis"
-                          >
-                            {item?.title}
-                          </Text>
-                          {/* <Text
-                            fontFamily="Nunito"
-                            fontWeight="400"
-                            textStyle="16"
-                            color="white.500"
-                            lineHeight={{ base: px2vw(22), lg: "22px" }}
-                            mb={{ base: px2vw(30), lg: "30px" }}
-                          >
-                            {item?.content}
-                          </Text>
-                          <BaseButton
-                            w={{ base: "full", lg: "160px" }}
-                            fontFamily="Nunito"
-                            fontWeight="600"
-                            textStyle="16"
-                            color="white.100"
-                            onClick={() => window.open(item?.link)}
-                          >
-                            Play
-                          </BaseButton> */}
-                        </Flex>
-                      </Flex>
-                    );
-                  })}
+                  {item?.title}
                 </Flex>
               </Flex>
             );
           })}
         </Flex>
-      )}
-
-      <LoadingPage
-        progress={48}
-        isShow={loadingShow}
-        setIsShow={() => setLoadingShow.off()}
-      />
+      </Flex>
     </Flex>
   );
 }

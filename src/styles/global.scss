@@ -92,13 +92,6 @@
 }
 @font-face {
   font-weight: 400;
-  font-family: "Eurostile";
-  font-style: normal;
-  src: url("../../public/fonts/Eurostile-Cond-Regular-Italic.otf")
-    format("truetype");
-}
-@font-face {
-  font-weight: 400;
   font-family: "SofiaPro";
   font-style: normal;
   src: url("../../public/fonts/Sofia-Pro-Regular.otf") format("truetype");
@@ -108,6 +101,54 @@
   font-family: "SofiaPro";
   font-style: normal;
   src: url("../../public/fonts/Sofia-Pro-Semi-Bold.otf") format("truetype");
+}
+@font-face {
+  font-weight: 400;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Regular.otf") format("truetype");
+}
+@font-face {
+  font-weight: 500;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Medium.otf") format("truetype");
+}
+@font-face {
+  font-weight: 600;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Medium.otf") format("truetype");
+}
+@font-face {
+  font-weight: 700;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Heavy.otf") format("truetype");
+}
+@font-face {
+  font-weight: 800;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Heavy.otf") format("truetype");
+}
+@font-face {
+  font-weight: 900;
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Black.otf") format("truetype");
+}
+@font-face {
+  font-weight: "bold";
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Black.otf") format("truetype");
+}
+@font-face {
+  font-weight: "bolder";
+  font-family: "Eurostile";
+  font-style: normal;
+  src: url("../../public/fonts/Eurostile-Black.otf") format("truetype");
 }
 
 // 清浮动

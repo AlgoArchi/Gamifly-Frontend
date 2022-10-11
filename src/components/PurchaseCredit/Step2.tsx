@@ -91,6 +91,7 @@ function Index({
         user_id: userInfo?.id,
         game_id: activeGame?.id,
         amount: 1,
+        accessToken: userInfo?.access_token,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

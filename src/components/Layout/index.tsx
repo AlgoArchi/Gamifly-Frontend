@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import {
-  Container,
-  Flex,
-  Text,
-  Image,
-  useBoolean,
-  useToast,
-} from "@chakra-ui/react";
+import { Flex, useBoolean, useToast, Image } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import { login } from "@/apis/login";
 import { getReferralCode, setReferral } from "@/apis/userInfo";
@@ -16,16 +9,17 @@ import { getNotifications } from "@/apis/notifications";
 import useSWR from "swr";
 import { deleteStore, getStore, setStore } from "@/utils/storage";
 import globalStore from "@/stores/global";
-import footer1 from "@/assets/imgs/footer1.png";
-import footer2 from "@/assets/imgs/footer2.png";
-import footer3 from "@/assets/imgs/footer3.png";
-import footer4 from "@/assets/imgs/footer4.png";
-import LeftMenu from "./LeftMenu";
+import ruleIcon from "@/assets/imgs/ruleIcon.png";
+// import footer1 from "@/assets/imgs/footer1.png";
+// import footer2 from "@/assets/imgs/footer2.png";
+// import footer3 from "@/assets/imgs/footer3.png";
+// import footer4 from "@/assets/imgs/footer4.png";
+// import LeftMenu from "./LeftMenu";
 import Header from "./Header";
 import HeaderMobile from "./HeaderMobile";
-import BaseModal from "../BaseModal";
-import TermsOfUse from "../TermsOfUse";
-import PrivacyPolicy from "../PrivacyPolicy";
+import Footer from "./Footer";
+import MyRewards from "./MyRewards";
+import RewardsRule from "./RewardsRule";
 
 export interface LayoutProps {
   children: any;
@@ -41,13 +35,7 @@ function Index({ children }: LayoutProps) {
   const { userInfo } = globalStore();
   const [friendCode, setFriendCode] = useState(null);
   const [accessToken, setAccessToken] = useState<any>(null);
-  const loginRouter =
-    router?.pathname !== "/" &&
-    router?.pathname !== "/login" &&
-    router.pathname !== "/advertisement" &&
-    router.pathname !== "/test";
-  const [showTermsOfService, setShowTermsOfService] = useBoolean(false);
-  const [showPrivacyPolicy, setShowPrivacyPolicy] = useBoolean(false);
+  const [showRule, setShowRule] = useBoolean(false);
   const { data: loginData } = useSWR(
     accessToken ? [login.key] : null,
     (_) =>
@@ -80,6 +68,7 @@ function Index({ children }: LayoutProps) {
       requestReward.fetcher({
         user_id: userInfo?.id,
         type: 1,
+        accessToken: userInfo?.access_token,
       }),
     { revalidateOnFocus: false }
   );
@@ -101,7 +90,9 @@ function Index({ children }: LayoutProps) {
       console.log("login success");
       setFriendCode(getStore("inviteCode"));
       setNotificationsRandom(Math.random());
+      router.push(router.pathname);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loginData]);
 
   useEffect(() => {
@@ -173,8 +164,7 @@ function Index({ children }: LayoutProps) {
   return (
     <Flex
       justifyContent="flex-start"
-      bg={loginRouter ? "black.900" : "#17192E"}
-      pl={{ base: "0", lg: loginRouter ? "237px" : "0" }}
+      bg="black.1600"
       pos="relative"
       overflowX={{ base: "hidden", lg: "auto" }}
       _before={{
@@ -188,203 +178,66 @@ function Index({ children }: LayoutProps) {
         filter: "blur(200px)",
       }}
     >
-      {/* 两个背景图 */}
-      {loginRouter && (
-        <>
-          {/* 蓝色背景圆圈 */}
-          <Container
-            pos="absolute"
-            bottom={{ base: "auto", lg: "100px" }}
-            top={{ base: "20%", lg: "auto" }}
-            left={{ base: px2vw(-120), lg: "60px" }}
-            w={{ base: px2vw(250), lg: "326px" }}
-            h={{ base: px2vw(180), lg: "278px" }}
-            bgColor="blue.100"
-            filter={{ base: "blur(75px)", lg: "blur(100px)" }}
-          />
-          {/* 绿色背景圆圈 */}
-          <Container
-            pos="absolute"
-            top={{ base: "auto", lg: "35%" }}
-            bottom={{ base: "15%", lg: "auto" }}
-            right="0"
-            w={{ base: px2vw(230), lg: "326px" }}
-            h={{ base: px2vw(190), lg: "318px" }}
-            bgColor="green.100"
-            boxShadow="0px 4px 200px #5EC6B8"
-            borderRadius="100px"
-            filter={{ base: "blur(75px)", lg: "blur(100px)" }}
-          />
-        </>
-      )}
-      {/* 左侧边导航栏 */}
-      {loginRouter && <LeftMenu />}
-      {/* 右侧内容 */}
+      {/* 内容 */}
       <Flex
-        w="full"
-        pl={loginRouter ? { base: px2vw(15), lg: "20px" } : 0}
-        pr={loginRouter ? { base: px2vw(15), lg: "20px" } : 0}
+        w={{ base: "full", lg: router?.pathname === "/" ? "full" : "1280px" }}
+        px={{ base: router?.pathname === "/" ? 0 : px2vw(16), lg: 0 }}
+        pt={{ base: px2vw(90), lg: 0 }}
+        mx="auto"
+        boxSizing="border-box"
         flexDirection="column"
         justifyContent="space-start"
         zIndex={1}
       >
         {/* 顶部Header */}
-        {loginRouter && (
-          <>
-            <Header
-              notificationList={notificationList}
-              loginOutClick={() => {
-                clearInterval(interVals);
-                setGetRequestReward(0);
-              }}
-            />
-            <HeaderMobile
-              loginOutClick={() => {
-                clearInterval(interVals);
-                setGetRequestReward(0);
-              }}
-            />
-          </>
-        )}
+        <Header
+          notificationList={notificationList}
+          loginOutClick={() => {
+            clearInterval(interVals);
+            setGetRequestReward(0);
+          }}
+        />
+        <HeaderMobile
+          loginOutClick={() => {
+            clearInterval(interVals);
+            setGetRequestReward(0);
+          }}
+        />
         {/* 页面 */}
-        {loginRouter ? (
-          <Flex
-            flexDir="column"
-            justifyContent="space-between"
-            py={{ base: px2vw(30), lg: "20px" }}
-            minH={{
-              base: `calc(100vh - ${px2vw(55)})`,
-              lg: "calc(100vh - 72px)",
-            }}
-            // overflowX="auto"
-          >
-            {children}
-            <Flex
-              w={{ base: "full", lg: "360px" }}
-              h={{ base: px2vw(300), lg: "300px" }}
-              flexDir="column"
-              alignItems="center"
-              justifyContent="center"
-              // display={{ base: "none", lg: "flex" }}
-              mx="auto"
-              mt="50px"
-            >
-              <Text
-                textStyle="18"
-                color="white.100"
-                textAlign="center"
-                fontWeight="700"
-                mb={{ base: px2vw(20), lg: "20px" }}
-              >
-                Join Our Community
-              </Text>
-              <Flex mb={{ base: px2vw(28), lg: "28px" }}>
-                {/* Discord */}
-                <Flex
-                  w={{ base: px2vw(46), lg: "46px" }}
-                  h={{ base: px2vw(46), lg: "46px" }}
-                  mr={{ base: px2vw(15), lg: "15px" }}
-                  borderRadius={{ base: px2vw(12), lg: "12px" }}
-                  bgColor="black.100"
-                  justifyContent="center"
-                  alignItems="center"
-                  boxShadow="0px 2px 26px #3d50ff"
-                  cursor="pointer"
-                  onClick={() => window.open(" https://discord.gg/FMGNrjk75k")}
-                >
-                  <Image src={footer1} />
-                </Flex>
-                {/* Instagram */}
-                <Flex
-                  w={{ base: px2vw(46), lg: "46px" }}
-                  h={{ base: px2vw(46), lg: "46px" }}
-                  mr={{ base: px2vw(15), lg: "15px" }}
-                  borderRadius={{ base: px2vw(12), lg: "12px" }}
-                  bgColor="black.100"
-                  justifyContent="center"
-                  alignItems="center"
-                  boxShadow="0px 2px 26px #3d50ff"
-                  cursor="pointer"
-                  onClick={() =>
-                    window.open(
-                      "https://instagram.com/gamifly?igshid=YmMyMTA2M2Y="
-                    )
-                  }
-                >
-                  <Image src={footer2} />
-                </Flex>
-                {/* Telegram */}
-                <Flex
-                  w={{ base: px2vw(46), lg: "46px" }}
-                  h={{ base: px2vw(46), lg: "46px" }}
-                  mr={{ base: px2vw(15), lg: "15px" }}
-                  borderRadius={{ base: px2vw(12), lg: "12px" }}
-                  bgColor="black.100"
-                  justifyContent="center"
-                  alignItems="center"
-                  boxShadow="0px 2px 26px #3d50ff"
-                  cursor="pointer"
-                  onClick={() => window.open("http://t.me/gamifly")}
-                >
-                  <Image src={footer3} />
-                </Flex>
-                {/* twitter */}
-                <Flex
-                  w={{ base: px2vw(46), lg: "46px" }}
-                  h={{ base: px2vw(46), lg: "46px" }}
-                  borderRadius={{ base: px2vw(12), lg: "12px" }}
-                  bgColor="black.100"
-                  justifyContent="center"
-                  alignItems="center"
-                  boxShadow="0px 2px 26px #3d50ff"
-                  cursor="pointer"
-                  onClick={() => window.open("https://twitter.com/Gamiflyco")}
-                >
-                  <Image src={footer4} />
-                </Flex>
-              </Flex>
-              <Flex
-                fontSize={{ base: px2vw(15), lg: "15px" }}
-                lineHeight={{ base: px2vw(15), lg: "15px" }}
-                fontWeight="700"
-                color="white.100"
-                opacity="0.6"
-              >
-                <Text
-                  textDecor="underline"
-                  cursor="pointer"
-                  onClick={() => setShowTermsOfService.on()}
-                >
-                  Term of service
-                </Text>
-                <Text mx="10px">and</Text>
-                <Text
-                  textDecor="underline"
-                  cursor="pointer"
-                  onClick={() => setShowPrivacyPolicy.on()}
-                >
-                  Privacy policy
-                </Text>
-              </Flex>
-            </Flex>
-          </Flex>
+        {children}
+        <Footer />
+        {/* 右侧浮窗 */}
+        {!showRule ? (
+          <MyRewards helpClick={() => setShowRule.on()} />
         ) : (
-          children
+          <Flex
+            display={{ base: "none", lg: "flex" }}
+            w="390px"
+            h="200px"
+            pos="fixed"
+            bottom="90px"
+            right="0"
+            bgColor="black.1900"
+            border="1px solid"
+            borderColor="green.1000"
+            borderRadius="15px"
+            borderRight="none"
+            borderTopRightRadius="0"
+            borderBottomRightRadius="0"
+          >
+            <Image
+              w="8px"
+              h="16px"
+              my="auto"
+              ml="12px"
+              mr="33px"
+              cursor="pointer"
+              src={ruleIcon}
+              onClick={() => setShowRule.off()}
+            />
+            <RewardsRule mt="16px" />
+          </Flex>
         )}
-        {/* Terms of Service */}
-        <BaseModal
-          isShow={showTermsOfService}
-          close={() => setShowTermsOfService.off()}
-        >
-          <TermsOfUse />
-        </BaseModal>
-        {/* Privacy Policy */}
-        <BaseModal
-          isShow={showPrivacyPolicy}
-          close={() => setShowPrivacyPolicy.off()}
-        >
-          <PrivacyPolicy />
-        </BaseModal>
       </Flex>
     </Flex>
   );

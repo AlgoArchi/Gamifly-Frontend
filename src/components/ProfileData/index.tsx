@@ -47,7 +47,7 @@ function Index() {
     { revalidateOnFocus: false }
   );
 
-  // 获取我的NFT
+  // 获取我的积分
   const { data: getRewardAmountData } = useSWR(
     userInfo && userInfo?.id ? [getRewardAmount.key] : null,
     (_) => getRewardAmount.fetcher(userInfo?.id),

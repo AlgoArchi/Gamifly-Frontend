@@ -11,7 +11,11 @@ function Index() {
   const [isLogin] = useState(true);
   const [isSetMode, setIsSetMode] = useBoolean(false);
   return (
-    <Flex direction="column" w={{ base: "full", lg: "max-content" }}>
+    <Flex
+      direction="column"
+      w={{ base: "full", lg: "max-content" }}
+      pt={{ base: 0, lg: "150px" }}
+    >
       <Text
         mb={{ base: px2vw(20), lg: "20px" }}
         display={{ base: "none", lg: "block" }}

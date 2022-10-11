@@ -295,7 +295,11 @@ function App() {
     //     </Flex>
     //   </BaseModal>
     // </Flex>
-    <Flex justifyContent="center" alignItems="center">
+    <Flex
+      justifyContent="center"
+      alignItems="center"
+      pt={{ base: 0, lg: "150px" }}
+    >
       <Image src={comingSoon} />
     </Flex>
   );

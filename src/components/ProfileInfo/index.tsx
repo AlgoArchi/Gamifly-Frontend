@@ -10,6 +10,7 @@ import { getUserInfo, getReferralCount } from "@/apis/userInfo";
 import useSWR from "swr";
 import axios from "axios";
 import { setStore } from "@/utils/storage";
+import LoginOut from "../LoginOut";
 
 export interface IProps {
   isSetMode: boolean;
@@ -23,6 +24,7 @@ function Index({ isSetMode, saveClick }: IProps) {
   const [imgsSrc, setImgsSrc] = useState<any>();
   const [imgsSrcForUp, setImgsSrcForUp] = useState<any>();
   const [refferal, setRefferal] = useState<any>("--");
+  const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
 
   const refs = useRef(null);
   // 获取用户信息
@@ -306,6 +308,26 @@ function Index({ isSetMode, saveClick }: IProps) {
             </Flex>
           )}
         </Flex>
+        {/* log out */}
+        <Flex
+          fontSize={{ base: px2vw(17), lg: "17px" }}
+          h={{ base: px2vw(50), lg: "50px" }}
+          lineHeight={{ base: px2vw(50), lg: "50px" }}
+          mt={{ base: px2vw(20), lg: "20px" }}
+          w="full"
+          fontFamily="Eurostile"
+          fontWeight="400"
+          alignItems="center"
+          justifyContent="center"
+          border="1px solid"
+          borderColor="white.100"
+          borderRadius="5px"
+          color="white.100"
+          cursor="pointer"
+          onClick={() => setLogOut.on()}
+        >
+          <Text mt={{ base: px2vw(5), lg: "5px" }}>LOG OUT</Text>
+        </Flex>
       </Flex>
       {/* 上传头像 */}
       <Input
@@ -318,6 +340,11 @@ function Index({ isSetMode, saveClick }: IProps) {
         name="file"
         accept="image/*"
         opacity={0}
+      />
+      {/* log out */}
+      <LoginOut
+        logOut={logOut}
+        setLogOut={(boo: boolean) => (boo ? setLogOut.on() : setLogOut.off())}
       />
     </Flex>
   );

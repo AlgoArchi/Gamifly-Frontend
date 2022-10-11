@@ -3,13 +3,13 @@ import { Flex, Image, Text, useToast } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import gamesIcon from "@/assets/imgs/games.webp";
 import tournaments from "@/assets/imgs/tournaments.webp";
-import leaderboard from "@/assets/imgs/leaderboard.webp";
-import gamiflyInfo from "@/assets/imgs/gamiflyInfo.webp";
+// import leaderboard from "@/assets/imgs/leaderboard.webp";
+// import gamiflyInfo from "@/assets/imgs/gamiflyInfo.webp";
 import purchase from "@/assets/imgs/purchase.webp";
-import transfer from "@/assets/imgs/transfer.webp";
+// import transfer from "@/assets/imgs/transfer.webp";
 import invite from "@/assets/imgs/invite.webp";
 import px2vw from "@/utils/px2vw";
-import notificationIcon from "@/assets/imgs/notificationIcon.webp";
+// import notificationIcon from "@/assets/imgs/notificationIcon.webp";
 import leftLogo from "@/assets/imgs/leftLogo.png";
 import styles from "./style.module.scss";
 // import InviteFriend from "../InviteFriend";
@@ -33,40 +33,45 @@ export interface buttonItem {
 // 页面数组
 export const pageList: pageItem[] = [
   {
-    name: "Games",
+    name: "GAMES",
     path: "/games",
     icon: gamesIcon,
   },
   {
-    name: "Tournaments",
-    path: "/tournaments",
-    icon: tournaments,
-  },
-  {
-    name: "Leader boards",
-    path: "/leaderBoards",
-    icon: leaderboard,
-  },
-  {
-    name: "Notifications",
-    path: "/notifications",
-    icon: notificationIcon,
-  },
-  {
-    name: "Gamifly info",
-    path: "/gamiflyInfo",
-    icon: gamiflyInfo,
-  },
-  {
-    name: "NFTs",
+    name: "NFT",
     path: "/purchase",
     icon: purchase,
   },
   {
-    name: "Top up and Withdraw",
-    path: "/transfer",
-    icon: transfer,
+    name: "TOURNAMENTS",
+    path: "/tournaments",
+    icon: tournaments,
   },
+  {
+    name: "ABOUT US",
+    path: "/aboutUs",
+    icon: tournaments,
+  },
+  // {
+  //   name: "Leader boards",
+  //   path: "/leaderBoards",
+  //   icon: leaderboard,
+  // },
+  // {
+  //   name: "Notifications",
+  //   path: "/notifications",
+  //   icon: notificationIcon,
+  // },
+  // {
+  //   name: "Gamifly info",
+  //   path: "/gamiflyInfo",
+  //   icon: gamiflyInfo,
+  // },
+  // {
+  //   name: "Top up and Withdraw",
+  //   path: "/transfer",
+  //   icon: transfer,
+  // },
 ];
 
 // 页面列表

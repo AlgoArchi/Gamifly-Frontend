@@ -17,10 +17,8 @@ function Index({ logOut, setLogOut, confirmLogOut }: IProps) {
     <BaseModal
       isShow={logOut}
       close={() => setLogOut(false)}
-      w={{ base: `calc(100vw - ${px2vw(40)})`, lg: "336px" }}
-      h={{ base: px2vw(170), lg: "180px" }}
-      mt={{ base: "auto", lg: "200px" }}
-      mb={{ base: "auto", lg: "auto" }}
+      justifyContent="center"
+      alignItems="center"
     >
       <Flex flexDir="column">
         <Text
@@ -29,7 +27,7 @@ function Index({ logOut, setLogOut, confirmLogOut }: IProps) {
           textAlign="center"
           color="white.100"
           fontSize={{ base: px2vw(22), lg: "22px" }}
-          mb={{ base: px2vw(30), lg: "30px" }}
+          mb={{ base: px2vw(50), lg: "100px" }}
         >
           Log out?
         </Text>
@@ -37,6 +35,7 @@ function Index({ logOut, setLogOut, confirmLogOut }: IProps) {
           <BaseButton
             w={{ base: px2vw(130), lg: "130px" }}
             h={{ base: px2vw(52), lg: "52px" }}
+            mr={{ base: px2vw(50), lg: "50px" }}
             fontFamily="Nunito"
             fontSize="16px"
             fontWeight="600"

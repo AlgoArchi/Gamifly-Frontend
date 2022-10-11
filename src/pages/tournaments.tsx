@@ -55,12 +55,13 @@ function App() {
   }, [getTournamentsData]);
 
   return (
-    <Flex w="full" flexDir="column">
+    <Flex w="full" flexDir="column" pt={{ base: 0, lg: "150px" }}>
       <Text
         display={{ base: "none", lg: "block" }}
         fontFamily="Orbitron"
         fontWeight="700"
         fontSize="36px"
+        lineHeight="36px"
         mb="25px"
         color="white.100"
       >

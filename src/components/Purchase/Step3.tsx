@@ -99,6 +99,7 @@ function Index({
     setBuyPar({
       user_id: userInfo?.id,
       nft_list: nft_list,
+      accessToken: userInfo?.access_token,
     });
   };
   return (

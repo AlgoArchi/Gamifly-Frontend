@@ -15,6 +15,7 @@ import { walletLogin, login } from "@/apis/login";
 import { setReferral } from "@/apis/userInfo";
 import useSWR from "swr";
 import globalStore from "@/stores/global";
+import { useRouter } from "next/router";
 
 export interface IProps {
   loginModal: boolean;
@@ -29,6 +30,7 @@ function Index({
   setIsLogin,
   setLoginLoading,
 }: IProps) {
+  const router = useRouter();
   const toast = useToast();
   const { userInfo, globalAccount } = globalStore();
   const [friendCode, setFriendCode] = useState(null);
@@ -168,6 +170,7 @@ function Index({
       setFriendCode(getStore("friendCode"));
       setIsLogin?.(true);
       setLoginLoading?.(false);
+      router.push(router.pathname);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loginData]);
@@ -242,14 +245,12 @@ function Index({
       <Flex
         w={{ base: px2vw(300), lg: "340px" }}
         h={{ base: px2vw(50), lg: "50px" }}
-        mb={withOutMb ? "0" : { base: px2vw(10), lg: "10px" }}
+        mb={withOutMb ? "0" : { base: px2vw(28), lg: "10px" }}
         justifyContent="center"
         alignItems="center"
-        mx="auto"
         bgColor="transparent"
         border="1px solid"
-        borderColor="blue.100"
-        borderRadius="10px"
+        borderColor="green.1000"
         cursor="pointer"
         onClick={() => {
           click();
@@ -279,39 +280,23 @@ function Index({
   );
   return (
     <BaseModal
-      w={{ base: px2vw(350), lg: "430px" }}
-      h={{ base: px2vw(370), lg: "400px" }}
-      mt={{ base: px2vw(200), lg: "200px" }}
       borderRadius="10px"
-      p="0"
+      pt={{ base: px2vw(155), lg: "140px" }}
+      pl={{ base: px2vw(44), lg: "100px" }}
+      boxSizing="border-box"
       isShow={loginModal}
       close={() => setLoginModal(false)}
     >
       <Text
-        fontFamily="Orbitron"
+        fontFamily="Eurostile"
         fontWeight="700"
-        textAlign="center"
         color="white.100"
-        fontSize={{ base: px2vw(20), lg: "26px" }}
-        lineHeight={{ base: px2vw(20), lg: "26px" }}
-        mt={{ base: px2vw(27), lg: "27px" }}
-        mb={{ base: px2vw(15), lg: "15px" }}
+        fontSize={{ base: px2vw(35), lg: "35px" }}
+        lineHeight={{ base: px2vw(35), lg: "35px" }}
+        mb={{ base: px2vw(28), lg: "15px" }}
       >
-        Log In
+        CONNECT WITH
       </Text>
-      <Flex
-        h={{ base: px2vw(26), lg: "26px" }}
-        mb={{ base: px2vw(30), lg: "30px" }}
-        justifyContent="center"
-        alignItems="center"
-        w="full"
-        bgColor="blue.100"
-        color="white.100"
-        textStyle="14"
-        fontWeight="600"
-      >
-        login for rewards
-      </Flex>
       <LoginItem
         icon={googleSvg}
         name="Google ID"
