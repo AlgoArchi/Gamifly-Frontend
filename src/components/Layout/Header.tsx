@@ -21,6 +21,7 @@ import logo from "@/assets/imgs/logo.png";
 import menuGame from "@/assets/imgs/menuGame.png";
 import menuNFT from "@/assets/imgs/menuNFT.png";
 import menuTou from "@/assets/imgs/menuTou.png";
+import menuWithdraw from "@/assets/imgs/menuWithdraw.png";
 // import menuAbout from "@/assets/imgs/menuAbout.png";
 import BaseButton from "../BaseButton";
 import styles from "./style.module.scss";
@@ -76,10 +77,11 @@ export const pageList: pageItem[] = [
   //   name: "Gamifly info",
   //   path: "/gamiflyInfo",
   // },
-  // {
-  //   name: "Top up and Withdraw",
-  //   path: "/transfer",
-  // },
+  {
+    name: "TOP UP & WITHDRAW",
+    icon: menuWithdraw,
+    path: "/transfer",
+  },
 ];
 
 function Index({ notificationList }: IProps) {

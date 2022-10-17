@@ -72,7 +72,12 @@ function App() {
   }, [step, chooseType, paymentMethod, totalPrice]);
 
   return (
-    <Flex w="full" flexDir="column">
+    <Flex
+      w="full"
+      flexDir="column"
+      minH="100vh"
+      pt={{ base: px2vw(30), lg: "200px" }}
+    >
       {/* Title */}
       <Text
         display={{ base: "none", lg: "block" }}
