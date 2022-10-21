@@ -32,6 +32,8 @@ import TopGame from "@/components/TopGame";
 import TopSeller from "@/components/TopSeller";
 import RewardsRule from "@/components/Layout/RewardsRule";
 import copyFunction from "copy-to-clipboard";
+import useSWR from "swr";
+import { getTopEarning, getVisitors } from "@/apis/login";
 
 function App() {
   const router = useRouter();
@@ -43,6 +45,22 @@ function App() {
   const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
   const [inviteCode] = useState(router.query.inviteCode);
   const [tourStep, setTourStep] = useState(0); // tour步骤
+  const [topEarning, setTopEarning] = useState(0);
+  const [visitor, setVisitor] = useState(0);
+  const { data: getTopEarningData } = useSWR(
+    [getTopEarning.key],
+    () => getTopEarning.fetcher(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
+  const { data: getVisitorsData } = useSWR(
+    [getVisitors.key],
+    () => getVisitors.fetcher(),
+    {
+      revalidateOnFocus: false,
+    }
+  );
   const disconnectWallet = async () => {
     try {
       await deactivate();
@@ -69,6 +87,18 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inviteCode]);
+
+  useEffect(() => {
+    if (getTopEarningData && getTopEarningData?.result) {
+      setTopEarning(getTopEarningData?.top_earning);
+    }
+  }, [getTopEarningData]);
+
+  useEffect(() => {
+    if (getVisitorsData && getVisitorsData?.result) {
+      setVisitor(getVisitorsData?.visitor);
+    }
+  }, [getVisitorsData]);
 
   return (
     <Flex w="full" minH="100vh">
@@ -160,7 +190,8 @@ function App() {
             mx="auto"
           >
             <TopGame
-              usdc={89.54}
+              usdc={topEarning}
+              monthlyViews={visitor}
               mr={{ base: 0, lg: "30px" }}
               mb={{ base: px2vw(30), lg: 0 }}
             />

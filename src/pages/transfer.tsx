@@ -140,13 +140,13 @@ function App() {
       </Flex>
       {/* success */}
       <BaseModal
+        justifyContent="center"
+        px={{ base: px2vw(44), lg: "70px" }}
         isShow={showSuccess}
         close={() => {
           setShowSuccess.off();
           setStep(1);
         }}
-        w={{ base: `calc(100% - ${px2vw(30)})`, lg: "454px" }}
-        h={{ base: "400px", lg: "430px" }}
       >
         <Flex flexDir="column" alignItems="center" boxSizing="border-box">
           <Image

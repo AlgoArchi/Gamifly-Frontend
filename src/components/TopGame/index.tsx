@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Flex, FlexProps, Text, useInterval } from "@chakra-ui/react";
+import { Flex, FlexProps, Text } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import numberBg from "@/assets/imgs/numberBg.png";
-import { unitNumberFormat } from "@/utils/math";
+// import { unitNumberFormat } from "@/utils/math";
 
 export interface IProps extends FlexProps {
   usdc: number;
+  monthlyViews: number;
 }
-function Index({ usdc, ...props }: IProps) {
-  const [monthlyViews, setMonthlyViews] = useState(100000);
+function Index({ usdc, monthlyViews, ...props }: IProps) {
+  // const [monthlyViews, setMonthlyViews] = useState(100000);
   const [gameList] = useState([
     {
       name: "Cricket Game",
@@ -62,9 +63,9 @@ function Index({ usdc, ...props }: IProps) {
     }
   }, [usdc]);
 
-  useInterval(() => {
-    setMonthlyViews(monthlyViews + 1);
-  }, 1000);
+  // useInterval(() => {
+  //   setMonthlyViews(monthlyViews + 1);
+  // }, 1000);
 
   return (
     <Flex
@@ -183,7 +184,7 @@ function Index({ usdc, ...props }: IProps) {
         fontSize={{ base: px2vw(13), lg: "13px" }}
       >
         <Text>Visits:</Text>
-        <Text>{unitNumberFormat(monthlyViews)}</Text>
+        <Text>{monthlyViews}K</Text>
       </Flex>
     </Flex>
   );

@@ -6,7 +6,7 @@ export const networkConfigMap: Record<string, any> = {
   137: {
     chainId: hexValue(137),
     chainName: "polygon",
-    rpcUrls: ["https://rpc-mainnet.maticvigil.com"],
+    rpcUrls: ["https://polygon-rpc.com/"],
     nativeCurrency: {
       name: "MATIC",
       symbol: "MATIC",

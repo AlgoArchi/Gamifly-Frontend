@@ -29,3 +29,15 @@ export const setTrackInfo = {
     ajax.post("/api/setTrackInfo", params),
   key: "/api/setTrackInfo",
 };
+
+// 获取Top earning
+export const getTopEarning = {
+  fetcher: () => ajax.get("/api/getTopearning"),
+  key: "/api/getTopearning",
+};
+
+// 获取Visitors
+export const getVisitors = {
+  fetcher: () => ajax.get("/api/getVisitors"),
+  key: "/api/getVisitors",
+};

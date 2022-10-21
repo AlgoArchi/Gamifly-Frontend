@@ -143,7 +143,10 @@ function App() {
             fontWeight="bolder"
             cursor="pointer"
             onClick={() =>
-              window.open("https://app.gamifly.co/games/cricket/index.html")
+              window.open(
+                // "https://app.gamifly.co/games/cricket/index.html"
+                "https://play.google.com/store/apps/details?id=com.alabs.cricket.scifi.league"
+              )
             }
           >
             <Image src={playIcon} mr="10px" />

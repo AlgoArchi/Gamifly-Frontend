@@ -47,6 +47,7 @@ function Index({
   );
 
   useEffect(() => {
+    console.log(hash, "hash");
     if (hash) {
       setIsDeposit.on();
     }
