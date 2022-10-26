@@ -15,7 +15,6 @@ export const getI18nSSRProps = async (
   { locale }: GetI18nStaticProps | GetI18nServerSideProps,
   localeArr: string[]
 ) => {
-  
   const i18nProps = await serverSideTranslations(locale, [
     "common",
     ...localeArr,
