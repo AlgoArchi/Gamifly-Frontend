@@ -164,19 +164,19 @@ function Index({ children }: LayoutProps) {
   return (
     <Flex
       justifyContent="flex-start"
-      bg="black.1600"
+      bg={{ base: "black.100", lg: "black.1600" }}
       pos="relative"
       overflowX={{ base: "hidden", lg: "auto" }}
-      _before={{
-        content: "''",
-        pos: "absolute",
-        top: 0,
-        left: 0,
-        w: "full",
-        h: "full",
-        bgColor: "white.400",
-        filter: "blur(200px)",
-      }}
+      // _before={{
+      //   content: "''",
+      //   pos: "absolute",
+      //   top: 0,
+      //   left: 0,
+      //   w: "full",
+      //   h: "full",
+      //   bgColor: "white.400",
+      //   filter: "blur(200px)",
+      // }}
     >
       {/* 内容 */}
       <Flex

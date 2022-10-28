@@ -31,7 +31,7 @@ function Index() {
   }, [getGamiflyWalletTransactionsData]);
 
   return (
-    <Flex direction="column" w="full">
+    <Flex direction="column" w="full" pt={{ base: 0, lg: "150px" }}>
       <Flex
         display={{ base: "none", lg: "flex" }}
         mb={{ base: px2vw(30), lg: "30px" }}
@@ -105,16 +105,16 @@ function Index() {
           fontWeight="700"
           bgColor="black.400"
         >
-          <Flex w={{ base: px2vw(163), lg: "163px" }}>
+          <Flex w={{ base: px2vw(163), lg: "200px" }}>
             <Text>Time</Text>
           </Flex>
-          <Flex w={{ base: px2vw(110), lg: "140px" }}>
+          <Flex w={{ base: px2vw(110), lg: "180px" }}>
             <Text>Type</Text>
           </Flex>
           <Flex w={{ base: px2vw(107), lg: "107px" }}>
             <Text>Asset</Text>
           </Flex>
-          <Flex w={{ base: px2vw(109), lg: "79px" }}>
+          <Flex w={{ base: px2vw(109), lg: "150px" }}>
             <Text>Amount</Text>
           </Flex>
           <Flex w={{ base: px2vw(217), lg: "217px" }}>

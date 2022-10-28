@@ -1,35 +1,33 @@
 import React from "react";
-import { Flex, Text, useBoolean } from "@chakra-ui/react";
-
+import { Flex, useBoolean, Image } from "@chakra-ui/react";
 import ProfileInfo from "@/components/ProfileInfo";
 import ProfileData from "@/components/ProfileData";
 import ProfileNoLogin from "@/components/ProfileNoLogin";
-import px2vw from "@/utils/px2vw";
+import profileMobile from "@/assets/imgs/profileMobile.png";
 import { useState } from "react";
+import px2vw from "@/utils/px2vw";
 
 function Index() {
   const [isLogin] = useState(true);
   const [isSetMode, setIsSetMode] = useBoolean(false);
   return (
-    <Flex
-      direction="column"
-      w={{ base: "full", lg: "max-content" }}
-      pt={{ base: 0, lg: "150px" }}
-    >
-      <Text
-        mb={{ base: px2vw(20), lg: "20px" }}
-        display={{ base: "none", lg: "block" }}
-        color="white.100"
-        textStyle="32"
-        fontWeight="700"
-        lineHeight={{ base: px2vw(45), lg: "45px" }}
-      >
-        Profile
-      </Text>
+    <Flex direction="column" w="full" pt={{ base: 0, lg: "150px" }}>
+      <Image
+        display={{ base: "flex", lg: "none" }}
+        src={profileMobile}
+        pos="absolute"
+        top="0"
+        left="0"
+        w="full"
+        zIndex="0"
+      />
       <Flex
+        mt={{ base: px2vw(105), lg: 0 }}
         flexDir={{ base: "column", lg: "row" }}
+        justifyContent="center"
         alignItems="flex-start"
         overflow="hidden"
+        zIndex="1"
       >
         <ProfileInfo
           isSetMode={isSetMode}

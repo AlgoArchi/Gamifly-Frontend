@@ -87,6 +87,7 @@ function Index({ helpClick }: IProps) {
       borderTopRightRadius="0"
       borderBottomRightRadius="0"
       flexDir="column"
+      zIndex="99"
     >
       {/* rewards */}
       <Flex

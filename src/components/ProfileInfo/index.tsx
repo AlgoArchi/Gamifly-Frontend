@@ -1,15 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Flex, Text, Image, Input, useBoolean } from "@chakra-ui/react";
-import BaseButton from "@/components/BaseButton";
+import {
+  Flex,
+  Text,
+  Image,
+  Input,
+  useBoolean,
+  useToast,
+} from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import avatar from "@/assets/imgs/avatar.png";
-import editIcon from "@/assets/imgs/editIcon.png";
+import editIcon from "@/assets/imgs/edit.png";
 import camera from "@/assets/imgs/camera.png";
 import globalStore from "@/stores/global";
 import { getUserInfo, getReferralCount } from "@/apis/userInfo";
 import useSWR from "swr";
 import axios from "axios";
-import { setStore } from "@/utils/storage";
+import { getStore, setStore } from "@/utils/storage";
+import copyFunction from "copy-to-clipboard";
 import LoginOut from "../LoginOut";
 
 export interface IProps {
@@ -17,7 +24,8 @@ export interface IProps {
   saveClick: () => void;
 }
 
-function Index({ isSetMode, saveClick }: IProps) {
+function Index({ isSetMode = false, saveClick }: IProps) {
+  const toast = useToast();
   const { userInfo, dataRadom } = globalStore();
   const [inputValue, setInputValue] = useState("");
   const [updateClick, setUpdateClick] = useBoolean(false);
@@ -64,7 +72,6 @@ function Index({ isSetMode, saveClick }: IProps) {
       formData.append("id", userInfo?.id);
       formData.append("name", inputValue || userInfo?.name);
       formData.append("avatar", imgsSrcForUp || userInfo?.avatar);
-      console.log(imgsSrcForUp, 123);
       axios({
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +85,6 @@ function Index({ isSetMode, saveClick }: IProps) {
             dataRadom: Math.random(),
           });
           setUpdateClick.off();
-          saveClick();
         }
       });
     }
@@ -92,6 +98,13 @@ function Index({ isSetMode, saveClick }: IProps) {
         : setRefferal(getReferralCountData?.value);
     }
   }, [getReferralCountData]);
+
+  useEffect(() => {
+    if (imgsSrc === "" || imgsSrc === undefined) return;
+    setUpdateClick.on();
+    saveClick();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imgsSrc]);
 
   // 选图头像
   const onChange = (changeEvent: any) => {
@@ -116,55 +129,64 @@ function Index({ isSetMode, saveClick }: IProps) {
       boxSizing="border-box"
       borderBottom="none"
     >
-      <Flex w="full" position="relative">
+      {/* 头像 */}
+      <Flex flexDir={{ base: "row", lg: "column" }}>
         <Flex
-          pos="relative"
-          w={{ base: px2vw(190), lg: "190px" }}
-          h={{ base: px2vw(190), lg: "190px" }}
-          mx="auto"
-          mb={{ base: px2vw(30), lg: "30px" }}
-          cursor={!isSetMode ? "default" : "pointer"}
-          onClick={() => {
-            if (isSetMode) {
-              const obj: any = refs?.current;
-              obj?.click();
-            }
-          }}
+          position="relative"
+          w={{ base: px2vw(76), lg: "full" }}
+          mr={{ base: px2vw(15), lg: "0" }}
         >
-          <Image
-            w="full"
-            borderRadius="50%"
-            src={
-              imgsSrc ||
-              (userInfo?.avatar
-                ? `${window.imgUrl.imageUrl}${userInfo?.avatar}`
-                : avatar)
-            }
-          />
           <Flex
-            display={!isSetMode ? "none" : "flex"}
+            pos="relative"
+            w={{ base: px2vw(76), lg: "118px" }}
+            h={{ base: px2vw(76), lg: "118px" }}
+            mb={{ base: px2vw(13), lg: "13px" }}
+            mx={{ base: "0", lg: "auto" }}
+            bgColor="black.100"
             justifyContent="center"
             alignItems="center"
-            pos="absolute"
-            bottom="0"
-            bgColor="black.100"
             borderRadius="50%"
-            w={{ base: px2vw(42), lg: "42px" }}
-            h={{ base: px2vw(42), lg: "42px" }}
-            right={{ base: px2vw(10), lg: "10px" }}
           >
             <Image
-              w={{ base: px2vw(25), lg: "25px" }}
-              h={{ base: px2vw(25), lg: "25px" }}
-              src={camera}
+              w={{ base: px2vw(62), lg: "118px" }}
+              h={{ base: px2vw(62), lg: "118px" }}
+              borderRadius="50%"
+              src={
+                imgsSrc ||
+                (userInfo?.avatar
+                  ? `${window.imgUrl.imageUrl}${userInfo?.avatar}`
+                  : avatar)
+              }
             />
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              pos="absolute"
+              borderRadius="50%"
+              boxShadow="0px 2px 4px rgba(0,0,0,0.5)"
+              cursor="pointer"
+              w={{ base: px2vw(18), lg: "25px" }}
+              h={{ base: px2vw(18), lg: "25px" }}
+              right={{ base: px2vw(10), lg: "10px" }}
+              bottom={{ base: px2vw(5), lg: "0" }}
+              onClick={() => {
+                // if (isSetMode) {
+                const obj: any = refs?.current;
+                obj?.click();
+                // }
+              }}
+            >
+              <Image
+                w={{ base: px2vw(18), lg: "25px" }}
+                h={{ base: px2vw(18), lg: "25px" }}
+                src={camera}
+              />
+            </Flex>
           </Flex>
         </Flex>
-      </Flex>
-      <Flex w="full" direction="column">
         {isSetMode ? (
           // setting user name
-          <Flex>
+          <Flex my="auto">
             <Input
               h={{ base: px2vw(30), lg: "30px" }}
               mb={{ base: px2vw(16), lg: "16px" }}
@@ -173,147 +195,198 @@ function Index({ isSetMode, saveClick }: IProps) {
               outline="none"
               border="1px solid"
               borderRadius="0"
-              borderColor="blue.100"
+              borderColor="green.1000"
               placeholder={userInfo?.name || "User Name"}
               _placeholder={{
                 fontFamily: "Nunito",
                 fontSize: { base: px2vw(16), lg: "16px" },
                 fontWeight: 600,
-                color: "blue.100",
+                color: "green.1000",
               }}
               _focusVisible={{
-                borderColor: "blue.100",
+                borderColor: "green.1000",
               }}
               _hover={{
-                color: "blue.100",
-                borderColor: "blue.100",
+                color: "white.100",
+                borderColor: "green.1000",
               }}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onBlur={() => {
+                setUpdateClick.on();
+                saveClick();
+              }}
             />
           </Flex>
         ) : (
-          <Text
-            color="white.100"
-            fontWeight="600"
-            fontSize={{ base: px2vw(16), lg: "18px" }}
-            lineHeight={{ base: px2vw(18), lg: "18px" }}
-            mb={{ base: px2vw(16), lg: "16px" }}
+          <Flex
+            mb={{ base: px2vw(30), lg: "30px" }}
+            justifyContent="center"
+            my="auto"
+            cursor="pointer"
+            onClick={() => saveClick()}
           >
-            {userInfo?.name || "User Name"}
-          </Text>
-        )}
-        {/* 修改按钮 */}
-        {isSetMode ? (
-          <BaseButton
-            w="full"
-            bgColor="transparent"
-            border="1px solid"
-            borderColor="blue.100"
-            color="blue.100"
-            boxShadow="none"
-            fontWeight="400"
-            fontSize={{ base: px2vw(14), lg: "14px" }}
-            _hover={{
-              bgColor: "transparent",
-              borderColor: "blue.100",
-              color: "blue.100",
-              boxShadow: "none",
-            }}
-            isLoading={updateClick}
-            mb={{ base: px2vw(15), lg: "15px" }}
-            h={{ base: px2vw(52), lg: "52px" }}
-            onClick={() => {
-              if (inputValue !== "" || imgsSrc) {
-                setUpdateClick.on();
-              } else {
-                saveClick();
-              }
-            }}
-          >
-            <Image
-              w={{ base: px2vw(16), lg: "16px" }}
-              h={{ base: px2vw(16), lg: "16px" }}
-              mr={{ base: px2vw(10), lg: "10px" }}
-              src={editIcon}
-              my="auto"
-            />
-            Save changes
-          </BaseButton>
-        ) : (
-          userInfo?.id && (
-            <BaseButton
-              w="full"
-              bgColor="transparent"
-              border="1px solid"
-              borderColor="blue.100"
-              color="blue.100"
-              boxShadow="none"
-              fontWeight="400"
-              fontSize={{ base: px2vw(14), lg: "14px" }}
-              _hover={{
-                bgColor: "transparent",
-                borderColor: "blue.100",
-                color: "blue.100",
-                boxShadow: "none",
-              }}
-              mb={{ base: px2vw(15), lg: "15px" }}
-              h={{ base: px2vw(52), lg: "52px" }}
-              onClick={() => saveClick()}
+            <Text
+              textAlign="center"
+              color="white.100"
+              fontWeight="600"
+              fontSize={{ base: px2vw(18), lg: "18px" }}
+              lineHeight={{ base: px2vw(18), lg: "18px" }}
             >
-              <Image
-                w={{ base: px2vw(16), lg: "16px" }}
-                h={{ base: px2vw(16), lg: "16px" }}
-                mr={{ base: px2vw(10), lg: "10px" }}
-                src={editIcon}
-                my="auto"
-              />
-              Edit profile
-            </BaseButton>
-          )
+              {userInfo?.name || "User Name"}
+            </Text>
+            <Image
+              my="auto"
+              w={{ base: px2vw(12), lg: "12px" }}
+              h={{ base: px2vw(12), lg: "12px" }}
+              ml={{ base: px2vw(7), lg: "7px" }}
+              src={editIcon}
+            />
+          </Flex>
         )}
+      </Flex>
+      <Flex w="full" direction="column">
+        <Flex
+          w="full"
+          h="1px"
+          bgColor="black.1800"
+          display={{ base: "none", lg: "flex" }}
+          mb={{ base: px2vw(15), lg: "20px" }}
+        />
         {/* invitation */}
         <Flex
           flexDir="column"
           w="full"
-          border="1px solid"
-          borderColor="blue.100"
-          borderRadius="5px"
+          mb={{ base: px2vw(35), lg: "35px" }}
+          display={{ base: "none", lg: "flex" }}
         >
+          <Text
+            textStyle="14"
+            color="white.100"
+            textAlign="center"
+            fontWeight="bold"
+            mb={{ base: px2vw(10), lg: "10px" }}
+          >
+            MY INVITATION
+          </Text>
           <Flex
-            py={{ base: px2vw(12), lg: "12px" }}
+            h={{ base: px2vw(70), lg: "70px" }}
+            w="full"
             justifyContent="center"
             alignItems="center"
-            color={refferal === "--" ? "gray.200" : "white.100"}
-            textStyle="14"
-            textAlign="center"
           >
-            {refferal !== "--"
-              ? `${refferal} Invitation done!`
-              : "You haven't invited friends yet"}
-          </Flex>
-          {userInfo?.id && (
-            <Flex
-              py={{ base: px2vw(12), lg: "12px" }}
-              justifyContent="center"
-              alignItems="center"
-              textStyle="14"
-              textAlign="center"
-              color="white.100"
-              bgColor="blue.100"
-              cursor="pointer"
-              onClick={() => globalStore.setState({ showInviteFriend: true })}
+            <Text
+              textStyle="24"
+              fontFamily="Eurostile"
+              color="green.900"
+              mt={{ base: px2vw(5), lg: "5px" }}
+              mr={{ base: px2vw(17), lg: "17px" }}
             >
-              {refferal !== "--" ? "Invite more" : "Invite to get rewards"}
+              {refferal === "--" ? "0" : refferal}
+            </Text>
+            <Flex
+              flexDir="column"
+              fontFamily="Eurostile"
+              textStyle="12"
+              fontWeight="400"
+              color="gray.500"
+            >
+              <Text>FRIENDS</Text>
+              <Text>INVITED</Text>
             </Flex>
-          )}
+          </Flex>
+        </Flex>
+        {/* Invite Mobile */}
+        <Flex
+          display={{ base: "flex", lg: "none" }}
+          fontSize={{ base: px2vw(17), lg: "17px" }}
+          h={{ base: px2vw(50), lg: "50px" }}
+          lineHeight={{ base: px2vw(50), lg: "50px" }}
+          w="full"
+          fontFamily="Eurostile"
+          fontWeight="400"
+          alignItems="center"
+          justifyContent="space-between"
+          bgColor="green.1000"
+          border="1px solid"
+          borderColor="green.1000"
+          borderRadius="5px"
+          color="black.1600"
+          cursor="pointer"
+          onClick={() => {
+            copyFunction(
+              `https://www.gamifly.co?inviteCode=${getStore("referralCode")}`
+            );
+            toast({
+              title: "success",
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+          }}
+        >
+          <Flex h={px2vw(70)} ml={px2vw(10)} alignItems="center">
+            <Text
+              textStyle="20"
+              fontFamily="Eurostile"
+              color="black.100"
+              mt={{ base: px2vw(5), lg: "5px" }}
+              mr={{ base: px2vw(5), lg: "17px" }}
+            >
+              {refferal === "--" ? "0" : refferal}
+            </Text>
+            <Flex
+              flexDir="column"
+              fontFamily="Eurostile"
+              textStyle="12"
+              fontWeight="400"
+              color="gray.500"
+            >
+              <Text>FRIENDS</Text>
+              <Text>INVITED</Text>
+            </Flex>
+          </Flex>
+          <Text mt={px2vw(5)} mr={px2vw(28)}>
+            SPEED UP EARNING
+          </Text>
+        </Flex>
+        {/* Invite */}
+        <Flex
+          display={{ base: "none", lg: "flex" }}
+          fontSize={{ base: px2vw(17), lg: "17px" }}
+          h={{ base: px2vw(50), lg: "50px" }}
+          lineHeight={{ base: px2vw(50), lg: "50px" }}
+          w="full"
+          fontFamily="Eurostile"
+          fontWeight="400"
+          alignItems="center"
+          justifyContent="center"
+          bgColor="green.1000"
+          border="1px solid"
+          borderColor="green.1000"
+          borderRadius="5px"
+          color="black.1600"
+          cursor="pointer"
+          onClick={() => {
+            copyFunction(
+              `https://www.gamifly.co?inviteCode=${getStore("referralCode")}`
+            );
+            toast({
+              title: "success",
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+          }}
+        >
+          <Text mt={{ base: px2vw(5), lg: "5px" }}>INVITE FRIENDS</Text>
         </Flex>
         {/* log out */}
         <Flex
           fontSize={{ base: px2vw(17), lg: "17px" }}
           h={{ base: px2vw(50), lg: "50px" }}
           lineHeight={{ base: px2vw(50), lg: "50px" }}
-          mt={{ base: px2vw(20), lg: "20px" }}
+          mt={{ base: px2vw(15), lg: "15px" }}
           w="full"
           fontFamily="Eurostile"
           fontWeight="400"
@@ -328,6 +401,13 @@ function Index({ isSetMode, saveClick }: IProps) {
         >
           <Text mt={{ base: px2vw(5), lg: "5px" }}>LOG OUT</Text>
         </Flex>
+        <Flex
+          w="full"
+          h="1px"
+          bgColor="black.1800"
+          display={{ base: "flex", lg: "none" }}
+          mt={px2vw(20)}
+        />
       </Flex>
       {/* 上传头像 */}
       <Input

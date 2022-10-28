@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Text, Image, Box } from "@chakra-ui/react";
+import { Flex, Text, Image, Box, useBoolean } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import px2vw from "@/utils/px2vw";
-import eth from "@/assets/imgs/eth.png";
-import wallet from "@/assets/imgs/wallet.png";
-import coin from "@/assets/imgs/coin.png";
+import gamiflyToken from "@/assets/imgs/gamiflyToken.png";
+// import wallet from "@/assets/imgs/wallet.png";
+// import coin from "@/assets/imgs/coin.png";
 import usdc from "@/assets/imgs/usdc.png";
+import withdrawIcon from "@/assets/imgs/withdrawIcon.png";
+import copy from "@/assets/imgs/copy2.png";
+import copySuccessIcon from "@/assets/imgs/copySuccess.png";
 import globalStore from "@/stores/global";
 import useSWR from "swr";
 import {
@@ -15,16 +18,18 @@ import {
   getRewardAmount,
 } from "@/apis/userInfo";
 import TransactionItem, { transactionItem } from "../TransactionItem";
-import NFTItem, { NFTItemProp } from "../NFTItem";
+// import NFTItem, { NFTItemProp } from "../NFTItem";
 import styles from "./style.module.scss";
+import copyFunction from "copy-to-clipboard";
 
 function Index() {
   const { userInfo } = globalStore();
   const router = useRouter();
   const [transactionsList, setTransactionsList] = useState<any>([]);
-  const [nftList, setNftList] = useState<any>([]);
+  const [_nftList, setNftList] = useState<any>([]);
   const [gamiflyWallet, setGamiflyWallet] = useState<any>("--");
   const [rewards, setRewards] = useState<any>("--");
+  const [copySuccess, setCopySuccess] = useBoolean(false);
 
   // 获取钱包余额
   const { data: getGamiflyWalletBalanceData } = useSWR(
@@ -88,124 +93,248 @@ function Index() {
   return (
     <Flex
       direction="column"
-      w={{ base: "100%", lg: "705px" }}
+      w={{ base: "full", lg: "850px" }}
       ml={{ base: 0, lg: "55px" }}
       mt={{ base: px2vw(20), lg: 0 }}
     >
       {/* info */}
-      <Flex flexDir={{ base: "column", lg: "row" }} alignItems="center">
-        {/* Gamifly Account */}
-        <Flex
-          w={{ base: "full", lg: "275px" }}
-          h={{ base: px2vw(170), lg: "170px" }}
-          borderRadius={{ base: px2vw(10), lg: "10px" }}
-          px={{ base: px2vw(17), lg: "17px" }}
-          py={{ base: px2vw(15), lg: "15px" }}
-          mr={{ base: 0, lg: "30px" }}
-          mb={{ base: px2vw(20), lg: 0 }}
-          direction="column"
-          justifyContent="space-between"
-          boxSizing="border-box"
-          bgColor="black.100"
-          bgImage={wallet}
-          bgSize="100% 100%"
-          boxShadow="0px 10px 15px #0F0F0F"
+      <Flex
+        px={{ base: 0, lg: "30px" }}
+        py={{ base: 0, lg: "20px" }}
+        flexDir="column"
+        boxSizing="border-box"
+        bgColor="black.100"
+        borderRadius="15px"
+      >
+        {/* title */}
+        <Text
+          textStyle="16"
+          fontFamily="Eurostile"
+          fontWeight="bold"
+          color="white.100"
+          mb={{ base: px2vw(20), lg: "20px" }}
         >
-          <Text textStyle={{ base: "16", lg: "18" }} fontWeight="700">
-            Gamifly Account
-          </Text>
-          <Flex flexDir="column">
-            <Text
-              fontSize={{ base: px2vw(36), lg: "43px" }}
-              lineHeight={{ base: px2vw(50), lg: "60px" }}
-              color="blue.100"
-            >
-              {gamiflyWallet === "--" ? "0" : Number(gamiflyWallet).toFixed(2)}
-            </Text>
-            <Flex>
-              <Image
-                src={eth}
-                w={{ base: px2vw(20), lg: "20px" }}
-                h={{ base: px2vw(20), lg: "20px" }}
-                mr={{ base: px2vw(7), lg: "7px" }}
-                ignoreFallback
-              />
+          MY GAMIFLY WALLET
+        </Text>
+        {/* content */}
+        <Flex
+          w="full"
+          flexDir={{ base: "column", lg: "row" }}
+          alignItems="center"
+        >
+          {/* Gamifly Account */}
+          <Flex
+            w={{ base: "full", lg: "350px" }}
+            mb={{ base: px2vw(20), lg: 0 }}
+            mr={{ base: 0, lg: "25px" }}
+            px={{ base: px2vw(15), lg: "15px" }}
+            py={{ base: px2vw(10), lg: "10px" }}
+            justifyContent="space-between"
+            boxSizing="border-box"
+            bgColor="black.1600"
+            borderRadius="10px"
+          >
+            <Flex flexDir="column" justifyContent="space-between">
               <Text
-                textStyle="14"
-                lineHeight={{ base: px2vw(20), lg: "20px" }}
+                textStyle="16"
                 fontWeight="400"
-                color="white.100"
+                mb={{ base: px2vw(20), lg: "20px" }}
               >
-                TOKENS
+                Token Balance
               </Text>
+              <Flex flexDir="column">
+                <Text
+                  fontSize={{ base: px2vw(54), lg: "54px" }}
+                  lineHeight={{ base: px2vw(54), lg: "54px" }}
+                  mb={{ base: px2vw(15), lg: "15px" }}
+                  color="white.100"
+                  fontFamily="SofiaPro"
+                >
+                  {gamiflyWallet === "--"
+                    ? "0"
+                    : Number(gamiflyWallet).toFixed(2)}
+                </Text>
+                <Flex>
+                  <Image
+                    src={gamiflyToken}
+                    w={{ base: px2vw(25), lg: "25px" }}
+                    h={{ base: px2vw(25), lg: "25px" }}
+                    mr={{ base: px2vw(7), lg: "7px" }}
+                    ignoreFallback
+                  />
+                  <Text
+                    textStyle="14"
+                    lineHeight={{ base: px2vw(25), lg: "25px" }}
+                    fontWeight="400"
+                    color="white.100"
+                  >
+                    Gamifly token
+                  </Text>
+                </Flex>
+              </Flex>
+            </Flex>
+            <Flex
+              w={{ base: px2vw(107), lg: "107px" }}
+              h={{ base: px2vw(35), lg: "35px" }}
+              borderRadius="20px"
+              bgColor="green.1000"
+              justifyContent="center"
+              alignItems="center"
+              color="black.1700"
+              fontFamily="Eurostile"
+              textStyle="13"
+              fontWeight="400"
+              mt="auto"
+              cursor="pointer"
+              onClick={() => router.push("/transfer")}
+            >
+              <Text mt={{ base: px2vw(5), lg: "5px" }}>BUY MORE</Text>
             </Flex>
           </Flex>
-        </Flex>
-        {/* Gamifly Rewards */}
-        <Flex
-          w={{ base: "full", lg: "275px" }}
-          h={{ base: px2vw(170), lg: "170px" }}
-          borderRadius={{ base: px2vw(10), lg: "10px" }}
-          px={{ base: px2vw(17), lg: "17px" }}
-          py={{ base: px2vw(15), lg: "15px" }}
-          direction="column"
-          justifyContent="space-between"
-          boxSizing="border-box"
-          bgColor="black.100"
-          bgImage={coin}
-          bgSize="100% 100%"
-          boxShadow="0px 10px 15px #0F0F0F"
-        >
-          <Text textStyle={{ base: "16", lg: "18" }} fontWeight="700">
-            Rewards
-          </Text>
-          <Flex flexDir="column">
-            <Text
-              fontSize={{ base: px2vw(36), lg: "43px" }}
-              lineHeight={{ base: px2vw(50), lg: "60px" }}
-              color="yellow.100"
-            >
-              {rewards === "--" ? "0" : Number(rewards).toFixed(2)}
-            </Text>
-            <Flex>
-              <Image
-                src={usdc}
-                w={{ base: px2vw(20), lg: "20px" }}
-                h={{ base: px2vw(20), lg: "20px" }}
-                mr={{ base: px2vw(7), lg: "7px" }}
-                ignoreFallback
-              />
+          {/* Gamifly Rewards */}
+          <Flex
+            w={{ base: "full", lg: "380px" }}
+            px={{ base: px2vw(15), lg: "15px" }}
+            py={{ base: px2vw(10), lg: "10px" }}
+            justifyContent="space-between"
+            boxSizing="border-box"
+            bgColor="black.1600"
+            borderRadius="10px"
+          >
+            <Flex flexDir="column" justifyContent="space-between">
               <Text
-                textStyle="14"
-                lineHeight={{ base: px2vw(20), lg: "20px" }}
+                textStyle="16"
                 fontWeight="400"
-                color="white.100"
+                mb={{ base: px2vw(20), lg: "20px" }}
               >
-                USDC
+                Rewards
               </Text>
+              <Flex flexDir="column">
+                <Text
+                  fontSize={{ base: px2vw(54), lg: "54px" }}
+                  lineHeight={{ base: px2vw(54), lg: "54px" }}
+                  mb={{ base: px2vw(15), lg: "15px" }}
+                  color="yellow.100"
+                  fontFamily="SofiaPro"
+                >
+                  {rewards === "--" ? "0" : Number(rewards).toFixed(2)}
+                </Text>
+                <Flex>
+                  <Image
+                    src={usdc}
+                    w={{ base: px2vw(20), lg: "20px" }}
+                    h={{ base: px2vw(20), lg: "20px" }}
+                    mr={{ base: px2vw(7), lg: "7px" }}
+                    ignoreFallback
+                  />
+                  <Text
+                    textStyle="14"
+                    lineHeight={{ base: px2vw(20), lg: "20px" }}
+                    fontWeight="400"
+                    color="white.100"
+                  >
+                    USDC
+                  </Text>
+                </Flex>
+              </Flex>
             </Flex>
+            <Image
+              w={{ base: px2vw(107), lg: "107px" }}
+              h={{ base: px2vw(35), lg: "35px" }}
+              src={withdrawIcon}
+              mt="auto"
+              cursor="pointer"
+              onClick={() => router.push("/transfer")}
+            />
+          </Flex>
+        </Flex>
+        {/* My Gamifly Wallet Address */}
+        <Flex
+          px={{ base: px2vw(15), lg: "15px" }}
+          pt={{ base: px2vw(10), lg: "10px" }}
+          pb={{ base: px2vw(20), lg: "20px" }}
+          mt={{ base: px2vw(40), lg: "40px" }}
+          flexDir="column"
+          bgColor="black.1600"
+          borderRadius="10px"
+          boxSizing="border-box"
+        >
+          <Text
+            textStyle="16"
+            color="white.100"
+            fontFamily="SofiaPro"
+            fontWeight="400"
+          >
+            My Gamifly Wallet Address
+          </Text>
+          <Flex
+            fontFamily="SofiaPro"
+            fontWeight="400"
+            alignItems="center"
+            mt={{ base: px2vw(25), lg: "25px" }}
+          >
+            <Text color="green.1000" textDecor="underline" mr="5px">
+              {`${userInfo?.platform_wallet?.substring(
+                0,
+                5
+              )}...${userInfo?.platform_wallet?.substring(
+                userInfo?.platform_wallet.length - 4,
+                userInfo?.platform_wallet.length
+              )}`}
+            </Text>
+            <Image
+              w={{ base: px2vw(19), lg: "19px" }}
+              h={{ base: px2vw(19), lg: "19px" }}
+              src={copy}
+              cursor="pointer"
+              onClick={() => {
+                copyFunction(userInfo?.platform_wallet);
+                setCopySuccess.on();
+              }}
+            />
+            {copySuccess && (
+              <Flex ml={{ base: px2vw(15), lg: "15px" }}>
+                <Image
+                  w={{ base: px2vw(13), lg: "13px" }}
+                  h={{ base: px2vw(13), lg: "13px" }}
+                  src={copySuccessIcon}
+                />
+                <Text
+                  fontFamily="SofiaPro"
+                  textStyle="13"
+                  color="white.800"
+                  ml={{ base: px2vw(5), lg: "5px" }}
+                >
+                  Your address has been copied to the click board
+                </Text>
+              </Flex>
+            )}
           </Flex>
         </Flex>
       </Flex>
-      {/* Gamifly Account transactions */}
+      {/* TRANSACTION HISTORY */}
       <Flex
-        w={{ base: "full", lg: "580px" }}
-        my={{ base: px2vw(20), lg: "30px" }}
-        py={{ base: px2vw(10), lg: "10px" }}
-        px={{ base: px2vw(15), lg: "15px" }}
+        w={{ base: "full", lg: "850px" }}
+        mt={{ base: px2vw(20), lg: "30px" }}
+        mb={{ base: px2vw(80), lg: "140px" }}
+        py={{ base: px2vw(30), lg: "30px" }}
+        px={{ base: px2vw(25), lg: "25px" }}
         borderRadius="10px"
         direction="column"
-        bgColor="black.100"
+        bgColor="black.1600"
         boxSizing="border-box"
-        boxShadow="0px 10px 15px #0F0F0F"
+        boxShadow="0px 0px 20px RGBA(188, 252, 71, 0.5)"
+        border="1px solid"
+        borderColor="green.1000"
       >
         <Text
-          mb={{ base: px2vw(10), lg: "15px" }}
-          textStyle={{ base: "16", lg: "18" }}
-          lineHeight={{ base: px2vw(20), lg: "22px" }}
-          fontWeight="700"
+          fontFamily="Eurostile"
+          textStyle="16"
+          fontWeight="bold"
+          color="green.1000"
+          mb={{ base: px2vw(20), lg: "20px" }}
         >
-          Gamifly Account transactions
+          TRANSACTION HISTORY
         </Text>
         {/* table */}
         <Flex
@@ -223,41 +352,30 @@ function Index() {
             px={{ base: px2vw(20), lg: "20px" }}
             boxSizing="border-box"
             fontFamily="Nunito"
-            color="white.300"
+            color="white.100"
             textStyle="14"
             fontWeight="700"
-            bgColor="black.400"
+            bgColor="black.1600"
           >
-            <Flex w={{ base: px2vw(163), lg: "163px" }}>
-              <Text>Time</Text>
+            <Flex w={{ base: px2vw(163), lg: "200px" }}>
+              <Text>TIME</Text>
             </Flex>
-            <Flex w={{ base: px2vw(110), lg: "140px" }}>
-              <Text>Type</Text>
+            <Flex w={{ base: px2vw(110), lg: "250px" }}>
+              <Text>TYPE</Text>
             </Flex>
             {/* <Flex w={{ base: px2vw(107), lg: "107px" }}>
               <Text>Asset</Text>
             </Flex> */}
-            <Flex w={{ base: px2vw(109), lg: "79px" }}>
-              <Text>Amount</Text>
+            <Flex w={{ base: px2vw(109), lg: "200px" }}>
+              <Text>AMOUNT</Text>
             </Flex>
             <Flex
               justifyContent="flex-end"
               w={{ base: px2vw(140), lg: "140px" }}
             >
-              <Text>Status</Text>
+              <Text>STATUS</Text>
             </Flex>
           </Flex>
-          {/* line */}
-          <Box
-            display={{ base: "none", lg: "block" }}
-            w="full"
-            h="2px"
-            bg="linear-gradient(270deg, #5EC6B8 50%, rgba(94, 198, 184, 0) 73.46%)"
-            transform="matrix(-1, 0, 0, 1, 0, 0)"
-            pos="absolute"
-            top="50px"
-            left="0"
-          />
           {/* table content */}
           {transactionsList.length > 0 ? (
             <Box>
@@ -299,10 +417,10 @@ function Index() {
               lineHeight="50px"
               boxSizing="border-box"
               fontFamily="Nunito"
-              color="green.100"
+              color="green.1000"
               textStyle="14"
               fontWeight="600"
-              bgColor="black.300"
+              bgColor="black.1600"
               cursor="pointer"
               onClick={() => router.push("/transactions")}
             >
@@ -319,10 +437,10 @@ function Index() {
             lineHeight={px2vw(50)}
             boxSizing="border-box"
             fontFamily="Nunito"
-            color="green.100"
+            color="green.1000"
             textStyle="14"
             fontWeight="600"
-            bgColor="black.300"
+            bgColor="black.1600"
             cursor="pointer"
             onClick={() => router.push("/transactions")}
           >
@@ -330,9 +448,8 @@ function Index() {
           </Flex>
         )}
       </Flex>
-
       {/* My NFT */}
-      <Flex
+      {/* <Flex
         py={{ base: px2vw(10), lg: "10px" }}
         px={{ base: px2vw(5), lg: "15px" }}
         w={{ base: "full", lg: "580px" }}
@@ -393,7 +510,7 @@ function Index() {
             No NFT yet
           </Box>
         )}
-      </Flex>
+      </Flex> */}
     </Flex>
   );
 }

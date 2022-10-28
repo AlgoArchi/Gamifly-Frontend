@@ -16,12 +16,12 @@ export interface transactionItem {
 }
 
 export interface IProps extends FlexProps {
-  index: number;
+  index?: number;
   item: transactionItem;
   isSimple?: boolean;
 }
 
-function Index({ index, item, isSimple }: IProps) {
+function Index({ item, isSimple }: IProps) {
   const toast = useToast();
   // 处理日期格式
   const returnTime = (time: string) => {
@@ -46,15 +46,18 @@ function Index({ index, item, isSimple }: IProps) {
       justifyContent={isSimple ? "flex-start" : "space-between"}
       boxSizing="border-box"
       fontFamily="Nunito"
-      color="white.600"
+      color="white.100"
       textStyle="14"
       fontWeight="400"
-      bgColor={index % 2 === 0 ? "black.300" : "black.400"}
+      // bgColor={index % 2 === 0 ? "black.300" : "black.400"}
+      bgColor="black.1600"
+      borderBottom="1px solid"
+      borderColor="black.1800"
     >
-      <Flex w={{ base: px2vw(163), lg: "163px" }}>
+      <Flex w={{ base: px2vw(163), lg: "200px" }}>
         <Text>{returnTime(item.datetime)}</Text>
       </Flex>
-      <Flex w={{ base: px2vw(110), lg: "140px" }}>
+      <Flex w={{ base: px2vw(110), lg: !isSimple ? "180px" : "250px" }}>
         <Text>{item.type}</Text>
       </Flex>
       {!isSimple && (
@@ -62,7 +65,10 @@ function Index({ index, item, isSimple }: IProps) {
           <Text>{item.asset}</Text>
         </Flex>
       )}
-      <Flex w={{ base: px2vw(109), lg: "79px" }}>
+      <Flex
+        w={{ base: px2vw(109), lg: !isSimple ? "150px" : "200px" }}
+        color="green.1000"
+      >
         <Text>{item.amount}</Text>
       </Flex>
       {!isSimple && (

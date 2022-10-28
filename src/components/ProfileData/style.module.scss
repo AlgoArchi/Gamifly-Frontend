@@ -1,13 +1,13 @@
 .table::-webkit-scrollbar-track {
-  background: rgba(94, 198, 184, 0.21);
+  background: #0f0f0f;
   border-radius: 0;
 }
 .table::-webkit-scrollbar {
   height: 3px;
 }
 .table::-webkit-scrollbar-thumb {
-  background: #5ec6b8;
-  box-shadow: 0 2px 71px #5ec6b8;
+  background: #0f0f0f;
+  // box-shadow: 0 2px 71px #0f0f0f;
 }
 .step2::-webkit-scrollbar {
   display: none;
