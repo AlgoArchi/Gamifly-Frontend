@@ -28,6 +28,7 @@ function Index({ isSetMode = false, saveClick }: IProps) {
   const toast = useToast();
   const { userInfo, dataRadom } = globalStore();
   const [inputValue, setInputValue] = useState("");
+  const [externalWallet, setExternalWallet] = useState("");
   const [updateClick, setUpdateClick] = useBoolean(false);
   const [imgsSrc, setImgsSrc] = useState<any>();
   const [imgsSrcForUp, setImgsSrcForUp] = useState<any>();
@@ -66,11 +67,15 @@ function Index({ isSetMode = false, saveClick }: IProps) {
       updateClick &&
       userInfo &&
       userInfo?.id &&
-      (imgsSrcForUp || inputValue)
+      (imgsSrcForUp || inputValue || externalWallet)
     ) {
       const formData = new FormData();
       formData.append("id", userInfo?.id);
       formData.append("name", inputValue || userInfo?.name);
+      formData.append(
+        "withdraw_address",
+        externalWallet || userInfo?.withdraw_address
+      );
       formData.append("avatar", imgsSrcForUp || userInfo?.avatar);
       axios({
         headers: {
@@ -349,6 +354,38 @@ function Index({ isSetMode = false, saveClick }: IProps) {
           <Text mt={px2vw(5)} mr={px2vw(28)}>
             SPEED UP EARNING
           </Text>
+        </Flex>
+        <Flex my="auto">
+          <Input
+            h={{ base: px2vw(30), lg: "30px" }}
+            mb={{ base: px2vw(16), lg: "16px" }}
+            w="full"
+            bgColor="transparent"
+            outline="none"
+            border="1px solid"
+            borderRadius="0"
+            borderColor="green.1000"
+            placeholder={userInfo?.withdraw_address || "Withdraw Wallet"}
+            _placeholder={{
+              fontFamily: "Nunito",
+              fontSize: { base: px2vw(16), lg: "16px" },
+              fontWeight: 600,
+              color: "green.1000",
+            }}
+            _focusVisible={{
+              borderColor: "green.1000",
+            }}
+            _hover={{
+              color: "white.100",
+              borderColor: "green.1000",
+            }}
+            value={externalWallet}
+            onChange={(e) => setExternalWallet(e.target.value)}
+            onBlur={() => {
+              setUpdateClick.on();
+              saveClick();
+            }}
+          />
         </Flex>
         {/* Invite */}
         <Flex

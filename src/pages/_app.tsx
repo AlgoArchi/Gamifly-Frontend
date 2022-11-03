@@ -63,7 +63,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>{`${pageProps?.title || publicRuntimeConfig.title}`}</title>
+        <title>Gamifly</title>
         <meta charSet="utf-8" />
         <meta
           name="App-Config"

@@ -9,6 +9,7 @@ import walletIcon from "@/assets/imgs/walletIcon.png";
 import BaseModal from "../BaseModal";
 import { useWeb3React } from "@web3-react/core";
 import { switchNetwork } from "@/connect/wallet";
+import { ethers } from "ethers";
 import { connectorLocalStorageKey, injected } from "@/connect/connectors";
 import { deleteStore, getStore, setStore } from "@/utils/storage";
 import { walletLogin, login } from "@/apis/login";
@@ -30,19 +31,23 @@ function Index({
   setIsLogin,
   setLoginLoading,
 }: IProps) {
+  const message = "This is just for verifying wallet owner";
   const router = useRouter();
   const toast = useToast();
   const { userInfo, globalAccount } = globalStore();
   const [friendCode, setFriendCode] = useState(null);
   const [accessToken, setAccessToken] = useState("");
   const { activate, chainId, account, deactivate } = useWeb3React();
+  const [signature, setSignature] = useState("");
   const [isMetaMask, setIsMetaMask] = useBoolean(false);
   const [random, setRandom] = useState(0);
   const { data: walletLoginData } = useSWR(
-    isMetaMask && random ? [walletLogin.key, random] : null,
+    isMetaMask && signature && random ? [walletLogin.key, random] : null,
     (_) =>
       walletLogin.fetcher({
         wallet_address: account || globalAccount,
+        signature: signature,
+        signed_message: message,
       }),
     { revalidateOnFocus: false }
   );
@@ -97,6 +102,7 @@ function Index({
     })
       .then(() => {
         setStore(connectorLocalStorageKey, "true");
+        handleSign();
         setIsMetaMask.on();
         setRandom(Math.random());
       })
@@ -132,6 +138,7 @@ function Index({
             setStore(connectorLocalStorageKey, "true");
             setIsMetaMask.on();
             setRandom(Math.random());
+            handleSign();
           }
         }, 1000);
       });
@@ -149,6 +156,13 @@ function Index({
     } catch (err) {
       console.log(err, "err");
     }
+  };
+
+  const handleSign = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = await provider.getSigner();
+    const signature = await signer.signMessage(message);
+    setSignature(signature);
   };
 
   useEffect(() => {
