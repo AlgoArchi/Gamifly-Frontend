@@ -92,7 +92,7 @@ function Index({ backClick, confirmClick }: IProps) {
         lineHeight={{ base: px2vw(40), lg: "40px" }}
         mb={{ base: px2vw(36), lg: "58px" }}
       >
-        Enter the amount of deposit
+        Enter the amount of withdraw
       </Text>
       {/* address */}
       <Flex
@@ -128,12 +128,12 @@ function Index({ backClick, confirmClick }: IProps) {
           fontSize={{ base: px2vw(13), lg: "13px" }}
           lineHeight={{ base: px2vw(13), lg: "13px" }}
         >
-          {`${userInfo?.external_wallet_address?.substring(
+          {`${userInfo?.platform_wallet?.substring(
             0,
             5
-          )}...${userInfo?.external_wallet_address?.substring(
-            userInfo?.external_wallet_address.length - 4,
-            userInfo?.external_wallet_address.length
+          )}...${userInfo?.platform_wallet?.substring(
+            userInfo?.platform_wallet.length - 4,
+            userInfo?.platform_wallet.length
           )}`}
         </Text>
       </Flex>
