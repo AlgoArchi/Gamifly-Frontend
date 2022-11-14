@@ -28,12 +28,12 @@ function Index({ isSetMode = false, saveClick }: IProps) {
   const toast = useToast();
   const { userInfo, dataRadom } = globalStore();
   const [inputValue, setInputValue] = useState("");
-  const [externalWallet, setExternalWallet] = useState("");
   const [updateClick, setUpdateClick] = useBoolean(false);
   const [imgsSrc, setImgsSrc] = useState<any>();
   const [imgsSrcForUp, setImgsSrcForUp] = useState<any>();
   const [refferal, setRefferal] = useState<any>("--");
   const [logOut, setLogOut] = useBoolean(false); // 登出弹窗
+  const [isLogin, setIsLogin] = useBoolean(userInfo?.id);
 
   const refs = useRef(null);
   // 获取用户信息
@@ -48,6 +48,15 @@ function Index({ isSetMode = false, saveClick }: IProps) {
     (_) => getReferralCount.fetcher(userInfo?.id),
     { revalidateOnFocus: false }
   );
+
+  useEffect(() => {
+    if (userInfo && userInfo?.id) {
+      setIsLogin.on();
+    } else {
+      setIsLogin.off();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo]);
 
   // 获取用户信息回调
   useEffect(() => {
@@ -67,16 +76,13 @@ function Index({ isSetMode = false, saveClick }: IProps) {
       updateClick &&
       userInfo &&
       userInfo?.id &&
-      (imgsSrcForUp || inputValue || externalWallet)
+      (imgsSrcForUp || inputValue)
     ) {
       const formData = new FormData();
       formData.append("id", userInfo?.id);
       formData.append("name", inputValue || userInfo?.name);
-      formData.append(
-        "withdraw_address",
-        externalWallet || userInfo?.withdraw_address
-      );
       formData.append("avatar", imgsSrcForUp || userInfo?.avatar);
+      formData.append("accessToken", userInfo?.access_token);
       axios({
         headers: {
           "Content-Type": "application/json",
@@ -97,10 +103,10 @@ function Index({ isSetMode = false, saveClick }: IProps) {
   }, [updateClick]);
 
   useEffect(() => {
-    if (getReferralCountData) {
-      getReferralCountData?.value === 0
-        ? setRefferal("--")
-        : setRefferal(getReferralCountData?.value);
+    if (getReferralCountData && getReferralCountData?.value) {
+      setRefferal(getReferralCountData?.value);
+    } else {
+      setRefferal("--");
     }
   }, [getReferralCountData]);
 
@@ -124,6 +130,11 @@ function Index({ isSetMode = false, saveClick }: IProps) {
         console.log(reader.error);
       };
     }
+  };
+
+  const confirmUpdate = () => {
+    saveClick();
+    setUpdateClick.on();
   };
 
   return (
@@ -191,38 +202,92 @@ function Index({ isSetMode = false, saveClick }: IProps) {
         </Flex>
         {isSetMode ? (
           // setting user name
-          <Flex my="auto">
-            <Input
-              h={{ base: px2vw(30), lg: "30px" }}
-              mb={{ base: px2vw(16), lg: "16px" }}
+          <>
+            <Flex my="auto">
+              <Input
+                h={{ base: px2vw(30), lg: "30px" }}
+                mb={{ base: px2vw(4), lg: "4px" }}
+                w="full"
+                bgColor="transparent"
+                outline="none"
+                border={0}
+                color="white.100"
+                fontWeight="600"
+                fontSize={{ base: px2vw(18), lg: "18px" }}
+                lineHeight={{ base: px2vw(18), lg: "18px" }}
+                placeholder={userInfo?.name || "User Name"}
+                _placeholder={{
+                  fontFamily: "Nunito",
+                  fontSize: {
+                    base: px2vw(18),
+                    md: "18px",
+                    lg: "18px",
+                    xl: "18px",
+                  },
+                  fontWeight: 600,
+                  color: "white.1000",
+                }}
+                _focusVisible={{
+                  border: 0,
+                }}
+                value={inputValue || userInfo?.name}
+                onChange={(e) => setInputValue(e.target.value)}
+                // onBlur={() => {
+                //   setUpdateClick.on();
+                //   saveClick();
+                // }}
+              />
+            </Flex>
+            <Flex
               w="full"
-              bgColor="transparent"
-              outline="none"
-              border="1px solid"
-              borderRadius="0"
-              borderColor="green.1000"
-              placeholder={userInfo?.name || "User Name"}
-              _placeholder={{
-                fontFamily: "Nunito",
-                fontSize: { base: px2vw(16), lg: "16px" },
-                fontWeight: 600,
-                color: "green.1000",
-              }}
-              _focusVisible={{
-                borderColor: "green.1000",
-              }}
-              _hover={{
-                color: "white.100",
-                borderColor: "green.1000",
-              }}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onBlur={() => {
-                setUpdateClick.on();
-                saveClick();
-              }}
+              h="1px"
+              bgColor="black.1800"
+              display={{ base: "none", lg: "flex" }}
+              mb={{ base: px2vw(15), lg: "20px" }}
             />
-          </Flex>
+            <Flex mb={{ base: px2vw(30), lg: "30px" }}>
+              <Flex
+                fontSize={{ base: px2vw(14), lg: "14px" }}
+                h={{ base: px2vw(30), lg: "30px" }}
+                mr={{ base: px2vw(5), lg: "5px" }}
+                lineHeight={{ base: px2vw(30), lg: "30px" }}
+                w="full"
+                fontFamily="Eurostile"
+                fontWeight="400"
+                alignItems="center"
+                justifyContent="center"
+                border="1px solid"
+                borderColor="white.100"
+                borderRadius="5px"
+                color="white.100"
+                cursor="pointer"
+                onClick={() => saveClick()}
+              >
+                <Text>CANCEL</Text>
+              </Flex>
+
+              <Flex
+                fontSize={{ base: px2vw(14), lg: "14px" }}
+                h={{ base: px2vw(30), lg: "30px" }}
+                ml={{ base: px2vw(5), lg: "5px" }}
+                lineHeight={{ base: px2vw(30), lg: "30px" }}
+                w="full"
+                fontFamily="Eurostile"
+                fontWeight="400"
+                alignItems="center"
+                justifyContent="center"
+                border="1px solid"
+                borderColor="purple.100"
+                bgColor="purple.100"
+                borderRadius="5px"
+                color="white.100"
+                cursor="pointer"
+                onClick={() => confirmUpdate()}
+              >
+                <Text>OK</Text>
+              </Flex>
+            </Flex>
+          </>
         ) : (
           <Flex
             mb={{ base: px2vw(30), lg: "30px" }}
@@ -251,13 +316,6 @@ function Index({ isSetMode = false, saveClick }: IProps) {
         )}
       </Flex>
       <Flex w="full" direction="column">
-        <Flex
-          w="full"
-          h="1px"
-          bgColor="black.1800"
-          display={{ base: "none", lg: "flex" }}
-          mb={{ base: px2vw(15), lg: "20px" }}
-        />
         {/* invitation */}
         <Flex
           flexDir="column"
@@ -355,38 +413,7 @@ function Index({ isSetMode = false, saveClick }: IProps) {
             SPEED UP EARNING
           </Text>
         </Flex>
-        <Flex my="auto">
-          <Input
-            h={{ base: px2vw(30), lg: "30px" }}
-            mb={{ base: px2vw(16), lg: "16px" }}
-            w="full"
-            bgColor="transparent"
-            outline="none"
-            border="1px solid"
-            borderRadius="0"
-            borderColor="green.1000"
-            placeholder={userInfo?.withdraw_address || "Withdraw Wallet"}
-            _placeholder={{
-              fontFamily: "Nunito",
-              fontSize: { base: px2vw(16), lg: "16px" },
-              fontWeight: 600,
-              color: "green.1000",
-            }}
-            _focusVisible={{
-              borderColor: "green.1000",
-            }}
-            _hover={{
-              color: "white.100",
-              borderColor: "green.1000",
-            }}
-            value={externalWallet}
-            onChange={(e) => setExternalWallet(e.target.value)}
-            onBlur={() => {
-              setUpdateClick.on();
-              saveClick();
-            }}
-          />
-        </Flex>
+
         {/* Invite */}
         <Flex
           display={{ base: "none", lg: "flex" }}
@@ -418,26 +445,30 @@ function Index({ isSetMode = false, saveClick }: IProps) {
         >
           <Text mt={{ base: px2vw(5), lg: "5px" }}>INVITE FRIENDS</Text>
         </Flex>
+
         {/* log out */}
-        <Flex
-          fontSize={{ base: px2vw(17), lg: "17px" }}
-          h={{ base: px2vw(50), lg: "50px" }}
-          lineHeight={{ base: px2vw(50), lg: "50px" }}
-          mt={{ base: px2vw(15), lg: "15px" }}
-          w="full"
-          fontFamily="Eurostile"
-          fontWeight="400"
-          alignItems="center"
-          justifyContent="center"
-          border="1px solid"
-          borderColor="white.100"
-          borderRadius="5px"
-          color="white.100"
-          cursor="pointer"
-          onClick={() => setLogOut.on()}
-        >
-          <Text mt={{ base: px2vw(5), lg: "5px" }}>LOG OUT</Text>
-        </Flex>
+        {isLogin && (
+          <Flex
+            fontSize={{ base: px2vw(17), lg: "17px" }}
+            h={{ base: px2vw(50), lg: "50px" }}
+            lineHeight={{ base: px2vw(50), lg: "50px" }}
+            mt={{ base: px2vw(15), lg: "15px" }}
+            w="full"
+            fontFamily="Eurostile"
+            fontWeight="400"
+            alignItems="center"
+            justifyContent="center"
+            border="1px solid"
+            borderColor="white.100"
+            borderRadius="5px"
+            color="white.100"
+            cursor="pointer"
+            onClick={() => setLogOut.on()}
+          >
+            <Text mt={{ base: px2vw(5), lg: "5px" }}>LOG OUT</Text>
+          </Flex>
+        )}
+
         <Flex
           w="full"
           h="1px"

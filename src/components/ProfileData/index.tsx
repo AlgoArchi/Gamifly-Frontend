@@ -72,6 +72,8 @@ function Index() {
   useEffect(() => {
     if (getGamiflyWalletTransactionsData) {
       setTransactionsList(getGamiflyWalletTransactionsData);
+    } else {
+      setTransactionsList([]);
     }
   }, [getGamiflyWalletTransactionsData]);
 
@@ -83,10 +85,10 @@ function Index() {
   }, [getMyNFTsData]);
 
   useEffect(() => {
-    if (getRewardAmountData) {
-      getRewardAmountData?.value === 0
-        ? setRewards("--")
-        : setRewards(getRewardAmountData?.value);
+    if (getRewardAmountData && getRewardAmountData?.value) {
+      setRewards(getRewardAmountData?.value);
+    } else {
+      setRewards("--");
     }
   }, [getRewardAmountData]);
 

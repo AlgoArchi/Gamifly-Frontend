@@ -1,29 +1,53 @@
-import React, { useMemo, useState } from "react";
-import { Flex, Text, Image, useBoolean } from "@chakra-ui/react";
+import React, { useMemo, useState, useEffect } from "react";
+import { Flex, Text, Image, useBoolean, useToast } from "@chakra-ui/react";
 import { getI18nSSRProps, GetI18nServerSideProps } from "@/utils/i18n";
 import px2vw from "@/utils/px2vw";
 // import arrows from "@/assets/imgs/arrows.png";
 import featuresIcon from "@/assets/imgs/featuresIcon.png";
+import depositBackground from "@/assets/imgs/deposit.png";
+import withdrawBackground from "@/assets/imgs/withdraw.png";
+import withdrawButton from "@/assets/imgs/withdrawButton.png";
+import depositButton from "@/assets/imgs/depositButton.png";
 // import Step1 from "@/components/Transfer/Step1";
 import Withdraw from "@/components/Transfer/Withdraw";
+import Withdraw2 from "@/components/Transfer/Withdraw2";
 import Deposit from "@/components/Transfer/Deposit";
+import Deposit2 from "@/components/Transfer/Deposit2";
 import BaseButton from "@/components/BaseButton";
 import buySuccess from "@/assets/imgs/buySuccess.png";
 import BaseModal from "@/components/BaseModal";
 import TransferStep3 from "@/components/Transfer/TransferStep3";
 import TransferStep4 from "@/components/Transfer/TransferStep4";
+import globalStore from "@/stores/global";
+import { useRouter } from "next/router";
 
 function App() {
-  const [step, setStep] = useState(1); // 步骤
-  const [chooseType, setChooseType] = useState("Deposit"); // Deposit / Withdraw
+  const router = useRouter();
+  const toast = useToast();
+  const { userInfo } = globalStore();
+  const [step, setStep] = useState(0); // 步骤
+  const [chooseType, setChooseType] = useState(""); // Deposit / Withdraw
   const [paymentMethod] = useState(3); // 支付类型
   const [totalPrice] = useState(0); // 总价格
   // const [priceUnit] = useState("GMF"); // 总价格
   const [transferVal, setTransferVal] = useState("0");
   const [hash, setHash] = useState("");
   const [showSuccess, setShowSuccess] = useBoolean(false);
+  const [step1Val, setStep1Val] = useState("");
   const [step2Val, setStep2Val] = useState("");
   const [gmfVal, setGmfVal] = useState("");
+
+  useEffect(() => {
+    if (userInfo.access_token == "" || userInfo.access_token == null) {
+      router.push("/");
+      toast({
+        position: "top-right",
+        title: "Please login first",
+        status: "success",
+        isClosable: true,
+      });
+    }
+  }, []);
 
   const contentDeposit = useMemo(() => {
     return (
@@ -36,11 +60,10 @@ function App() {
         //   setHash(hash);
         //   setShowSuccess.on();
         // }}
-        backClick={() => setStep(1)}
-        confirmClick={(val: string, gmfVal: string) => {
-          setStep2Val(val);
-          setGmfVal(gmfVal);
-          setStep(3);
+        backClick={() => setStep(0)}
+        confirmClick={(connectedAddress: string) => {
+          setStep1Val(connectedAddress);
+          setStep(2);
         }}
       />
     );
@@ -58,15 +81,20 @@ function App() {
         //   setShowSuccess.on();
         // }}
 
-        backClick={() => setStep(1)}
+        backClick={() => setStep(0)}
         confirmClick={(val: string) => {
-          setStep2Val(val);
-          setStep(3);
+          setStep1Val(val);
+          setStep(2);
         }}
       />
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentMethod, totalPrice]);
+
+  const setType = (type: string) => {
+    setChooseType(type);
+    setStep(1);
+  };
 
   return (
     <Flex
@@ -84,8 +112,9 @@ function App() {
           fontFamily="Eurostile"
           fontWeight="700"
           color="white.100"
+          textTransform="uppercase"
         >
-          TOP UP & WITHDRAW
+          {step == 0 ? "TOP UP & WITHDRAW" : chooseType}
         </Text>
         <Image
           src={featuresIcon}
@@ -95,152 +124,224 @@ function App() {
           mt={{ base: px2vw(5), lg: "5px" }}
         />
       </Flex>
-      <Flex flexDir="column" alignItems="center">
-        {/* step1 */}
+
+      <Flex w="full" alignItems="center" justifyContent="center">
+        {/* Opetion choose */}
         <Flex
-          display={step === 1 ? "flex" : "none"}
-          w={{ base: "full", lg: "496px" }}
-          h={{ base: "fit-content", lg: "480px" }}
-          py={{ base: px2vw(25), lg: "30px" }}
-          px={{ base: px2vw(25), lg: "60px" }}
-          flexDir="column"
+          display={step === 0 ? "flex" : "none"}
+          w="full"
+          flexDir={{ base: "column", lg: "row" }}
           alignItems="center"
-          border="1px solid"
-          borderColor="black.1800"
-          borderRadius="40px"
-          boxSizing="border-box"
+          justifyContent="center"
+          mt={{ base: px2vw(30), lg: "30px" }}
         >
-          <Text fontFamily="SofiaPro" textStyle="14" color="gray.500" mr="auto">
-            Step 1/4
-          </Text>
-          <Text
-            fontFamily="SofiaPro"
-            fontWeight="600"
-            color="white.100"
-            mr="auto"
-            fontSize={{ base: px2vw(21), lg: "21px" }}
-            lineHeight={{ base: px2vw(40), lg: "40px" }}
-            mb={{ base: px2vw(25), lg: "35px" }}
-          >
-            Select types of Transfer
-          </Text>
-          {/* Withdraw */}
+          {/* Withdraw option */}
           <Flex
-            h={{ base: px2vw(60), lg: "80px" }}
-            py={{ base: px2vw(0), lg: "12px" }}
-            px={{ base: px2vw(15), lg: "25px" }}
-            bgColor={chooseType === "Withdraw" ? "blue.300" : "gray.600"}
-            color={chooseType === "Withdraw" ? "white.100" : "blue.300"}
-            borderRadius={{ base: "15px", lg: "20px" }}
-            w="full"
-            boxSizing="border-box"
-            justifyContent="space-between"
-            fontFamily="SofiaPro"
-            cursor="pointer"
-            onClick={() => setChooseType("Withdraw")}
-          >
-            {/* text */}
-            <Flex flexDir="column">
-              <Text
-                fontWeight="700"
-                textStyle={{ base: "16", lg: "18" }}
-                lineHeight={{ base: px2vw(30), lg: "30px" }}
-              >
-                Withdraw Cash
-              </Text>
-              <Text
-                fontWeight="500"
-                textStyle="12"
-                lineHeight={{ base: px2vw(12), lg: "22px" }}
-              >
-                Cash that you win and can withdraw any time
-              </Text>
-            </Flex>
-            {/* button */}
-            <Flex
-              w={{ base: px2vw(18), lg: "30px" }}
-              h={{ base: px2vw(18), lg: "30px" }}
-              bgColor={
-                chooseType === "Withdraw"
-                  ? "rgba(81, 81, 81, 0.3)"
-                  : "rgba(81, 81, 81, 0.1)"
-              }
-              borderRadius="5px"
-              my="auto"
-            ></Flex>
-          </Flex>
-          {/* Deposit */}
-          <Flex
-            h={{ base: px2vw(60), lg: "80px" }}
-            py={{ base: px2vw(0), lg: "12px" }}
-            px={{ base: px2vw(15), lg: "25px" }}
-            mt={{ base: px2vw(20), lg: "35px" }}
-            mb={{ base: px2vw(60), lg: "60px" }}
-            bgColor={chooseType === "Deposit" ? "blue.300" : "gray.600"}
-            color={chooseType === "Deposit" ? "white.100" : "blue.300"}
-            borderRadius={{ base: "15px", lg: "20px" }}
-            w="full"
-            boxSizing="border-box"
-            justifyContent="space-between"
-            fontFamily="SofiaPro"
-            cursor="pointer"
-            onClick={() => setChooseType("Deposit")}
-          >
-            {/* text */}
-            <Flex flexDir="column">
-              <Text
-                fontWeight="700"
-                textStyle={{ base: "16", lg: "18" }}
-                lineHeight={{ base: px2vw(30), lg: "30px" }}
-                mt={{ base: px2vw(5), lg: 0 }}
-              >
-                Deposit Cash
-              </Text>
-              <Text
-                fontWeight="500"
-                textStyle="12"
-                lineHeight={{ base: px2vw(12), lg: "22px" }}
-              >
-                Cash that you add to your Gamifly wallet!
-              </Text>
-            </Flex>
-            {/* button */}
-            <Flex
-              w={{ base: px2vw(18), lg: "30px" }}
-              h={{ base: px2vw(18), lg: "30px" }}
-              bgColor={
-                chooseType === "Deposit"
-                  ? "rgba(81, 81, 81, 0.3)"
-                  : "rgba(81, 81, 81, 0.1)"
-              }
-              borderRadius="5px"
-              my="auto"
-            ></Flex>
-          </Flex>
-          {/* button */}
-          <Flex
-            w={{ base: px2vw(118), lg: "160px" }}
-            h={{ base: px2vw(40), lg: "50px" }}
-            fontSize={{ base: px2vw(14), lg: "17px" }}
-            borderRadius="5px"
+            h={{ base: "319px", lg: "319px" }}
+            w={{ base: "437px", lg: "437px" }}
+            mb={{ base: px2vw(20), lg: 0 }}
+            mr={{ base: 0, lg: "25px" }}
+            px={{ base: "15px", lg: "15px" }}
+            py={{ base: "10px", lg: "10px" }}
             justifyContent="center"
+            flexDir="column"
             alignItems="center"
-            fontFamily="Eurostile"
-            fontWeight="bold"
-            color="black.1600"
-            bgColor="green.1000"
-            ml="auto"
-            cursor="pointer"
-            onClick={() => setStep(2)}
+            bgImage={withdrawBackground}
+            bgSize="full"
+            textAlign="center"
           >
-            <Text mt={{ base: px2vw(5), lg: "5px" }}>CONTINUE</Text>
+            <Text
+              fontFamily="Eurostile"
+              fontWeight="900"
+              fontSize={{ base: "35px", lg: "35px" }}
+              lineHeight={{ base: "25px", lg: "25px" }}
+              mb={{ base: "40px", lg: "40px" }}
+              mt={{ base: "35px", lg: "35px" }}
+              pr={{ base: "5px", lg: "5px" }}
+              textAlign="center"
+              bgGradient="linear(to-l, #7928CA, #FF0080)"
+              bgClip="text"
+              fontStyle="italic"
+            >
+              NO LIMIT
+            </Text>
+            <Text
+              fontFamily="Eurostile"
+              fontWeight="900"
+              fontSize={{ base: "35px", lg: "35px" }}
+              lineHeight={{ base: "25px", lg: "25px" }}
+              mb={{ base: "50px", lg: "50px" }}
+              pr={{ base: "5px", lg: "5px" }}
+              bgGradient="linear(to-l, #7928CA, #FF0080)"
+              bgClip="text"
+              fontStyle="italic"
+            >
+              NO HIDDEN FEE
+            </Text>
+            <Text
+              fontFamily="SofiaPro"
+              fontWeight="600"
+              color="white.100"
+              h={{ base: "35px", lg: "35px" }}
+              w={{ base: "150px", lg: "150px" }}
+              px={{ base: "15px", lg: "15px" }}
+              pt={{ base: "7px", lg: "7px" }}
+              fontSize={{ base: "14px", lg: "14px" }}
+              lineHeight={{ base: "30px", lg: "30px" }}
+              bgImage={withdrawButton}
+              bgSize={{ base: "150px", lg: "150px" }}
+              cursor="pointer"
+              onClick={() => setType("Withdraw")}
+            >
+              WITHDRAW NOW
+            </Text>
+          </Flex>
+
+          {/* Deposit option */}
+          <Flex
+            h={{ base: "319px", lg: "319px", md: "319px", sm: "319px" }}
+            w={{ base: "437px", lg: "437px", md: "437px", sm: "437px" }}
+            mr={{ base: 0, lg: "25px" }}
+            px={{ base: "15px", lg: "15px" }}
+            py={{ base: "10px", lg: "10px" }}
+            flexDir="column"
+            alignItems="center"
+            boxSizing="border-box"
+            bgImage={depositBackground}
+            justifyContent="space-around"
+          >
+            {/* Description */}
+            <Flex mb={{ base: "-30px", lg: "-30px" }}>
+              {/* Title description */}
+              <Flex
+                flexDir="column"
+                px={{ base: "15px", lg: "15px" }}
+                pt={{ base: "7px", lg: "7px" }}
+                justifyContent="space-between"
+              >
+                <Text
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="green.1000"
+                  fontSize={{ base: "14px", lg: "14px" }}
+                  lineHeight={{ base: "30px", lg: "30px" }}
+                  py={{ base: "7px", lg: "7px" }}
+                >
+                  FIRST TIME DEPOSIT
+                </Text>
+                <Text
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="green.1000"
+                  fontSize={{ base: "14px", lg: "14px" }}
+                  lineHeight={{ base: "30px", lg: "30px" }}
+                  py={{ base: "7px", lg: "7px" }}
+                >
+                  $5 Deposit
+                </Text>
+                <Text
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="green.1000"
+                  fontSize={{ base: "14px", lg: "14px" }}
+                  lineHeight={{ base: "30px", lg: "30px" }}
+                  py={{ base: "7px", lg: "7px" }}
+                >
+                  $10 Deposit
+                </Text>
+              </Flex>
+
+              {/* Explanation */}
+              <Flex
+                flexDir="column"
+                px={{ base: "15px", lg: "15px" }}
+                pt={{ base: "7px", lg: "7px" }}
+                textAlign="right"
+              >
+                <Text
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="white.100"
+                  fontSize={{ base: "14px", lg: "14px" }}
+                  lineHeight={{ base: "30px", lg: "30px" }}
+                  py={{ base: "7px", lg: "7px" }}
+                >
+                  FIRST TIME DEPOSIT
+                </Text>
+                <Text
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="white.100"
+                  fontSize={{ base: "14px", lg: "14px" }}
+                  lineHeight={{ base: "30px", lg: "30px" }}
+                  py={{ base: "7px", lg: "7px" }}
+                >
+                  $5 Deposit
+                </Text>
+                <Text
+                  fontFamily="SofiaPro"
+                  fontWeight="600"
+                  color="white.100"
+                  fontSize={{ base: "14px", lg: "14px" }}
+                  lineHeight={{ base: "30px", lg: "30px" }}
+                  py={{ base: "7px", lg: "7px" }}
+                >
+                  $10 Deposit
+                </Text>
+              </Flex>
+            </Flex>
+
+            {/* Deposit button */}
+            <Text
+              fontFamily="SofiaPro"
+              fontWeight="600"
+              color="black.100"
+              h={{ base: "35px", lg: "35px" }}
+              w={{ base: "150px", lg: "150px" }}
+              px={{ base: "15px", lg: "15px" }}
+              pt={{ base: "7px", lg: "7px" }}
+              fontSize={{ base: "14px", lg: "14px" }}
+              lineHeight={{ base: "30px", lg: "30px" }}
+              bgImage={depositButton}
+              bgSize={{ base: "150px", lg: "150px" }}
+              cursor="pointer"
+              onClick={() => setType("Deposit")}
+            >
+              DEPOSIT NOW
+            </Text>
           </Flex>
         </Flex>
-        {chooseType === "Deposit" && step === 2 && contentDeposit}
-        {chooseType === "Withdraw" && step === 2 && contentWithdraw}
+        {chooseType === "Deposit" && step === 1 && contentDeposit}
+        {chooseType === "Withdraw" && step === 1 && contentWithdraw}
+
+        {step === 2 && chooseType === "Withdraw" && (
+          <Withdraw2
+            withdrawAddress={step1Val}
+            backClick={() => setStep(1)}
+            confirmClick={(val: string, gmfVal: string) => {
+              setStep2Val(val);
+              setGmfVal(gmfVal);
+              setStep(3);
+            }}
+          />
+        )}
+
+        {step === 2 && chooseType === "Deposit" && (
+          <Deposit2
+            connectedAddress={step1Val}
+            backClick={() => setStep(1)}
+            confirmClick={(val: string, gmfVal: string) => {
+              setStep2Val(val);
+              setGmfVal(gmfVal);
+              setStep(3);
+            }}
+          />
+        )}
+
         {step === 3 && (
           <TransferStep3
             chooseType={chooseType}
+            address={step1Val}
             inputVal={step2Val}
             gmfVal={gmfVal}
             backClick={(type: string) => {
@@ -250,7 +351,15 @@ function App() {
             confirmClick={() => setStep(4)}
           />
         )}
-        {step === 4 && <TransferStep4 inputVal={step2Val} gmfVal={gmfVal} />}
+        {step === 4 && (
+          <TransferStep4
+            address={step1Val}
+            chooseType={chooseType}
+            inputVal={step2Val}
+            gmfVal={gmfVal}
+            backClick={() => setStep(0)}
+          />
+        )}
       </Flex>
       {/* success */}
       <BaseModal
@@ -315,8 +424,7 @@ function App() {
               boxShadow="none"
               onClick={() => {
                 setShowSuccess.off();
-                setStep(1);
-                setChooseType("Deposit");
+                setStep(0);
                 setHash("");
                 setTransferVal("0");
               }}
@@ -327,8 +435,7 @@ function App() {
               w={{ base: px2vw(140), lg: "190px" }}
               onClick={() => {
                 setShowSuccess.off();
-                setStep(1);
-                setChooseType("Deposit");
+                setStep(0);
                 setHash("");
                 setTransferVal("0");
                 window.open(`https://polygonscan.com/tx/${hash}`);

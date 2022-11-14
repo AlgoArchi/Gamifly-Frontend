@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import {
   Flex,
-  Image,
+  // Image,
   Input,
   Text,
   useBoolean,
   // useToast,
 } from "@chakra-ui/react";
+import { ethers } from "ethers";
 import px2vw from "@/utils/px2vw";
-import copySuccessIcon from "@/assets/imgs/copySuccess.png";
-import usdc from "@/assets/imgs/usdc.png";
+// import copySuccessIcon from "@/assets/imgs/copySuccess.png";
+// import usdc from "@/assets/imgs/usdc.png";
 // import gamiflyToken from "@/assets/imgs/gamiflyToken.png";
 // import messageIcon from "@/assets/imgs/messageIcon.png";
 import { withdraw } from "@/apis/withdraw";
@@ -32,6 +33,7 @@ function Index({ backClick, confirmClick }: IProps) {
   // const [loading, setLoading] = useBoolean(false);
   const [isWithdraw] = useBoolean(false);
   const [inputValue, setInputValue] = useState("");
+  const [isAddress, setIsAddress] = useBoolean(true);
   const { data: _withdrawData } = useSWR(
     userInfo && userInfo?.platform_wallet && isWithdraw
       ? [withdraw.key, isWithdraw, inputValue]
@@ -47,6 +49,23 @@ function Index({ backClick, confirmClick }: IProps) {
       revalidateOnFocus: false,
     }
   );
+
+  // useEffect(() => {
+  //   if(ethers.utils.isAddress(inputValue)){
+  //     setIsAddress.on();
+  //   } else {
+  //     setIsAddress.off();
+  //   }
+  // }, [inputValue])
+
+  const checkingAddress = () => {
+    if (ethers.utils.isAddress(inputValue)) {
+      setIsAddress.on();
+      confirmClick(inputValue);
+    } else {
+      setIsAddress.off();
+    }
+  };
 
   // useEffect(() => {
   //   if (withdrawData?.result) {
@@ -79,76 +98,61 @@ function Index({ backClick, confirmClick }: IProps) {
       borderColor="black.1800"
       borderRadius="40px"
       boxSizing="border-box"
+      justifyContent="center"
     >
       <Text fontFamily="SofiaPro" textStyle="14" color="gray.500" mr="auto">
-        Step 2/4
+        Step 1/4
       </Text>
       <Text
         fontFamily="SofiaPro"
         fontWeight="600"
         color="white.100"
         mr="auto"
-        fontSize={{ base: px2vw(21), lg: "21px" }}
-        lineHeight={{ base: px2vw(40), lg: "40px" }}
-        mb={{ base: px2vw(36), lg: "58px" }}
+        fontSize={{ base: "21px", lg: "21px" }}
+        lineHeight={{ base: "40px", lg: "40px" }}
+        mb={{ base: "15px", lg: "15px" }}
       >
-        Enter the amount of withdraw
+        Withdraw to Metamask address
       </Text>
-      {/* address */}
-      <Flex
-        w={{ base: px2vw(300), lg: "300px" }}
-        h={{ base: px2vw(40), lg: "40px" }}
-        mb={{ base: px2vw(15), lg: "15px" }}
-        alignItems="center"
-        justifyContent="center"
+      <Text
+        fontFamily="SofiaPro"
+        fontWeight="500"
+        color="gray.700"
         mr="auto"
-        bgColor="black.100"
-        borderRadius="30px"
+        fontSize={{ base: px2vw(14), lg: "14px" }}
+        lineHeight={{ base: px2vw(18), lg: "18px" }}
+        mb={{ base: px2vw(15), lg: "15px" }}
       >
-        <Image
-          src={copySuccessIcon}
-          w={{ base: px2vw(13), lg: "13px" }}
-          h={{ base: px2vw(13), lg: "13px" }}
-          mr={{ base: px2vw(5), lg: "5px" }}
-        />
-        <Text
-          fontFamily="SofiaPro"
-          fontWeight="600"
-          color="#BABABA"
-          fontSize={{ base: px2vw(13), lg: "13px" }}
-          lineHeight={{ base: px2vw(13), lg: "13px" }}
-          mr={{ base: px2vw(10), lg: "10px" }}
-        >
-          Your are connected with
-        </Text>
-        <Text
-          fontFamily="SofiaPro"
-          color="green.1000"
-          textDecor="underline"
-          fontSize={{ base: px2vw(13), lg: "13px" }}
-          lineHeight={{ base: px2vw(13), lg: "13px" }}
-        >
-          {`${userInfo?.platform_wallet?.substring(
-            0,
-            5
-          )}...${userInfo?.platform_wallet?.substring(
-            userInfo?.platform_wallet.length - 4,
-            userInfo?.platform_wallet.length
-          )}`}
-        </Text>
-      </Flex>
+        The address is where your winning rewards goes
+      </Text>
+
+      {/* address */}
+      <Text
+        fontFamily="SofiaPro"
+        fontWeight="600"
+        color="green.1000"
+        mr="auto"
+        fontSize={{ base: "21px", lg: "21px" }}
+        lineHeight={{ base: "40px", lg: "40px" }}
+        mb={{ base: "15px", lg: "15px" }}
+        ml={{ base: "20px", lg: "20px" }}
+      >
+        ADD ADDRESS
+      </Text>
+
       {/* input */}
-      <Flex w="full" flexDir="column" mb={{ base: px2vw(110), lg: "110px" }}>
+      <Flex w="full" flexDir="column" mb={{ base: "10px", lg: "10px" }}>
         <Flex
           w="full"
-          h={{ base: px2vw(70), lg: "70px" }}
-          px={{ base: px2vw(17), lg: "17px" }}
+          h={{ base: "40px", lg: "40px" }}
+          px={{ base: "17px", lg: "17px" }}
           justifyContent="space-between"
           alignItems="center"
           boxSizing="border-box"
-          borderRadius="20px"
+          borderRadius="50px"
           border="1px solid"
-          borderColor="green.1000"
+          borderColor="black"
+          bgColor="black"
         >
           <Input
             // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -165,38 +169,57 @@ function Index({ backClick, confirmClick }: IProps) {
             _placeholder={{
               fontFamily: "SofiaPro",
               textStyle: 14,
-              color: "green.1000",
+              color: "gray.700",
               opacity: 0.6,
             }}
-            placeholder="Enter USDC value here"
+            placeholder="Please enter your Metamask wallet address here"
             onChange={(e) => {
               setInputValue?.(e.target.value);
             }}
           />
-          <Flex
-            ml={{ base: px2vw(10), lg: "10px" }}
-            mr={{ base: px2vw(20), lg: "20px" }}
-          >
-            <Image
-              src={usdc}
-              w={{ base: px2vw(18), lg: "18px" }}
-              h={{ base: px2vw(18), lg: "18px" }}
-              mr={{ base: px2vw(5), lg: "5px" }}
-            />
-            <Text
-              fontFamily="SofiaPro"
-              textStyle="12"
-              fontWeight="600"
-              color="white.100"
-              lineHeight={{ base: px2vw(18), lg: "18px" }}
-            >
-              USDC
-            </Text>
-          </Flex>
         </Flex>
       </Flex>
+      {/* Address checking */}
+      <Flex
+        w={{ base: px2vw(300), lg: "300px" }}
+        h={{ base: px2vw(40), lg: "40px" }}
+        mb={{ base: "110px", lg: "110px" }}
+        alignItems="left"
+        justifyContent="left"
+      >
+        {isAddress ? (
+          <>
+            {/* <Image
+            src={copySuccessIcon}
+            w={{ base: px2vw(13), lg: "13px" }}
+            h={{ base: px2vw(13), lg: "13px" }}
+            mr={{ base: px2vw(5), lg: "5px" }}
+          />
+          <Text
+            fontFamily="SofiaPro"
+            fontWeight="600"
+            color="#BABABA"
+            fontSize={{ base: px2vw(13), lg: "13px" }}
+            lineHeight={{ base: px2vw(13), lg: "13px" }}
+          >
+          Valid address
+          </Text> */}
+          </>
+        ) : (
+          <Text
+            fontFamily="SofiaPro"
+            fontWeight="600"
+            color="red"
+            fontSize={{ base: px2vw(13), lg: "13px" }}
+            lineHeight={{ base: px2vw(13), lg: "13px" }}
+          >
+            Please enter a valid address
+          </Text>
+        )}
+      </Flex>
+
       {/* buttons */}
-      <Flex w="full" justifyContent="space-between">
+      <Flex w="full" justifyContent="space-between" mt="auto">
         {/* back */}
         <Flex
           w={{ base: px2vw(118), lg: "160px" }}
@@ -228,11 +251,11 @@ function Index({ backClick, confirmClick }: IProps) {
           cursor={inputValue === "" ? "no-drop" : "pointer"}
           w={{ base: px2vw(118), lg: "160px" }}
           h={{ base: px2vw(40), lg: "50px" }}
-          bgColor={inputValue === "" ? "gray.800" : "green.1000"}
-          borderColor={inputValue === "" ? "gray.800" : "green.1000"}
+          bgColor={inputValue === "" ? "#749733" : "green.1000"}
+          borderColor={inputValue === "" ? "#749733" : "green.1000"}
           onClick={() => {
             if (inputValue !== "") {
-              confirmClick(inputValue);
+              checkingAddress();
             }
           }}
         >
@@ -241,7 +264,7 @@ function Index({ backClick, confirmClick }: IProps) {
             fontSize={{ base: px2vw(17), lg: "17px" }}
             fontFamily="Eurostile"
             fontWeight="bold"
-            color={inputValue === "" ? "gray.700" : "black.1600"}
+            color="black.1600"
           >
             CONFIRM
           </Text>

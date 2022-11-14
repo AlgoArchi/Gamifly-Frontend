@@ -52,3 +52,8 @@ export const getRewardAmount = {
   fetcher: (params: string) => ajax.get(`/api/getRewardAmount/${params}`),
   key: "/api/getRewardAmount",
 };
+
+export const getWithdrawableAmount = {
+  fetcher: (params: string) => ajax.get(`/api/getWithdrawableAmount/${params}`),
+  key: "/api/getWithdrawableAmount",
+};

@@ -1,15 +1,32 @@
-import React from "react";
-import { Flex, useBoolean, Image } from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { Flex, useBoolean, useToast, Image } from "@chakra-ui/react";
 import ProfileInfo from "@/components/ProfileInfo";
 import ProfileData from "@/components/ProfileData";
 import ProfileNoLogin from "@/components/ProfileNoLogin";
 import profileMobile from "@/assets/imgs/profileMobile.png";
 import { useState } from "react";
 import px2vw from "@/utils/px2vw";
+import { useRouter } from "next/router";
+import globalStore from "@/stores/global";
 
 function Index() {
+  const router = useRouter();
+  const toast = useToast();
   const [isLogin] = useState(true);
   const [isSetMode, setIsSetMode] = useBoolean(false);
+  const { userInfo } = globalStore();
+
+  useEffect(() => {
+    if (userInfo.access_token == "" || userInfo.access_token == null) {
+      router.push("/");
+      toast({
+        position: "top-right",
+        title: "Please login first",
+        status: "success",
+        isClosable: true,
+      });
+    }
+  }, []);
   return (
     <Flex direction="column" w="full" pt={{ base: 0, lg: "150px" }}>
       <Image

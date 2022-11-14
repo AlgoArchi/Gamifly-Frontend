@@ -1,27 +1,14 @@
 import React, { useEffect, useState } from "react";
-import {
-  Flex,
-  Input,
-  Text,
-  Image,
-  useBoolean,
-  Spinner,
-} from "@chakra-ui/react";
+import { Flex, Text, Image, useBoolean, useToast } from "@chakra-ui/react";
 import px2vw from "@/utils/px2vw";
 import copySuccessIcon from "@/assets/imgs/copySuccess.png";
-import usdc from "@/assets/imgs/usdc.png";
-import gamiflyToken from "@/assets/imgs/gamiflyToken.png";
-// import messageIcon from "@/assets/imgs/messageIcon.png";
-// import transferLine from "@/assets/imgs/transferLine.png";
-// import PaymentMethod from "../PaymentMethod";
-// import GamiflyWallet from "../GamiflyWallet";
-// import CryptoWallet from "../CryptoWallet";
-// import BaseButton from "../BaseButton";
-// import { useWeb3React } from "@web3-react/core";
+import logoIcon from "@/assets/imgs/logoIcon.png";
+import { switchNetwork } from "@/connect/wallet";
+import { setStore } from "@/utils/storage";
+import { connectorLocalStorageKey, injected } from "@/connect/connectors";
 import globalStore from "@/stores/global";
-// import { recharge } from "@/connect/wallet";
-import { deposit, getGMFPrice } from "@/apis/deposit";
-import useSWR from "swr";
+import { useWeb3React } from "@web3-react/core";
+import metamask from "@/assets/imgs/metamask.webp";
 
 export interface IProps {
   // paymentMethod: number;
@@ -29,65 +16,66 @@ export interface IProps {
   // setPaymentMethod: (type: number) => void;
   // success: (val: string, hash: string) => void;
   backClick: () => void;
-  confirmClick: (val: string, gmf: string) => void;
+  confirmClick: (connectedAddress: string) => void;
 }
 
 function Index({ backClick, confirmClick }: IProps) {
-  // const { library, account } = useWeb3React();
+  const toast = useToast();
+  const { activate, chainId, account } = useWeb3React();
   const { userInfo } = globalStore();
-  const [inputValue, setInputValue] = useState("");
-  const [isDeposit, setIsDeposit] = useBoolean(false);
-  const [hash] = useState("");
-  // const [setLoading] = useBoolean(false);
-  const [gmfPrice, setGmfPrice] = useState("");
-  const [getNewPriceLoading, setGetNewPriceLoading] = useBoolean(false);
-  // const token = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+  // const { library, account } = useWeb3React();
+  const [connectedAddress, setConnectedAddress] = useState("");
+  const [isConnected, setIsConnected] = useBoolean(false);
 
-  const { data: depositData } = useSWR(
-    userInfo && userInfo?.platform_wallet && hash && isDeposit && deposit.key,
-    () =>
-      deposit.fetcher({
-        hash: hash,
-        wallet_address: userInfo?.platform_wallet,
-      }),
-    {
-      revalidateOnFocus: false,
+  const connectMetamask = async () => {
+    // Connect wallet
+    if (chainId !== 137) {
+      const res = await switchNetwork(137);
+      if (!res) {
+        toast({
+          title: `add network fail`,
+          status: "error",
+          isClosable: true,
+        });
+        return;
+      } else if (res === "no metamask") {
+        toast({
+          title: `Please install the metamask wallet`,
+          status: "error",
+          isClosable: true,
+        });
+      }
     }
-  );
-  const { data: getGMFPriceData } = useSWR(
-    Number(inputValue) ? [getGMFPrice.key, inputValue] : null,
-    () => getGMFPrice.fetcher(inputValue),
-    {
-      revalidateOnFocus: false,
-    }
-  );
-
-  useEffect(() => {
-    if (getGMFPriceData) {
-      setGmfPrice(getGMFPriceData.value);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getGMFPriceData]);
-
-  useEffect(() => {
-    setGetNewPriceLoading.off();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gmfPrice]);
-
-  useEffect(() => {
-    if (hash) {
-      setIsDeposit.on();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hash]);
+    // eslint-disable-next-line no-async-promise-executor
+    new Promise<void>(async (resolve) => {
+      try {
+        await activate(injected, undefined, true);
+        resolve();
+      } catch (error) {
+        console.log(error);
+      }
+    })
+      .then(() => {
+        setStore(connectorLocalStorageKey, "true");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   useEffect(() => {
-    if (depositData) {
-      // success(inputValue, hash);
-      // setLoading.off();
+    if (account) {
+      setIsConnected.on();
+    } else {
+      setIsConnected.off();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [depositData]);
+  }, [account]);
+
+  useEffect(() => {
+    if (account) {
+      setConnectedAddress(account);
+    }
+  }, [account]);
 
   return (
     <Flex
@@ -103,7 +91,7 @@ function Index({ backClick, confirmClick }: IProps) {
       boxSizing="border-box"
     >
       <Text fontFamily="SofiaPro" textStyle="14" color="gray.500" mr="auto">
-        Step 2/4
+        Step 1/4
       </Text>
       <Text
         fontFamily="SofiaPro"
@@ -112,152 +100,224 @@ function Index({ backClick, confirmClick }: IProps) {
         mr="auto"
         fontSize={{ base: px2vw(21), lg: "21px" }}
         lineHeight={{ base: px2vw(40), lg: "40px" }}
-        mb={{ base: px2vw(36), lg: "58px" }}
+        mb={{ base: "13px", lg: "13px" }}
       >
-        Enter the amount of deposit
+        {isConnected ? "You are connected" : "Connect with Metamask"}
       </Text>
+
+      {/* Section 1 */}
+      <Text
+        fontFamily="SofiaPro"
+        textStyle="14"
+        color="gray.500"
+        mr="auto"
+        mb={{ base: "7px", lg: "7px" }}
+      >
+        Deposit from
+      </Text>
+
       {/* address */}
       <Flex
-        w={{ base: px2vw(300), lg: "300px" }}
-        h={{ base: px2vw(40), lg: "40px" }}
-        mb={{ base: px2vw(15), lg: "15px" }}
-        alignItems="center"
-        justifyContent="center"
+        w={{ base: "full", lg: "full" }}
+        px={{ base: "15px", lg: "15px" }}
+        pb={{ base: "20px", lg: "20px" }}
+        mb={{ base: "15px", lg: "15px" }}
         mr="auto"
         bgColor="black.100"
-        borderRadius="30px"
+        borderRadius="8px"
+        flexDir="column"
       >
-        <Image
-          src={copySuccessIcon}
-          w={{ base: px2vw(13), lg: "13px" }}
-          h={{ base: px2vw(13), lg: "13px" }}
-          mr={{ base: px2vw(5), lg: "5px" }}
-        />
-        <Text
-          fontFamily="SofiaPro"
-          fontWeight="600"
-          color="#BABABA"
-          fontSize={{ base: px2vw(13), lg: "13px" }}
-          lineHeight={{ base: px2vw(13), lg: "13px" }}
-          mr={{ base: px2vw(10), lg: "10px" }}
-        >
-          Your are connected with
-        </Text>
-        <Text
-          fontFamily="SofiaPro"
-          color="green.1000"
-          textDecor="underline"
-          fontSize={{ base: px2vw(13), lg: "13px" }}
-          lineHeight={{ base: px2vw(13), lg: "13px" }}
-        >
-          {`${userInfo?.platform_wallet?.substring(
-            0,
-            5
-          )}...${userInfo?.platform_wallet?.substring(
-            userInfo?.platform_wallet.length - 4,
-            userInfo?.platform_wallet.length
-          )}`}
-        </Text>
-      </Flex>
-      {/* input */}
-      <Flex w="full" flexDir="column" mb={{ base: px2vw(110), lg: "110px" }}>
-        <Flex
-          w="full"
-          h={{ base: px2vw(70), lg: "70px" }}
-          px={{ base: px2vw(17), lg: "17px" }}
-          justifyContent="space-between"
-          alignItems="center"
-          boxSizing="border-box"
-          borderRadius="20px"
-          border="1px solid"
-          borderColor="green.1000"
-        >
-          <Input
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            border="none"
-            outline="none"
-            bgColor="transparent"
-            p="0"
-            color="green.1000"
-            _focusVisible={{
-              border: "none",
-              outline: "none",
-            }}
-            _placeholder={{
-              fontFamily: "SofiaPro",
-              textStyle: 14,
-              color: "green.1000",
-              opacity: 0.6,
-            }}
-            placeholder="Enter USDC value here"
-            onChange={(e) => {
-              if (e.target.value !== "" && Number(e.target.value) !== 0) {
-                setGetNewPriceLoading.on();
-              }
-              setInputValue?.(e.target.value);
-            }}
+        <Flex alignItems="center" mb={{ base: "10px", lg: "10px" }}>
+          <Image
+            src={metamask}
+            w={{ base: "40px", lg: "40px" }}
+            h={{ base: "40px", lg: "40px" }}
+            mr={{ base: "3px", lg: "3px" }}
           />
-          <Flex
-            ml={{ base: px2vw(10), lg: "10px" }}
-            mr={{ base: px2vw(20), lg: "20px" }}
+          <Text
+            fontFamily="SofiaPro"
+            fontWeight="600"
+            color="#BABABA"
+            fontSize={{ base: px2vw(13), lg: "13px" }}
+            lineHeight={{ base: px2vw(13), lg: "13px" }}
+            mr={{ base: px2vw(10), lg: "10px" }}
           >
-            <Image
-              src={usdc}
-              w={{ base: px2vw(18), lg: "18px" }}
-              h={{ base: px2vw(18), lg: "18px" }}
-              mr={{ base: px2vw(5), lg: "5px" }}
-            />
+            {isConnected ? "Connected Metamask" : "Connect Metamask"}
+          </Text>
+        </Flex>
+        {isConnected ? (
+          <Flex
+            px={{ base: "20px", lg: "20px" }}
+            textAlign="center"
+            justifyContent="space-between"
+          >
+            <Flex
+              fontFamily="SofiaPro"
+              fontWeight="600"
+              color="#d9d9d9"
+              fontSize={{ base: "15px", lg: "15px" }}
+              lineHeight={{ base: "23px", lg: "23px" }}
+              mr={{ base: px2vw(10), lg: "10px" }}
+              flexDir="column"
+            >
+              <Text>Account Name</Text>
+              <Text
+                fontFamily="SofiaPro"
+                color="#7ba52e"
+                textDecor="underline"
+                fontSize={{ base: "13px", lg: "13px" }}
+                lineHeight={{ base: "13px", lg: "13px" }}
+              >
+                {`${connectedAddress?.substring(
+                  0,
+                  5
+                )}...${connectedAddress?.substring(
+                  connectedAddress.length - 4,
+                  connectedAddress.length
+                )}`}
+              </Text>
+            </Flex>
+            <Flex
+              fontFamily="SofiaPro"
+              fontWeight="600"
+              color="#d9d9d9"
+              fontSize={{ base: "15px", lg: "15px" }}
+              lineHeight={{ base: "23px", lg: "23px" }}
+              mr={{ base: px2vw(10), lg: "10px" }}
+              alignItems="center"
+            >
+              <Image
+                src={copySuccessIcon}
+                w={{ base: "13px", lg: "13px" }}
+                h={{ base: "13px", lg: "13px" }}
+                mr={{ base: "5px", lg: "5px" }}
+              />
+              <Text>Connected</Text>
+            </Flex>
+          </Flex>
+        ) : (
+          <Flex
+            px={{ base: "20px", lg: "20px" }}
+            mt={{ base: "25px", lg: "30px" }}
+            mb={{ base: "25px", lg: "25px" }}
+            textAlign="center"
+            justifyContent="center"
+          >
             <Text
               fontFamily="SofiaPro"
-              textStyle="12"
               fontWeight="600"
-              color="white.100"
-              lineHeight={{ base: px2vw(18), lg: "18px" }}
+              color="#808080"
+              fontSize={{ base: "15px", lg: "15px" }}
+              lineHeight={{ base: "23px", lg: "23px" }}
+              mr={{ base: px2vw(10), lg: "10px" }}
             >
-              USDC
+              <Text>
+                You haven&apos;t connected with Metamask yet. To deposit Gamifly
+                Token and earn more, you need to connect with Metamask
+              </Text>
             </Text>
-          </Flex>
-        </Flex>
-        {inputValue && (
-          <Flex mt="10px">
-            {getNewPriceLoading ? (
-              <Spinner size="xs" />
-            ) : (
-              <Flex alignItems="center">
-                <Text
-                  fontFamily="SofiaPro"
-                  fontWeight="bold"
-                  fontSize={{ base: px2vw(19), lg: "19px" }}
-                  lineHeight={{ base: px2vw(25), lg: "25px" }}
-                >
-                  ≈ {Number(gmfPrice)} GMF
-                </Text>
-                <Image
-                  src={gamiflyToken}
-                  w={{ base: px2vw(25), lg: "25px" }}
-                  h={{ base: px2vw(25), lg: "25px" }}
-                  mx={{ base: px2vw(5), lg: "5px" }}
-                />
-                <Text
-                  fontFamily="SofiaPro"
-                  fontWeight="bold"
-                  textStyle="12"
-                  lineHeight={{ base: px2vw(25), lg: "25px" }}
-                >
-                  Gamifly token
-                </Text>
-              </Flex>
-            )}
           </Flex>
         )}
       </Flex>
+
+      {/* Section 2 */}
+
+      {isConnected && (
+        <>
+          <Text
+            fontFamily="SofiaPro"
+            textStyle="14"
+            color="gray.500"
+            mr="auto"
+            mb={{ base: "7px", lg: "7px" }}
+          >
+            To
+          </Text>
+          <Flex
+            w={{ base: "full", lg: "full" }}
+            px={{ base: "15px", lg: "15px" }}
+            pb={{ base: "20px", lg: "20px" }}
+            mb={{ base: "15px", lg: "15px" }}
+            mr="auto"
+            bgColor="gray.800"
+            borderRadius="8px"
+            flexDir="column"
+          >
+            <Flex
+              alignItems="center"
+              mb={{ base: "10px", lg: "10px" }}
+              mt={{ base: "10px", lg: "10px" }}
+            >
+              <Image
+                src={logoIcon}
+                w={{ base: "17px", lg: "17px" }}
+                h={{ base: "17px", lg: "17px" }}
+                mr={{ base: "10px", lg: "10px" }}
+              />
+              <Text
+                fontFamily="SofiaPro"
+                fontWeight="600"
+                color="#BABABA"
+                fontSize={{ base: px2vw(13), lg: "13px" }}
+                lineHeight={{ base: px2vw(13), lg: "13px" }}
+                mr={{ base: px2vw(10), lg: "10px" }}
+              >
+                My Gamifly Wallet
+              </Text>
+            </Flex>
+            <Flex
+              px={{ base: "20px", lg: "20px" }}
+              textAlign="center"
+              justifyContent="space-between"
+              mt={{ base: "10px", lg: "10px" }}
+            >
+              <Flex
+                fontFamily="SofiaPro"
+                fontWeight="600"
+                color="#d9d9d9"
+                fontSize={{ base: "15px", lg: "15px" }}
+                lineHeight={{ base: "23px", lg: "23px" }}
+                mr={{ base: px2vw(10), lg: "10px" }}
+                flexDir="column"
+              >
+                <Text>{userInfo?.name || "User Name"}</Text>
+              </Flex>
+              <Flex
+                fontFamily="SofiaPro"
+                fontWeight="600"
+                color="#d9d9d9"
+                fontSize={{ base: "15px", lg: "15px" }}
+                lineHeight={{ base: "23px", lg: "23px" }}
+                mr={{ base: px2vw(10), lg: "10px" }}
+                alignItems="center"
+              >
+                <Text
+                  fontFamily="SofiaPro"
+                  color="#7ba52e"
+                  textDecor="underline"
+                  fontSize={{ base: "13px", lg: "13px" }}
+                  lineHeight={{ base: "13px", lg: "13px" }}
+                >
+                  {`${userInfo?.platform_wallet?.substring(
+                    0,
+                    5
+                  )}...${userInfo?.platform_wallet?.substring(
+                    userInfo?.platform_wallet.length - 4,
+                    userInfo?.platform_wallet.length
+                  )}`}
+                </Text>
+              </Flex>
+            </Flex>
+          </Flex>
+        </>
+      )}
+
       {/* buttons */}
-      <Flex w="full" justifyContent="space-between">
+      <Flex w="full" justifyContent="space-between" mt="auto">
         {/* back */}
         <Flex
-          w={{ base: px2vw(118), lg: "160px" }}
-          h={{ base: px2vw(40), lg: "50px" }}
+          w={{ base: "160px", lg: "160px" }}
+          h={{ base: "50px", lg: "50px" }}
           border="1px solid"
           borderColor="green.1000"
           borderRadius="5px"
@@ -267,8 +327,7 @@ function Index({ backClick, confirmClick }: IProps) {
           onClick={() => backClick()}
         >
           <Text
-            mt={{ base: px2vw(5), lg: "5px" }}
-            fontSize={{ base: px2vw(17), lg: "17px" }}
+            fontSize={{ base: "17px", lg: "17px" }}
             fontFamily="Eurostile"
             fontWeight="bold"
             color="green.1000"
@@ -282,158 +341,36 @@ function Index({ backClick, confirmClick }: IProps) {
           borderRadius="5px"
           justifyContent="center"
           alignItems="center"
-          cursor={inputValue === "" ? "no-drop" : "pointer"}
-          w={{ base: px2vw(118), lg: "160px" }}
-          h={{ base: px2vw(40), lg: "50px" }}
-          bgColor={inputValue === "" ? "gray.800" : "green.1000"}
-          borderColor={inputValue === "" ? "gray.800" : "green.1000"}
+          cursor="pointer"
+          w={{ base: "160px", lg: "160px" }}
+          h={{ base: "50px", lg: "50px" }}
+          bgColor="green.1000"
+          borderColor="green.1000"
           onClick={() => {
-            if (inputValue !== "") {
-              confirmClick(inputValue, gmfPrice);
+            if (isConnected) {
+              confirmClick(connectedAddress);
+            } else {
+              connectMetamask();
             }
           }}
         >
           <Text
-            mt={{ base: px2vw(5), lg: "5px" }}
-            fontSize={{ base: px2vw(17), lg: "17px" }}
+            fontSize={
+              isConnected
+                ? { base: "15px", lg: "15px" }
+                : { base: "13px", lg: "13px" }
+            }
             fontFamily="Eurostile"
+            textAlign="center"
+            lineHeight="18px"
             fontWeight="bold"
-            color={inputValue === "" ? "gray.700" : "black.1600"}
+            color="black.1600"
           >
-            CONFIRM
+            {isConnected ? "CONTINUE" : "CONNECT METAMASK"}
           </Text>
         </Flex>
       </Flex>
     </Flex>
-    // <Flex
-    //   minH={{ base: "auto", lg: "486px" }}
-    //   flexDir={{ base: "column", lg: "row" }}
-    //   bgColor={{ base: "transparent", lg: "black.300" }}
-    //   pb={{ base: px2vw(148), lg: 0 }}
-    //   borderRadius="6px"
-    //   overflow={"hidden"}
-    // >
-    //   <Flex
-    //     w={{ base: "full", lg: "30%" }}
-    //     flexDir="column"
-    //     p={{ base: 0, lg: "20px" }}
-    //     mt={{ base: px2vw(20), lg: 0 }}
-    //   >
-    //     <Text
-    //       fontFamily="Orbitron"
-    //       color="white.100"
-    //       textStyle="18"
-    //       fontWeight="600"
-    //       mb={{ base: px2vw(20), lg: "20px" }}
-    //       lineHeight={{ base: px2vw(23), lg: "23px" }}
-    //     >
-    //       Total amount
-    //     </Text>
-    //     {paymentMethod === 1 || paymentMethod === 2 ? (
-    //       <GamiflyWallet
-    //         price={0}
-    //         buttonLoading={loading}
-    //         buttonText="Deposit"
-    //         loadingText="Deposit"
-    //         unit="GMF"
-    //       />
-    //     ) : (
-    //       <CryptoWallet
-    //         buttonLoading={loading}
-    //         nativePrice={inputValue}
-    //         otherPrice={21.3}
-    //         nativeUnit="USDC"
-    //         otherUnit="TRX"
-    //         buttonText="Deposit"
-    //         loadingText="Deposit"
-    //         isInput
-    //         inputValueChange={(val) => setInputValue(val)}
-    //         buyClick={() => {
-    //           setLoading.on();
-    //           recharge(
-    //             library,
-    //             String(account || globalAccount),
-    //             token,
-    //             userInfo,
-    //             inputValue,
-    //             (res: string) => setHash(res)
-    //           );
-    //         }}
-    //       />
-    //     )}
-    //   </Flex>
-    //   <Flex
-    //     flexDir="column"
-    //     display={{ base: "flex", lg: "none" }}
-    //     h={px2vw(148)}
-    //     p={px2vw(15)}
-    //     w="full"
-    //     boxSizing="border-box"
-    //     bgColor="black.1200"
-    //     color="white.100"
-    //     pos="fixed"
-    //     borderTopLeftRadius="6px"
-    //     borderTopRightRadius="6px"
-    //     bottom={0}
-    //     left={0}
-    //     zIndex={1}
-    //   >
-    //     {/* price */}
-    //     <Flex
-    //       w="full"
-    //       h={px2vw(20)}
-    //       justifyContent="space-between"
-    //       mb={px2vw(15)}
-    //     >
-    //       <Text
-    //         fontFamily="Nunito"
-    //         fontWeight="600"
-    //         textStyle="16"
-    //         lineHeight={px2vw(20)}
-    //       >
-    //         Total amount:
-    //       </Text>
-    //       <Flex>
-    //         <Image
-    //           src={messageIcon}
-    //           w={px2vw(20)}
-    //           h={px2vw(20)}
-    //           mr={px2vw(8)}
-    //         />
-    //         <Text
-    //           fontFamily="Orbitron"
-    //           fontWeight="400"
-    //           textStyle="16"
-    //           color="green.100"
-    //           lineHeight={px2vw(20)}
-    //         >
-    //           {inputValue}
-    //         </Text>
-    //       </Flex>
-    //     </Flex>
-    //     <BaseButton
-    //       fontFamily="Nunito"
-    //       textStyle="16"
-    //       w="full"
-    //       loadingText="Deposit"
-    //       isLoading={loading}
-    //       onClick={() => {
-    //         setLoading.on();
-    //         recharge(
-    //           library,
-    //           String(account || globalAccount),
-    //           token,
-    //           userInfo,
-    //           inputValue,
-    //           (res: string) => setHash(res),
-    //           () => setLoading.off()
-    //         );
-    //       }}
-    //     >
-    //       Deposit
-    //     </BaseButton>
-    //   </Flex>
-    // </Flex>
   );
 }
 
