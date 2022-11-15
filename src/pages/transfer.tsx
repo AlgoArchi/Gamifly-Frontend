@@ -47,7 +47,7 @@ function App() {
         isClosable: true,
       });
     }
-  }, []);
+  }, [userInfo?.access_token]);
 
   const contentDeposit = useMemo(() => {
     return (

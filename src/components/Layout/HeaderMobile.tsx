@@ -29,11 +29,61 @@ import { deleteStore, getStore, setStore } from "@/utils/storage";
 import { connectorLocalStorageKey } from "@/connect/connectors";
 import globalStore from "@/stores/global";
 import copyFunction from "copy-to-clipboard";
-import { pageItem, pageList } from "./Header";
+import menuGame from "@/assets/imgs/menuGame.png";
+import menuNFT from "@/assets/imgs/menuNFT.png";
+import menuTou from "@/assets/imgs/menuTou.png";
+import menuWithdraw from "@/assets/imgs/menuWithdraw.png";
 
 export interface IProps {
   loginOutClick: () => void;
 }
+
+export interface pageItem {
+  name: string;
+  path: string;
+  icon?: string;
+}
+// 页面数组
+export const pageList: pageItem[] = [
+  {
+    name: "GAMES",
+    icon: menuGame,
+    path: "/games",
+  },
+  {
+    name: "NFT",
+    icon: menuNFT,
+    path: "/purchase",
+  },
+  {
+    name: "TOURNAMENTS",
+    icon: menuTou,
+    path: "/tournaments",
+  },
+  // {
+  //   name: "ABOUT US",
+  //   icon: menuAbout,
+  //   path: "",
+  // },
+  // {
+  //   name: "Leader boards",
+  //   path: "/leaderBoards",
+  // },
+  // {
+  //   name: "Notifications",
+  //   path: "/notifications",
+  // },
+  // {
+  //   name: "Gamifly info",
+  //   path: "/gamiflyInfo",
+  // },
+  {
+    name: "TOP UP & WITHDRAW",
+    icon: menuWithdraw,
+    path: "/transfer",
+  },
+];
+
 function Index({ loginOutClick }: IProps) {
   const router = useRouter();
   const toast = useToast();
@@ -123,7 +173,7 @@ function Index({ loginOutClick }: IProps) {
         my="auto"
         onClick={() => setOpen.on()}
       />
-      {/* 抽屉 */}
+      {/* Navbar */}
       <Flex
         display={open ? "flex" : "none"}
         w={px2vw(292)}
@@ -146,7 +196,7 @@ function Index({ loginOutClick }: IProps) {
           bottom="0"
           transform="rotate(180deg)"
         />
-        {/* 关闭按钮 */}
+        {/* Close*/}
         <Flex
           h={px2vw(90)}
           w="full"
@@ -163,7 +213,7 @@ function Index({ loginOutClick }: IProps) {
             onClick={() => setOpen.off()}
           />
         </Flex>
-        {/* 内容 */}
+        {/* Content */}
         <Flex
           px={px2vw(15)}
           pt={px2vw(35)}
@@ -175,7 +225,7 @@ function Index({ loginOutClick }: IProps) {
           fontFamily="Eurostile"
           fontWeight="bolder"
         >
-          {/* 上方内容 */}
+          {/* Content above */}
           <Flex
             w="full"
             flexDir="column"
@@ -209,7 +259,7 @@ function Index({ loginOutClick }: IProps) {
                 HOME
               </Text>
             </Flex>
-            {/* 页面 */}
+            {/* Page */}
             <Flex w="full" flexDir="column">
               {pageList.map((item: pageItem, index: number) => {
                 return (
@@ -342,7 +392,7 @@ function Index({ loginOutClick }: IProps) {
               </HStack>
             </Flex>
           </Flex>
-          {/* 邀请好友 */}
+          {/* Invite friends */}
           {isLogin && (
             <Flex
               w="full"
@@ -380,7 +430,7 @@ function Index({ loginOutClick }: IProps) {
               </Text>
             </Flex>
           )}
-          {/* 退出登录 */}
+          {/* Log in Button */}
           <Flex
             w="full"
             justifyContent="center"

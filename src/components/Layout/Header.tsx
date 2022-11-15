@@ -10,6 +10,7 @@ import {
   useBoolean,
 } from "@chakra-ui/react";
 import notificationIcon from "@/assets/imgs/notificationIcon.png";
+import transferIcon from "@/assets/imgs/transfer.webp";
 import close from "@/assets/imgs/greenClose.webp";
 import userProfile from "@/assets/imgs/userProfile.png";
 import buttonBg from "@/assets/imgs/buttonBg.png";
@@ -21,7 +22,6 @@ import logo from "@/assets/imgs/logo.png";
 import menuGame from "@/assets/imgs/menuGame.png";
 import menuNFT from "@/assets/imgs/menuNFT.png";
 import menuTou from "@/assets/imgs/menuTou.png";
-import menuWithdraw from "@/assets/imgs/menuWithdraw.png";
 // import menuAbout from "@/assets/imgs/menuAbout.png";
 import BaseButton from "../BaseButton";
 import styles from "./style.module.scss";
@@ -77,11 +77,11 @@ export const pageList: pageItem[] = [
   //   name: "Gamifly info",
   //   path: "/gamiflyInfo",
   // },
-  {
-    name: "TOP UP & WITHDRAW",
-    icon: menuWithdraw,
-    path: "/transfer",
-  },
+  // {
+  //   name: "TOP UP & WITHDRAW",
+  //   icon: menuWithdraw,
+  //   path: "/transfer",
+  // },
 ];
 
 function Index({ notificationList }: IProps) {
@@ -150,7 +150,7 @@ function Index({ notificationList }: IProps) {
         mx="auto"
       >
         {/* 左侧 */}
-        <Flex>
+        <Flex alignItems="center">
           <Image
             src={logo}
             w="163px"
@@ -159,7 +159,7 @@ function Index({ notificationList }: IProps) {
             cursor="pointer"
             onClick={() => router.push("/")}
           />
-          <HStack spacing="50px" pt="18px">
+          <HStack spacing="50px" alignItems="center">
             {pageList.map((item: pageItem, index: number) => {
               return (
                 <Text
@@ -314,6 +314,43 @@ function Index({ notificationList }: IProps) {
               Log In
             </BaseButton>
           )}
+
+          {isLogin && (
+            <BaseButton
+              px={{ base: "4px", lg: "4px" }}
+              ml={{ base: "11px", lg: "13px" }}
+              h="40px"
+              bgColor="green.1000"
+              borderRadius="12px"
+              boxShadow="none"
+              pos="relative"
+              _hover={{
+                boxShadow: "0px 2px 20px RGBA(203, 252, 98, 0.28)",
+              }}
+              _active={{
+                boxShadow: "0px 2px 20px RGBA(203, 252, 98, 0.28)",
+              }}
+              onClick={() => router.push("/transfer")}
+            >
+              <Image
+                filter="brightness(100) invert(1)"
+                w="20px"
+                h="20px"
+                mr={{ base: "2px", lg: "3px" }}
+                src={transferIcon}
+              />
+              <Text
+                fontFamily="Eurostile"
+                fontSize="15px"
+                lineHeight="13px"
+                fontWeight="1000"
+                color="black.100"
+              >
+                TOP UP & WITHDRAW
+              </Text>
+            </BaseButton>
+          )}
+
           {/* 头像 */}
           {isLogin && (
             <Image

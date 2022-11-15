@@ -17,7 +17,7 @@ function Index() {
   const { userInfo } = globalStore();
 
   useEffect(() => {
-    if (userInfo.access_token == "" || userInfo.access_token == null) {
+    if (userInfo?.access_token == "" || userInfo?.access_token == null) {
       router.push("/");
       toast({
         position: "top-right",
@@ -26,7 +26,7 @@ function Index() {
         isClosable: true,
       });
     }
-  }, []);
+  }, [userInfo?.access_token]);
   return (
     <Flex direction="column" w="full" pt={{ base: 0, lg: "150px" }}>
       <Image

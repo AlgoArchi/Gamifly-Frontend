@@ -449,6 +449,7 @@ function Index({ isSetMode = false, saveClick }: IProps) {
         {/* log out */}
         {isLogin && (
           <Flex
+            display={{ base: "none", lg: "flex" }}
             fontSize={{ base: px2vw(17), lg: "17px" }}
             h={{ base: px2vw(50), lg: "50px" }}
             lineHeight={{ base: px2vw(50), lg: "50px" }}
