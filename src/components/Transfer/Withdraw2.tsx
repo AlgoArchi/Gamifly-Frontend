@@ -79,6 +79,7 @@ function Index({ withdrawAddress, backClick, confirmClick }: IProps) {
 
   useEffect(() => {
     setGetNewPriceLoading.off();
+    // eslint-disable-next-line
   }, [gmfPrice]);
 
   useEffect(() => {
@@ -87,13 +88,16 @@ function Index({ withdrawAddress, backClick, confirmClick }: IProps) {
     } else {
       setAvailablePrice(true);
     }
+    // eslint-disable-next-line
   }, [inputValue]);
 
   useEffect(() => {
     if (getWithdrawableAmountData && getWithdrawableAmountData?.amount) {
       setWithdrawableAmount(getWithdrawableAmountData?.amount);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     } else {
       setWithdrawableAmount("0");
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }
   }, [getWithdrawableAmountData]);
 

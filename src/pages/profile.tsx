@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Flex, useBoolean, useToast, Image } from "@chakra-ui/react";
+import { Flex, useBoolean, Image } from "@chakra-ui/react";
 import ProfileInfo from "@/components/ProfileInfo";
 import ProfileData from "@/components/ProfileData";
 import ProfileNoLogin from "@/components/ProfileNoLogin";
@@ -11,22 +11,20 @@ import globalStore from "@/stores/global";
 
 function Index() {
   const router = useRouter();
-  const toast = useToast();
   const [isLogin] = useState(true);
   const [isSetMode, setIsSetMode] = useBoolean(false);
   const { userInfo } = globalStore();
 
   useEffect(() => {
-    if (userInfo?.access_token == "" || userInfo?.access_token == null) {
+    if (
+      window.location.href.indexOf("accessToken") === -1 &&
+      (userInfo?.access_token == "" || userInfo?.access_token == null)
+    ) {
       router.push("/");
-      toast({
-        position: "top-right",
-        title: "Please login first",
-        status: "success",
-        isClosable: true,
-      });
     }
+    // eslint-disable-next-line
   }, [userInfo?.access_token]);
+
   return (
     <Flex direction="column" w="full" pt={{ base: 0, lg: "150px" }}>
       <Image

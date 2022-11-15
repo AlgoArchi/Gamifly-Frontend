@@ -67,14 +67,18 @@ function Index({ connectedAddress, backClick, confirmClick }: IProps) {
       const usdcBalance =
         (await usdcContract.balanceOf(connectedAddress)) / 10 ** 6;
       console.log("USDC Balance", usdcBalance);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
 
       if (usdcBalance >= Number(inputValue)) {
         setIsBalance.on();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       } else {
         setIsBalance.off();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }
     };
     checkingBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue]);
 
   return (

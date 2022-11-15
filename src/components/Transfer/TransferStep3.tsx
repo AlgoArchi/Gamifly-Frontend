@@ -290,7 +290,6 @@ function Index({
             <Spinner />
           ) : (
             <Text
-              mt={{ base: px2vw(5), lg: "5px" }}
               fontSize={{ base: px2vw(17), lg: "17px" }}
               fontFamily="Eurostile"
               fontWeight="bold"
@@ -316,7 +315,6 @@ function Index({
           onClick={() => backClick(chooseType)}
         >
           <Text
-            mt={{ base: "5px", lg: "5px" }}
             fontSize={{ base: "17px", lg: "17px" }}
             fontFamily="Eurostile"
             fontWeight="bold"

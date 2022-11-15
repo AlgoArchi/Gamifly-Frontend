@@ -47,6 +47,7 @@ function App() {
         isClosable: true,
       });
     }
+    // eslint-disable-next-line
   }, [userInfo?.access_token]);
 
   const contentDeposit = useMemo(() => {

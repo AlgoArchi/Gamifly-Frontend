@@ -69,12 +69,13 @@ function Index({ backClick, confirmClick }: IProps) {
     } else {
       setIsConnected.off();
     }
+    // eslint-disable-next-line
   }, [account]);
 
   useEffect(() => {
     if (account) {
       setConnectedAddress(account);
-    }
+    } // eslint-disable-next-line
   }, [account]);
 
   return (

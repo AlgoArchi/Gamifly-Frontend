@@ -62,8 +62,10 @@ function Index({ backClick, confirmClick }: IProps) {
     if (ethers.utils.isAddress(inputValue)) {
       setIsAddress.on();
       confirmClick(inputValue);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     } else {
       setIsAddress.off();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }
   };
 
@@ -233,7 +235,6 @@ function Index({ backClick, confirmClick }: IProps) {
           onClick={() => backClick()}
         >
           <Text
-            mt={{ base: px2vw(5), lg: "5px" }}
             fontSize={{ base: px2vw(17), lg: "17px" }}
             fontFamily="Eurostile"
             fontWeight="bold"
@@ -260,7 +261,6 @@ function Index({ backClick, confirmClick }: IProps) {
           }}
         >
           <Text
-            mt={{ base: px2vw(5), lg: "5px" }}
             fontSize={{ base: px2vw(17), lg: "17px" }}
             fontFamily="Eurostile"
             fontWeight="bold"
@@ -271,111 +271,6 @@ function Index({ backClick, confirmClick }: IProps) {
         </Flex>
       </Flex>
     </Flex>
-    // <Flex
-    //   p={{ base: px2vw(20), lg: "20px" }}
-    //   flexDir="column"
-    //   w="full"
-    //   boxSizing="border-box"
-    //   bgColor="black.300"
-    //   borderRadius="6px"
-    //   overflow="hidden"
-    // >
-    //   <Text
-    //     fontFamily="Orbitron"
-    //     color="white.100"
-    //     textStyle="18"
-    //     fontWeight="600"
-    //     mb={{ base: px2vw(20), lg: "20px" }}
-    //     lineHeight={{ base: px2vw(23), lg: "23px" }}
-    //   >
-    //     Amount
-    //   </Text>
-    //   <CryptoWallet
-    //     isInput
-    //     withOutConversions
-    //     w={{ base: "full", lg: "314px" }}
-    //     nativePrice={inputValue}
-    //     buttonLoading={loading}
-    //     loadingText="Withdraw"
-    //     nativeUnit="USDC"
-    //     buttonText="Withdraw"
-    //     inputValueChange={(val: string) => setInputValue(val)}
-    //     buyClick={() => {
-    //       if (inputValue !== "" && !isNaN(Number(inputValue))) {
-    //         setLoading.on();
-    //         setWithdraw.on();
-    //       }
-    //       // success();
-    //     }}
-    //   />
-    //   {/* mobile buy */}
-    //   <Flex
-    //     flexDir="column"
-    //     display={{ base: "flex", lg: "none" }}
-    //     h={px2vw(148)}
-    //     p={px2vw(15)}
-    //     w="full"
-    //     boxSizing="border-box"
-    //     bgColor="black.1200"
-    //     color="white.100"
-    //     pos="fixed"
-    //     borderTopLeftRadius="6px"
-    //     borderTopRightRadius="6px"
-    //     bottom={0}
-    //     left={0}
-    //     zIndex={1}
-    //   >
-    //     {/* price */}
-    //     <Flex
-    //       w="full"
-    //       h={px2vw(20)}
-    //       justifyContent="space-between"
-    //       mb={px2vw(15)}
-    //     >
-    //       <Text
-    //         fontFamily="Nunito"
-    //         fontWeight="600"
-    //         textStyle="16"
-    //         lineHeight={px2vw(20)}
-    //       >
-    //         Total amount:
-    //       </Text>
-    //       <Flex>
-    //         <Image
-    //           src={messageIcon}
-    //           w={px2vw(20)}
-    //           h={px2vw(20)}
-    //           mr={px2vw(8)}
-    //         />
-    //         <Text
-    //           fontFamily="Orbitron"
-    //           fontWeight="400"
-    //           textStyle="16"
-    //           color="green.100"
-    //           lineHeight={px2vw(20)}
-    //         >
-    //           {inputValue}
-    //           USDC
-    //         </Text>
-    //       </Flex>
-    //     </Flex>
-    //     <BaseButton
-    //       isLoading={loading}
-    //       loadingText="Withdraw"
-    //       fontFamily="Nunito"
-    //       textStyle="16"
-    //       w="full"
-    //       onClick={() => {
-    //         if (inputValue !== "" && !isNaN(Number(inputValue))) {
-    //           setLoading.on();
-    //           setWithdraw.on();
-    //         }
-    //       }}
-    //     >
-    //       Withdraw
-    //     </BaseButton>
-    //   </Flex>
-    // </Flex>
   );
 }
 
